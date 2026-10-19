@@ -7,7 +7,8 @@ use App\Controller\{HomeController,
     ResetpasswordController,
     ContactController,
     MentionsController,
-    SitemapController};
+    SitemapController,
+    AssistantiaController};
 
 return [
     ['GET', '/', [HomeController::class, 'homeForm']],
@@ -24,4 +25,6 @@ return [
     ['GET', '/sitemap', [SitemapController::class, 'sitemapForm']],
     ['GET', '/contact', [ContactController::class, 'contactForm']],
     ['GET', '/mentions', [MentionsController::class, 'mentionsForm']],
+    ['GET', '/assistantia', [AssistantiaController::class, 'mathForm']],
+    ['POST', '/assistantia', [AssistantiaController::class, 'mathAction']],
 ];
