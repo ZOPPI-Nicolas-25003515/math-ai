@@ -1,0 +1,9 @@
+parameters:
+    level: 6
+    paths:
+        - app
+        - core
+        - public
+    excludePaths:
+        - vendor (?)
+        - tests (?)
