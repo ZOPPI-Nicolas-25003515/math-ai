@@ -1,8 +1,6 @@
 <?php
 $A_view = $A_view ?? [];
-$message = [];
 $errors = $A_view['errors'];
-$message = $A_view['message'];
 ?>
 
 <h1>Réinitialiser le mot de passe</h1>
@@ -10,9 +8,6 @@ $message = $A_view['message'];
 <?php
 if(!empty($errors)){?>
     <p style="color: red;"><?=htmlspecialchars($errors[0])?></p><?php
-}
-if(!empty($message)){?>
-    <p style="color: red;"><?=htmlspecialchars($message)?></p><?php
 }
 ?>
 
