@@ -43,7 +43,7 @@ final class ResetpasswordController
                 }
             }
         }
-        echo View::show('Resetpassword', array('errors' => $errors,'message' => $message, 'formData' => $_POST));
+        echo View::show('Resetpassword', array('errors' => $errors, 'formData' => $_POST));
     }
 
     public function resetpasswordForm(): void{
