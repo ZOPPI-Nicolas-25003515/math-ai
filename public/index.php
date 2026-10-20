@@ -8,7 +8,7 @@ use Core\Controller;
 use Core\Db;
 use App\Controller\{AnalyseiaController,
     AssistantiaController,
-    CoursiaController,
+    ClassiaController,
     ExerciceiaController,
     HomeController,
     LoginController,
@@ -34,7 +34,7 @@ $controllers = [
     AssistantiaController::class => fn() => new AssistantiaController(),
     AnalyseiaController::class => fn() => new AnalyseiaController(),
     ExerciceiaController::class => fn() => new ExerciceiaController(),
-    CoursiaController::class => fn() => new CoursiaController(),
+    ClassiaController::class => fn() => new ClassiaController(),
 ];
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';   // "/login?x=1" -> "/login"
