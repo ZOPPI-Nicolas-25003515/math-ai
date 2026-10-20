@@ -20,7 +20,7 @@ use PharIo\Manifest\ApplicationName;
 use PharIo\Manifest\Exception as ManifestException;
 use PharIo\Manifest\ManifestLoader;
 use PharIo\Version\Version as PharIoVersion;
-use PHPUnit\Event\Emitter;
+use PHPUnit\Event;
 use PHPUnit\Runner\Version;
 use SebastianBergmann\FileIterator\Facade as FileIteratorFacade;
 use Throwable;
@@ -32,13 +32,6 @@ use Throwable;
  */
 final readonly class PharLoader
 {
-    private Emitter $emitter;
-
-    public function __construct(Emitter $emitter)
-    {
-        $this->emitter = $emitter;
-    }
-
     /**
      * @param non-empty-string $directory
      *
@@ -51,7 +44,7 @@ final readonly class PharLoader
 
         foreach ((new FileIteratorFacade)->getFilesAsArray($directory, '.phar') as $file) {
             if (!$pharExtensionLoaded) {
-                $this->emitter->testRunnerTriggeredPhpunitWarning(
+                Event\Facade::emitter()->testRunnerTriggeredPhpunitWarning(
                     sprintf(
                         'Cannot load extension from %s because the PHAR extension is not available',
                         $file,
@@ -62,7 +55,7 @@ final readonly class PharLoader
             }
 
             if (!is_file('phar://' . $file . '/manifest.xml')) {
-                $this->emitter->testRunnerTriggeredPhpunitWarning(
+                Event\Facade::emitter()->testRunnerTriggeredPhpunitWarning(
                     sprintf(
                         '%s is not an extension for PHPUnit',
                         $file,
@@ -78,7 +71,7 @@ final readonly class PharLoader
                 $manifest        = ManifestLoader::fromFile('phar://' . $file . '/manifest.xml');
 
                 if (!$manifest->isExtensionFor($applicationName)) {
-                    $this->emitter->testRunnerTriggeredPhpunitWarning(
+                    Event\Facade::emitter()->testRunnerTriggeredPhpunitWarning(
                         sprintf(
                             '%s is not an extension for PHPUnit',
                             $file,
@@ -89,7 +82,7 @@ final readonly class PharLoader
                 }
 
                 if (!$manifest->isExtensionFor($applicationName, $version)) {
-                    $this->emitter->testRunnerTriggeredPhpunitWarning(
+                    Event\Facade::emitter()->testRunnerTriggeredPhpunitWarning(
                         sprintf(
                             '%s is not compatible with PHPUnit %s',
                             $file,
@@ -100,7 +93,7 @@ final readonly class PharLoader
                     continue;
                 }
             } catch (ManifestException $e) {
-                $this->emitter->testRunnerTriggeredPhpunitWarning(
+                Event\Facade::emitter()->testRunnerTriggeredPhpunitWarning(
                     sprintf(
                         'Cannot load extension from %s: %s',
                         $file,
@@ -114,7 +107,7 @@ final readonly class PharLoader
             try {
                 @require $file;
             } catch (Throwable $t) {
-                $this->emitter->testRunnerTriggeredPhpunitWarning(
+                Event\Facade::emitter()->testRunnerTriggeredPhpunitWarning(
                     sprintf(
                         'Cannot load extension from %s: %s',
                         $file,
@@ -125,27 +118,12 @@ final readonly class PharLoader
                 continue;
             }
 
-            $name    = $manifest->getName()->asString();
-            $version = $manifest->getVersion()->getVersionString();
+            $loadedExtensions[] = $manifest->getName()->asString() . ' ' . $manifest->getVersion()->getVersionString();
 
-            if ($name === '') {
-                // @codeCoverageIgnoreStart
-                $name = 'unknown';
-                // @codeCoverageIgnoreEnd
-            }
-
-            if ($version === '') {
-                // @codeCoverageIgnoreStart
-                $version = 'unknown';
-                // @codeCoverageIgnoreEnd
-            }
-
-            $loadedExtensions[] = $name . ' ' . $version;
-
-            $this->emitter->testRunnerLoadedExtensionFromPhar(
+            Event\Facade::emitter()->testRunnerLoadedExtensionFromPhar(
                 $file,
-                $name,
-                $version,
+                $manifest->getName()->asString(),
+                $manifest->getVersion()->getVersionString(),
             );
         }
 

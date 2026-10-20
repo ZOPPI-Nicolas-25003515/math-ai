@@ -15,7 +15,7 @@ use function class_exists;
 use function class_implements;
 use function in_array;
 use function sprintf;
-use PHPUnit\Event\Emitter;
+use PHPUnit\Event\Facade as EventFacade;
 use PHPUnit\TextUI\Configuration\Configuration;
 use ReflectionClass;
 use Throwable;
@@ -29,13 +29,11 @@ final readonly class ExtensionBootstrapper
 {
     private Configuration $configuration;
     private Facade $facade;
-    private Emitter $emitter;
 
-    public function __construct(Configuration $configuration, Facade $facade, Emitter $emitter)
+    public function __construct(Configuration $configuration, Facade $facade)
     {
         $this->configuration = $configuration;
         $this->facade        = $facade;
-        $this->emitter       = $emitter;
     }
 
     /**
@@ -45,7 +43,7 @@ final readonly class ExtensionBootstrapper
     public function bootstrap(string $className, array $parameters): void
     {
         if (!class_exists($className)) {
-            $this->emitter->testRunnerTriggeredPhpunitWarning(
+            EventFacade::emitter()->testRunnerTriggeredPhpunitWarning(
                 sprintf(
                     'Cannot bootstrap extension because class %s does not exist',
                     $className,
@@ -56,7 +54,7 @@ final readonly class ExtensionBootstrapper
         }
 
         if (!in_array(Extension::class, class_implements($className), true)) {
-            $this->emitter->testRunnerTriggeredPhpunitWarning(
+            EventFacade::emitter()->testRunnerTriggeredPhpunitWarning(
                 sprintf(
                     'Cannot bootstrap extension because class %s does not implement interface %s',
                     $className,
@@ -68,7 +66,7 @@ final readonly class ExtensionBootstrapper
         }
 
         try {
-            $instance = new ReflectionClass($className)->newInstance();
+            $instance = (new ReflectionClass($className))->newInstance();
 
             assert($instance instanceof Extension);
 
@@ -78,7 +76,7 @@ final readonly class ExtensionBootstrapper
                 ParameterCollection::fromArray($parameters),
             );
         } catch (Throwable $t) {
-            $this->emitter->testRunnerTriggeredPhpunitWarning(
+            EventFacade::emitter()->testRunnerTriggeredPhpunitWarning(
                 sprintf(
                     'Bootstrapping of extension %s failed: %s%s%s',
                     $className,
@@ -91,7 +89,7 @@ final readonly class ExtensionBootstrapper
             return;
         }
 
-        $this->emitter->testRunnerBootstrappedExtension(
+        EventFacade::emitter()->testRunnerBootstrappedExtension(
             $className,
             $parameters,
         );

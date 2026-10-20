@@ -69,21 +69,11 @@ final class ExtensionSettings
             return self::$settings;
         }
 
-        self::$settings = self::settings($parameters);
+        self::$settings = [];
 
-        return self::$settings;
-    }
-
-    /**
-     * @param Closure(): list<string> $parameters
-     *
-     * @return list<non-empty-string>
-     */
-    private static function settings(Closure $parameters): array
-    {
         if (PHP_SAPI !== 'cli') {
             // @codeCoverageIgnoreStart
-            return [];
+            return self::$settings;
             // @codeCoverageIgnoreEnd
         }
 
@@ -92,7 +82,7 @@ final class ExtensionSettings
 
         if ($loadedInChildProcess === null) {
             // @codeCoverageIgnoreStart
-            return [];
+            return self::$settings;
             // @codeCoverageIgnoreEnd
         }
 
@@ -120,7 +110,7 @@ final class ExtensionSettings
                 continue;
             }
 
-            if (new ReflectionExtension($name)->isTemporary()) {
+            if ((new ReflectionExtension($name))->isTemporary()) {
                 continue;
             }
 
@@ -128,7 +118,7 @@ final class ExtensionSettings
         }
 
         if ($candidates === []) {
-            return [];
+            return self::$settings;
         }
 
         foreach (array_keys($candidates) as $setting) {
@@ -140,19 +130,17 @@ final class ExtensionSettings
 
         if ($loadedInChildProcess === null) {
             // @codeCoverageIgnoreStart
-            return [];
+            return self::$settings;
             // @codeCoverageIgnoreEnd
         }
 
-        $settings = [];
-
         foreach ($candidates as $setting => $name) {
             if (in_array($name, $loadedInChildProcess, true)) {
-                $settings[] = $setting;
+                self::$settings[] = $setting;
             }
         }
 
-        return $settings;
+        return self::$settings;
     }
 
     /**
@@ -180,7 +168,7 @@ final class ExtensionSettings
             $pipes,
         );
 
-        if (!is_resource($process) || !isset($pipes[1], $pipes[2])) {
+        if (!is_resource($process)) {
             // @codeCoverageIgnoreStart
             return null;
             // @codeCoverageIgnoreEnd

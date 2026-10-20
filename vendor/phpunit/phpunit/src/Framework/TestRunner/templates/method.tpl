@@ -1,17 +1,14 @@
 <?php declare(strict_types=1);
 use PHPUnit\Event\Facade;
-use PHPUnit\Framework\TestRunner\ChildProcessOutputCollector;
-use PHPUnit\Framework\TestRunner\ErrorHandlerBootstrapper;
+use PHPUnit\Runner\Baseline\CannotLoadBaselineException;
+use PHPUnit\Runner\Baseline\Reader;
 use PHPUnit\Runner\CodeCoverage;
-use PHPUnit\Runner\Extension\ChildProcessExtensionBootstrapper;
-use PHPUnit\Runner\Extension\ChildProcessExtensionFacade;
-use PHPUnit\Runner\Extension\PharLoader;
+use PHPUnit\Runner\ErrorHandler;
 use PHPUnit\TextUI\Configuration\Registry as ConfigurationRegistry;
 use PHPUnit\TextUI\Configuration\CodeCoverageFilterRegistry;
 use PHPUnit\TextUI\Configuration\PhpHandler;
 use PHPUnit\TextUI\Configuration\SourceMapper;
 use PHPUnit\TestRunner\TestResult\PassedTests;
-use PHPUnit\Util\DifferBuilder;
 
 // php://stdout does not obey output buffering. Any output would break
 // unserialization of child process results in the parent process.
@@ -56,45 +53,66 @@ function __phpunit_run_isolated_test()
         CodeCoverage::instance()->init($configuration, CodeCoverageFilterRegistry::instance(), true);
     }
 
-    ErrorHandlerBootstrapper::bootstrap($configuration);
+    $deprecationTriggers = [
+        'functions' => [],
+        'methods'   => [],
+    ];
 
-    // The extensions are bootstrapped after the event facade has been
-    // initialized for isolation, so that the subscribers they register
-    // receive the events of the test, and so that a failure to bootstrap one
-    // is reported to the main process along with these events.
-    $extensionBootstrapper = new ChildProcessExtensionBootstrapper(
-        $configuration,
-        new ChildProcessExtensionFacade($dispatcher),
-        Facade::emitter(),
-    );
+    foreach ($configuration->source()->deprecationTriggers()['functions'] as $function) {
+        $deprecationTriggers['functions'][] = $function;
+    }
 
-    if (!$configuration->noExtensions()) {
-        foreach ($configuration->extensionBootstrappers() as $bootstrapper) {
-            $extensionBootstrapper->bootstrap(
-                $bootstrapper['className'],
-                $bootstrapper['parameters'],
+    foreach ($configuration->source()->deprecationTriggers()['methods'] as $method) {
+        [$className, $methodName] = explode('::', $method);
+
+        $deprecationTriggers['methods'][] = [
+            'className'  => $className,
+            'methodName' => $methodName,
+        ];
+    }
+
+    ErrorHandler::instance()->useDeprecationTriggers($deprecationTriggers);
+
+    if (!$configuration->hasGenerateBaseline() && $configuration->source()->useBaseline()) {
+        try {
+            ErrorHandler::instance()->useBaseline(
+                (new Reader)->read($configuration->source()->baseline()),
             );
+        } catch (CannotLoadBaselineException) {
+            // The main process has already reported that the baseline cannot be loaded
         }
     }
 
     $test = new \{className}('{methodName}');
 
-    $test->setData({dataName}, unserialize('{data}'));
+    $test->setData('{dataName}', unserialize('{data}'));
     $test->setDependencyInput(unserialize('{dependencyInput}'));
-    $test->setRepetition({repetition}, {totalRepetitions});
-    $test->setAttempt({attempt}, {maxAttempts});
     $test->setInIsolation(true);
 
     ob_end_clean();
 
     $test->run();
 
-    // What an extension prints while it is shut down is not shown.
-    ob_start();
-    $extensionBootstrapper->shutdown();
-    ob_end_clean();
+    $output = '';
 
-    $output = ChildProcessOutputCollector::collect($test);
+    if (!$test->expectsOutput()) {
+        $output = $test->output();
+    }
+
+    ini_set('xdebug.scream', '0');
+
+    // Not every STDOUT target stream is rewindable
+    $hasRewound = @rewind(STDOUT);
+
+    if ($hasRewound && $stdout = @stream_get_contents(STDOUT)) {
+        $output         = $stdout . $output;
+        $streamMetaData = stream_get_meta_data(STDOUT);
+
+        if (!empty($streamMetaData['stream_type']) && 'STDIO' === $streamMetaData['stream_type']) {
+            @ftruncate(STDOUT, 0);
+            @rewind(STDOUT);
+        }
+    }
 
     $codeCoverage = null;
 
@@ -107,7 +125,6 @@ function __phpunit_run_isolated_test()
         '{processResultNonce}' . serialize(
             (object)[
                 'testResult'    => $test->result(),
-                'status'        => $test->status(),
                 'codeCoverage'  => $codeCoverage,
                 'numAssertions' => $test->numberOfAssertionsPerformed(),
                 'output'        => $output,
@@ -133,13 +150,11 @@ restore_error_handler();
 
 ConfigurationRegistry::loadFrom('{serializedConfiguration}');
 
-DifferBuilder::configureComparatorFactory();
-
 if ('{sourceMapFile}' !== '') {
     SourceMapper::loadFrom('{sourceMapFile}', ConfigurationRegistry::get()->source());
 }
 
-(new PhpHandler(Facade::emitter()))->handle(ConfigurationRegistry::get()->php());
+(new PhpHandler)->handle(ConfigurationRegistry::get()->php());
 
 if ('{bootstrap}' !== '') {
     require_once '{bootstrap}';
@@ -158,15 +173,6 @@ foreach (ConfigurationRegistry::get()->bootstrapForTestSuite() as $__phpunit_tes
     }
 
     require_once $__phpunit_bootstrapForTestSuite;
-}
-
-// The extensions in PHARs are loaded before the event facade is initialized
-// for isolation, so that the events that are emitted while they are loaded,
-// which the main process has emitted already, are not reported again.
-if (!ConfigurationRegistry::get()->noExtensions() && ConfigurationRegistry::get()->hasPharExtensionDirectory()) {
-    (new PharLoader(Facade::emitter()))->loadPharExtensionsInDirectory(
-        ConfigurationRegistry::get()->pharExtensionDirectory(),
-    );
 }
 
 __phpunit_run_isolated_test();

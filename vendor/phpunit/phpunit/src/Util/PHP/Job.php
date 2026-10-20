@@ -9,8 +9,6 @@
  */
 namespace PHPUnit\Util\PHP;
 
-use PHPUnit\Event\TestRunner\ChildProcessReason;
-
 /**
  * @immutable
  *
@@ -24,7 +22,6 @@ final readonly class Job
      * @var non-empty-string
      */
     private string $code;
-    private ChildProcessReason $reason;
 
     /**
      * @var list<string>
@@ -55,10 +52,9 @@ final readonly class Job
      * @param list<non-empty-string> $arguments
      * @param ?non-empty-string      $input
      */
-    public function __construct(string $code, ChildProcessReason $reason, array $phpSettings = [], array $environmentVariables = [], array $arguments = [], ?string $input = null, bool $redirectErrors = false, bool $requiresXdebug = false)
+    public function __construct(string $code, array $phpSettings = [], array $environmentVariables = [], array $arguments = [], ?string $input = null, bool $redirectErrors = false, bool $requiresXdebug = false)
     {
         $this->code                 = $code;
-        $this->reason               = $reason;
         $this->phpSettings          = $phpSettings;
         $this->environmentVariables = $environmentVariables;
         $this->arguments            = $arguments;
@@ -73,11 +69,6 @@ final readonly class Job
     public function code(): string
     {
         return $this->code;
-    }
-
-    public function reason(): ChildProcessReason
-    {
-        return $this->reason;
     }
 
     /**

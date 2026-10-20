@@ -11,16 +11,18 @@ namespace SebastianBergmann\FileIterator;
 
 use const DIRECTORY_SEPARATOR;
 use const GLOB_ONLYDIR;
+use function array_filter;
+use function array_map;
 use function array_merge;
 use function array_unique;
+use function array_values;
 use function glob;
 use function is_dir;
 use function is_string;
-use function ltrim;
 use function realpath;
 use function sort;
 use function str_ends_with;
-use function strpos;
+use function stripos;
 use function substr;
 use AppendIterator;
 use FilesystemIterator;
@@ -43,10 +45,28 @@ final class Factory
      */
     public function getFileIterator(array|string $paths, array|string $suffixes = '', array|string $prefixes = '', array $exclude = []): AppendIterator
     {
-        $paths    = $this->resolveWildcards($this->toList($paths));
-        $exclude  = $this->resolveWildcards($exclude);
-        $suffixes = $this->toList($suffixes);
-        $prefixes = $this->toList($prefixes);
+        if (is_string($paths)) {
+            $paths = [$paths];
+        }
+
+        $paths   = $this->resolveWildcards($paths);
+        $exclude = $this->resolveWildcards($exclude);
+
+        if (is_string($prefixes)) {
+            if ($prefixes !== '') {
+                $prefixes = [$prefixes];
+            } else {
+                $prefixes = [];
+            }
+        }
+
+        if (is_string($suffixes)) {
+            if ($suffixes !== '') {
+                $suffixes = [$suffixes];
+            } else {
+                $suffixes = [];
+            }
+        }
 
         $iterator = new AppendIterator;
 
@@ -63,10 +83,10 @@ final class Factory
 
             $iterator->append(
                 new Iterator(
+                    $path,
                     new RecursiveIteratorIterator(
                         new ExcludeIterator(
                             $directoryIterator,
-                            (string) realpath($path),
                             $exclude,
                         ),
                         RecursiveIteratorIterator::LEAVES_ONLY,
@@ -79,20 +99,6 @@ final class Factory
         }
 
         return $iterator;
-    }
-
-    /**
-     * @param list<non-empty-string>|string $value
-     *
-     * @return list<non-empty-string>
-     */
-    private function toList(array|string $value): array
-    {
-        if (!is_string($value)) {
-            return $value;
-        }
-
-        return $value === '' ? [] : [$value];
     }
 
     /**
@@ -123,33 +129,38 @@ final class Factory
      */
     private function resolveWildcards(array $paths): array
     {
-        $result = [];
+        $_paths = [[]];
 
         foreach ($paths as $path) {
-            $endsWithDirectorySeparator = str_ends_with($path, '/') || str_ends_with($path, DIRECTORY_SEPARATOR);
+            $pathEndsWithDirectorySeparator = str_ends_with($path, '/') || str_ends_with($path, DIRECTORY_SEPARATOR);
+            $locals                         = $this->globstar($path);
 
-            $matches = $this->globstar($path);
+            if ($locals !== []) {
+                $_paths[] = array_map(
+                    static function (string $local) use ($pathEndsWithDirectorySeparator): string|false
+                    {
+                        $realPath = realpath($local);
 
-            if ($matches === []) {
-                $matches = [$path];
-            }
+                        if ($realPath !== false && $pathEndsWithDirectorySeparator && is_dir($realPath)) {
+                            return $realPath . DIRECTORY_SEPARATOR;
+                        }
 
-            foreach ($matches as $match) {
-                $realPath = realpath($match);
+                        return $realPath;
+                    },
+                    $locals,
+                );
+            } else {
+                $realPath = realpath($path);
 
-                if ($realPath === false) {
-                    continue;
+                if ($realPath !== false && $pathEndsWithDirectorySeparator && is_dir($realPath)) {
+                    $_paths[] = [$realPath . DIRECTORY_SEPARATOR];
+                } else {
+                    $_paths[] = [$realPath];
                 }
-
-                if ($endsWithDirectorySeparator && is_dir($realPath)) {
-                    $realPath .= DIRECTORY_SEPARATOR;
-                }
-
-                $result[] = $realPath;
             }
         }
 
-        return $result;
+        return array_values(array_filter(array_merge(...$_paths)));
     }
 
     /**
@@ -159,28 +170,15 @@ final class Factory
      */
     private function globstar(string $pattern): array
     {
-        $position = strpos($pattern, '**');
-
-        if ($position === false) {
+        if (stripos($pattern, '**') === false) {
             $files = glob($pattern, GLOB_ONLYDIR);
-
-            if ($files === false) {
-                return []; // @codeCoverageIgnore
-            }
         } else {
-            // Everything before '**', including the directory separator that
-            // precedes it; empty when the pattern begins with '**'.
-            $rootPattern = substr($pattern, 0, $position);
-
-            // Everything after '**', beginning with a directory separator.
+            $position    = stripos($pattern, '**');
+            $rootPattern = substr($pattern, 0, $position - 1);
             $restPattern = substr($pattern, $position + 2);
 
-            // '**' also matches zero directories. $rootPattern already ends
-            // with a directory separator, so the leading one of $restPattern
-            // is dropped here.
-            $patterns = [$rootPattern . ltrim($restPattern, '/' . DIRECTORY_SEPARATOR)];
-
-            $rootPattern .= '*';
+            $patterns = [$rootPattern . $restPattern];
+            $rootPattern .= '/*';
 
             while ($directories = glob($rootPattern, GLOB_ONLYDIR)) {
                 $rootPattern .= '/*';
@@ -193,16 +191,20 @@ final class Factory
             $files = [];
 
             foreach ($patterns as $_pattern) {
-                $files[] = $this->globstar($_pattern);
+                $files = array_merge($files, $this->globstar($_pattern));
             }
-
-            $files = array_merge(...$files);
         }
 
-        $files = array_unique($files);
+        if ($files !== false) {
+            $files = array_unique($files);
 
-        sort($files);
+            sort($files);
 
-        return $files;
+            return $files;
+        }
+
+        // @codeCoverageIgnoreStart
+        return [];
+        // @codeCoverageIgnoreEnd
     }
 }

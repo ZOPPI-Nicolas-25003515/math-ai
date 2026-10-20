@@ -18,6 +18,7 @@ use function is_object;
 use function is_string;
 use function preg_match;
 use function preg_replace;
+use function str_contains;
 use function strlen;
 use function strpos;
 use function strtolower;
@@ -96,11 +97,7 @@ final class DoubledMethod
         if (is_string($docComment) &&
             preg_match('#\*[ \t]*+@deprecated[ \t]*+(.*?)\r?+\n[ \t]*+\*(?:[ \t]*+@|/$)#s', $docComment, $deprecation) > 0
         ) {
-            $deprecationText = preg_replace('#[ \t]*\r?\n[ \t]*+\*[ \t]*+#', ' ', $deprecation[1]);
-
-            assert($deprecationText !== null);
-
-            $deprecation = trim($deprecationText);
+            $deprecation = trim(preg_replace('#[ \t]*\r?\n[ \t]*+\*[ \t]*+#', ' ', $deprecation[1]));
         } else {
             $deprecation = null;
         }
@@ -181,7 +178,7 @@ final class DoubledMethod
             $templateFile = 'doubled_method.tpl';
         }
 
-        $deprecation  = '';
+        $deprecation  = $this->deprecation;
         $returnResult = '';
 
         if (!$this->returnType->isNever() && !$this->returnType->isVoid() && !$this->mustNotReturnValue()) {
@@ -209,7 +206,9 @@ EOT;
 
         $argumentsCount = 0;
 
-        if ($this->argumentsForCall !== '') {
+        if (str_contains($this->argumentsForCall, '...')) {
+            $argumentsCount = null;
+        } elseif ($this->argumentsForCall !== '') {
             $argumentsCount = substr_count($this->argumentsForCall, ',') + 1;
         }
 
@@ -286,11 +285,9 @@ EOT;
             /* Note: PHP extensions may use empty names for reference arguments
              * or "..." for methods taking a variable number of arguments.
              */
-            // @codeCoverageIgnoreStart
             if ($name === '$' || $name === '$...') {
                 $name = '$arg' . $i;
             }
-            // @codeCoverageIgnoreEnd
 
             $default         = '';
             $reference       = '';
@@ -335,11 +332,9 @@ EOT;
             /* Note: PHP extensions may use empty names for reference arguments
              * or "..." for methods taking a variable number of arguments.
              */
-            // @codeCoverageIgnoreStart
             if ($name === '$' || $name === '$...') {
                 $name = '$arg' . $i;
             }
-            // @codeCoverageIgnoreEnd
 
             if ($parameter->isVariadic()) {
                 continue;
@@ -369,36 +364,18 @@ EOT;
 
             $parameterAsString = $parameter->__toString();
 
-            $pos = strpos($parameterAsString, '<optional> ');
-
-            // a parameter that has a default value is always rendered as optional
-            // @codeCoverageIgnoreStart
-            if ($pos === false) {
-                return 'null';
-            }
-            // @codeCoverageIgnoreEnd
-
-            $parts = explode(
+            return explode(
                 ' = ',
                 substr(
                     substr(
                         $parameterAsString,
-                        $pos + strlen('<optional> '),
+                        strpos($parameterAsString, '<optional> ') + strlen('<optional> '),
                     ),
                     0,
                     -2,
                 ),
-            );
-
-            if (isset($parts[1])) {
-                return $parts[1];
-            }
-
-            // neither the fallback below nor the exception handling can be
-            // reached: a parameter that has a default value is always rendered
-            // together with that default value
+            )[1];
             // @codeCoverageIgnoreStart
-            return 'null';
         } catch (\ReflectionException $e) {
             throw new ReflectionException(
                 $e->getMessage(),

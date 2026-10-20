@@ -14,7 +14,7 @@ use function file_get_contents;
 use function file_put_contents;
 use function serialize;
 use function unserialize;
-use PHPUnit\Event\Emitter;
+use PHPUnit\Event\Facade as EventFacade;
 use PHPUnit\TextUI\CliArguments\Configuration as CliConfiguration;
 use PHPUnit\TextUI\CliArguments\Exception;
 use PHPUnit\TextUI\XmlConfiguration\Configuration as XmlConfiguration;
@@ -39,7 +39,7 @@ final class Registry
             serialize(self::get()),
         );
 
-        if ($result !== false) {
+        if ($result) {
             return true;
         }
 
@@ -61,7 +61,7 @@ final class Registry
 
         assert($buffer !== false);
 
-        $configuration = unserialize(
+        self::$instance = unserialize(
             $buffer,
             [
                 'allowed_classes' => [
@@ -79,8 +79,6 @@ final class Registry
                     File::class,
                     FilterDirectoryCollection::class,
                     FilterDirectory::class,
-                    FilterFileCollection::class,
-                    FilterFile::class,
                     TestDirectoryCollection::class,
                     TestDirectory::class,
                     TestFileCollection::class,
@@ -92,12 +90,6 @@ final class Registry
                 ],
             ],
         );
-
-        if (!$configuration instanceof Configuration) {
-            return;
-        }
-
-        self::$instance = $configuration;
     }
 
     public static function get(): Configuration
@@ -112,11 +104,11 @@ final class Registry
      * @throws Exception
      * @throws NoCustomCssFileException
      */
-    public static function init(CliConfiguration $cliConfiguration, XmlConfiguration $xmlConfiguration, Emitter $emitter): Configuration
+    public static function init(CliConfiguration $cliConfiguration, XmlConfiguration $xmlConfiguration): Configuration
     {
-        self::$instance = new Merger($emitter)->merge($cliConfiguration, $xmlConfiguration);
+        self::$instance = (new Merger)->merge($cliConfiguration, $xmlConfiguration);
 
-        $emitter->testRunnerConfigured(self::$instance);
+        EventFacade::emitter()->testRunnerConfigured(self::$instance);
 
         return self::$instance;
     }

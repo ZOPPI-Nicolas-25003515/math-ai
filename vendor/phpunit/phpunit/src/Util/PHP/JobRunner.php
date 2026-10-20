@@ -17,29 +17,31 @@ use function array_values;
 use function assert;
 use function count;
 use function explode;
+use function fclose;
 use function file_get_contents;
 use function file_put_contents;
 use function function_exists;
+use function fwrite;
 use function ini_get_all;
 use function is_array;
 use function is_file;
 use function is_resource;
-use function is_string;
-use function preg_match;
+use function proc_close;
 use function proc_open;
 use function sprintf;
 use function str_contains;
 use function str_replace;
 use function str_starts_with;
+use function stream_get_contents;
 use function sys_get_temp_dir;
 use function tempnam;
-use function tmpfile;
 use function trim;
 use function unlink;
 use function xdebug_is_debugger_active;
-use PHPUnit\Event\Emitter;
+use PHPUnit\Event\Facade;
+use PHPUnit\Event\Facade as EventFacade;
+use PHPUnit\Framework\ChildProcessResultProcessor;
 use PHPUnit\Framework\Test;
-use PHPUnit\Framework\TestRunner\ChildProcessResultProcessor;
 use PHPUnit\Runner\CodeCoverage;
 use SebastianBergmann\Environment\Runtime;
 
@@ -51,12 +53,10 @@ use SebastianBergmann\Environment\Runtime;
 final readonly class JobRunner
 {
     private ChildProcessResultProcessor $processor;
-    private Emitter $emitter;
 
-    public function __construct(ChildProcessResultProcessor $processor, Emitter $emitter)
+    public function __construct(ChildProcessResultProcessor $processor)
     {
         $this->processor = $processor;
-        $this->emitter   = $emitter;
     }
 
     /**
@@ -84,7 +84,7 @@ final readonly class JobRunner
             $processResultNonce,
         );
 
-        $this->emitter->childProcessFinished($job->reason(), $result->stdout(), $result->stderr());
+        EventFacade::emitter()->childProcessFinished($result->stdout(), $result->stderr());
     }
 
     /**
@@ -108,7 +108,6 @@ final readonly class JobRunner
 
             $job = new Job(
                 $job->input(),
-                $job->reason(),
                 $job->phpSettings(),
                 $job->environmentVariables(),
                 $job->arguments(),
@@ -120,39 +119,7 @@ final readonly class JobRunner
 
         assert($temporaryFile !== '');
 
-        $running = $this->startProcess($job, $temporaryFile);
-
-        $running->write($job->code());
-        $running->closeStdin();
-
-        return $running->wait();
-    }
-
-    /**
-     * Spawn the code of the given job as a long-running worker process whose
-     * standard input remains open as a control channel.
-     *
-     * The job's code is written to a temporary file that is executed by the
-     * worker process; in contrast to run(), the code is not piped through
-     * standard input, leaving it available for the caller to send subsequent
-     * commands to the worker.
-     *
-     * @throws PhpProcessException
-     */
-    public function start(Job $job): RunningJob
-    {
-        $temporaryFile = tempnam(sys_get_temp_dir(), 'phpunit_');
-
-        if ($temporaryFile === false ||
-            file_put_contents($temporaryFile, $job->code()) === false) {
-            // @codeCoverageIgnoreStart
-            throw new PhpProcessException(
-                'Unable to write temporary file',
-            );
-            // @codeCoverageIgnoreEnd
-        }
-
-        return $this->startProcess($job, $temporaryFile);
+        return $this->runProcess($job, $temporaryFile);
     }
 
     /**
@@ -160,55 +127,35 @@ final readonly class JobRunner
      *
      * @throws PhpProcessException
      */
-    private function startProcess(Job $job, ?string $temporaryFile): RunningJob
+    private function runProcess(Job $job, ?string $temporaryFile): Result
     {
         $environmentVariables = null;
 
         if ($job->hasEnvironmentVariables()) {
             /** @phpstan-ignore nullCoalesce.variable */
-            $serverVariables = $_SERVER ?? [];
+            $environmentVariables = $_SERVER ?? [];
 
-            unset($serverVariables['argv'], $serverVariables['argc']);
-
-            $environmentVariables = [];
-
-            foreach ($serverVariables as $key => $value) {
-                if (!is_string($key)) {
-                    continue;
-                }
-
-                if (is_array($value)) {
-                    continue;
-                }
-
-                $environmentVariables[$key] = $value;
-            }
+            unset($environmentVariables['argv'], $environmentVariables['argc']);
 
             $environmentVariables = array_merge($environmentVariables, $job->environmentVariables());
-        }
 
-        $mergedOutputStream = null;
-
-        if ($job->redirectErrors()) {
-            $mergedOutputStream = tmpfile();
-
-            if ($mergedOutputStream === false) {
-                // @codeCoverageIgnoreStart
-                throw new PhpProcessException('Unable to create temporary file for redirected output');
-                // @codeCoverageIgnoreEnd
+            foreach ($environmentVariables as $key => $value) {
+                if (is_array($value)) {
+                    unset($environmentVariables[$key]);
+                }
             }
 
-            $pipeSpec = [
-                0 => ['pipe', 'r'],
-                1 => $mergedOutputStream,
-                2 => $mergedOutputStream,
-            ];
-        } else {
-            $pipeSpec = [
-                0 => ['pipe', 'r'],
-                1 => ['pipe', 'w'],
-                2 => ['pipe', 'w'],
-            ];
+            unset($key, $value);
+        }
+
+        $pipeSpec = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ];
+
+        if ($job->redirectErrors()) {
+            $pipeSpec[2] = ['redirect', 1];
         }
 
         $process = proc_open(
@@ -227,9 +174,36 @@ final readonly class JobRunner
             // @codeCoverageIgnoreEnd
         }
 
-        $this->emitter->childProcessStarted($job->reason());
+        Facade::emitter()->childProcessStarted();
 
-        return new RunningJob($process, $pipes, $mergedOutputStream, $temporaryFile);
+        fwrite($pipes[0], $job->code());
+        fclose($pipes[0]);
+
+        $stdout = '';
+        $stderr = '';
+
+        if (isset($pipes[1])) {
+            $stdout = stream_get_contents($pipes[1]);
+
+            fclose($pipes[1]);
+        }
+
+        if (isset($pipes[2])) {
+            $stderr = stream_get_contents($pipes[2]);
+
+            fclose($pipes[2]);
+        }
+
+        proc_close($process);
+
+        if ($temporaryFile !== null) {
+            unlink($temporaryFile);
+        }
+
+        assert($stdout !== false);
+        assert($stderr !== false);
+
+        return new Result($stdout, $stderr);
     }
 
     /**
@@ -305,13 +279,11 @@ final readonly class JobRunner
         $command = array_merge($command, $this->settingsToParameters(array_values($phpSettings)));
 
         if (PHP_SAPI === 'phpdbg') {
-            // @codeCoverageIgnoreStart
             $command[] = '-qrr';
 
             if ($file === null) {
                 $command[] = 's=';
             }
-            // @codeCoverageIgnoreEnd
         }
 
         if ($file !== null) {
@@ -387,12 +359,10 @@ final readonly class JobRunner
      * controlled sequence of directives.
      *
      * Otherwise quotes the value portion only when it contains characters
-     * PHP's INI parser would interpret as metacharacters: `;` starts a
+     * PHP's INI parser would interpret as metacharacters (`;` starts a
      * comment, `"` is a string delimiter, `=` is the assignment operator
-     * that would otherwise be parsed as starting a new directive, `$` starts
-     * `${...}` variable interpolation, and `{}|&~![()^]` are operators in
-     * unquoted values (a Windows short path such as `C:\Users\RUNNER~1`
-     * would otherwise trigger `PHP: syntax error, unexpected '~'`).
+     * that would otherwise be parsed as starting a new directive and
+     * trigger `PHP: syntax error, unexpected '='`).
      *
      * Quoting is avoided for plain values so that boolean keywords such as
      * `On` / `Off` keep their special INI semantics; wrapping them in quotes
@@ -420,12 +390,10 @@ final readonly class JobRunner
             );
         }
 
-        if (preg_match('/[;"=${}|&~!\[()^\]]/', $value) !== 1) {
+        if (!str_contains($value, ';') && !str_contains($value, '"') && !str_contains($value, '=')) {
             return $setting;
         }
 
-        // Inside a double-quoted INI value, \\ collapses to \ and \" to ",
-        // so both characters must be escaped to survive the round-trip
-        return $name . '="' . str_replace(['\\', '"'], ['\\\\', '\\"'], $value) . '"';
+        return $name . '="' . str_replace('"', '\\"', $value) . '"';
     }
 }

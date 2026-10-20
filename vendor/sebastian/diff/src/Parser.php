@@ -35,11 +35,9 @@ final class Parser
     {
         $lines = preg_split(self::LINE_BREAK, $string);
 
-        if ($lines === false) {
-            return [];
-        }
-
-        if ($lines !== [] && $lines[count($lines) - 1] === '') {
+        if ($lines !== false &&
+            $lines !== [] &&
+            $lines[count($lines) - 1] === '') {
             array_pop($lines);
         }
 
@@ -51,18 +49,11 @@ final class Parser
         $toLinesLeft   = 0;
 
         for ($i = 0; $i < $lineCount; $i++) {
-            if (!isset($lines[$i])) {
-                continue;
-            }
-
-            $line     = $lines[$i];
-            $nextLine = $lines[$i + 1] ?? null;
-
             if ($fromLinesLeft > 0 || $toLinesLeft > 0) {
-                $marker = $line === '' ? ' ' : $line[0];
+                $marker = $lines[$i] === '' ? ' ' : $lines[$i][0];
 
                 if ($marker === ' ' || $marker === '+' || $marker === '-' || $marker === '\\') {
-                    $collected[] = $line;
+                    $collected[] = $lines[$i];
 
                     if ($marker !== '+' && $marker !== '\\') {
                         $fromLinesLeft--;
@@ -79,18 +70,17 @@ final class Parser
                 $toLinesLeft   = 0;
             }
 
-            if (preg_match(self::CHUNK_HEADER, $line, $chunkMatch, PREG_UNMATCHED_AS_NULL) === 1) {
+            if (preg_match(self::CHUNK_HEADER, $lines[$i], $chunkMatch, PREG_UNMATCHED_AS_NULL)) {
                 $fromLinesLeft = isset($chunkMatch['startrange']) ? max(0, (int) $chunkMatch['startrange']) : 1;
                 $toLinesLeft   = isset($chunkMatch['endrange']) ? max(0, (int) $chunkMatch['endrange']) : 1;
 
-                $collected[] = $line;
+                $collected[] = $lines[$i];
 
                 continue;
             }
 
-            if ($nextLine !== null &&
-                preg_match(self::FROM_FILE_HEADER, $line, $fromMatch) === 1 &&
-                preg_match(self::TO_FILE_HEADER, $nextLine, $toMatch) === 1) {
+            if (preg_match(self::FROM_FILE_HEADER, $lines[$i], $fromMatch) &&
+                preg_match(self::TO_FILE_HEADER, $lines[$i + 1], $toMatch)) {
                 if ($diff !== null) {
                     $this->parseFileDiff($diff, $collected);
 
@@ -101,15 +91,13 @@ final class Parser
                 $diff = new Diff($fromMatch['file'], $toMatch['file']);
 
                 $i++;
+            } else {
+                if (preg_match(self::METADATA_HEADER, $lines[$i])) {
+                    continue;
+                }
 
-                continue;
+                $collected[] = $lines[$i];
             }
-
-            if (preg_match(self::METADATA_HEADER, $line) === 1) {
-                continue;
-            }
-
-            $collected[] = $line;
         }
 
         if ($diff !== null && $collected !== []) {
@@ -131,7 +119,7 @@ final class Parser
         $diffLines = [];
 
         foreach ($lines as $line) {
-            if (preg_match(self::CHUNK_HEADER, $line, $match, PREG_UNMATCHED_AS_NULL) === 1) {
+            if (preg_match(self::CHUNK_HEADER, $line, $match, PREG_UNMATCHED_AS_NULL)) {
                 $chunk = new Chunk(
                     (int) $match['start'],
                     isset($match['startrange']) ? max(0, (int) $match['startrange']) : 1,
@@ -145,7 +133,7 @@ final class Parser
                 continue;
             }
 
-            if (preg_match(self::CHUNK_LINE, $line, $match) === 1) {
+            if (preg_match(self::CHUNK_LINE, $line, $match)) {
                 $type = Line::UNCHANGED;
 
                 if ($match['type'] === '+') {

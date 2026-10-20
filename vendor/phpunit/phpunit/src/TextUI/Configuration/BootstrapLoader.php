@@ -13,7 +13,7 @@ use const PHP_EOL;
 use function in_array;
 use function is_readable;
 use function sprintf;
-use PHPUnit\Event\Emitter;
+use PHPUnit\Event\Facade as EventFacade;
 use Throwable;
 
 /**
@@ -23,13 +23,6 @@ use Throwable;
  */
 final class BootstrapLoader
 {
-    private readonly Emitter $emitter;
-
-    public function __construct(Emitter $emitter)
-    {
-        $this->emitter = $emitter;
-    }
-
     /**
      * @throws BootstrapScriptDoesNotExistException
      * @throws BootstrapScriptException
@@ -76,7 +69,7 @@ final class BootstrapLoader
                 $t->getTraceAsString(),
             );
 
-            while (($t = $t->getPrevious()) !== null) {
+            while ($t = $t->getPrevious()) {
                 $message .= sprintf(
                     '%s%sPrevious error: %s:%s%s%s%s',
                     PHP_EOL,
@@ -92,6 +85,6 @@ final class BootstrapLoader
             throw new BootstrapScriptException($message);
         }
 
-        $this->emitter->testRunnerBootstrapFinished($filename);
+        EventFacade::emitter()->testRunnerBootstrapFinished($filename);
     }
 }

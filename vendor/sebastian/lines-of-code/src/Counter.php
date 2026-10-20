@@ -38,7 +38,7 @@ final class Counter
     {
         $linesOfCode = substr_count($source, "\n");
 
-        if ($linesOfCode === 0) {
+        if ($linesOfCode === 0 && $source !== '') {
             $linesOfCode = 1;
         }
 
@@ -60,8 +60,8 @@ final class Counter
     }
 
     /**
-     * @param positive-int $linesOfCode
-     * @param Node[]       $nodes
+     * @param non-negative-int $linesOfCode
+     * @param Node[]           $nodes
      *
      * @throws RuntimeException
      */

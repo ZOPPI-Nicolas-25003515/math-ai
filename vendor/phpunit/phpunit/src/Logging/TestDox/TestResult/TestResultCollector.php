@@ -79,7 +79,7 @@ final class TestResultCollector
             $testsByDeclaringClass = [];
 
             foreach ($tests as $test) {
-                $declaringClassName = new ReflectionMethod($test->test()->className(), $test->test()->methodName())->getDeclaringClass()->getName();
+                $declaringClassName = (new ReflectionMethod($test->test()->className(), $test->test()->methodName()))->getDeclaringClass()->getName();
 
                 if (!isset($testsByDeclaringClass[$declaringClassName])) {
                     $testsByDeclaringClass[$declaringClassName] = [];
@@ -106,7 +106,15 @@ final class TestResultCollector
                  */
                 static function (string $a, string $b): int
                 {
-                    return is_subclass_of($a, $b) <=> is_subclass_of($b, $a);
+                    if (is_subclass_of($b, $a)) {
+                        return -1;
+                    }
+
+                    if (is_subclass_of($a, $b)) {
+                        return 1;
+                    }
+
+                    return 0;
                 },
             );
 
@@ -123,14 +131,9 @@ final class TestResultCollector
             $result,
             static function (TestResultCollection $a, TestResultCollection $b): int
             {
-                $aList = $a->asArray();
-                $bList = $b->asArray();
-
-                assert($aList !== [] && $bList !== []);
-
                 return strnatcasecmp(
-                    $aList[0]->test()->testDox()->prettifiedClassName(),
-                    $bList[0]->test()->testDox()->prettifiedClassName(),
+                    $a->asArray()[0]->test()->testDox()->prettifiedClassName(),
+                    $b->asArray()[0]->test()->testDox()->prettifiedClassName(),
                 );
             },
         );
@@ -418,8 +421,6 @@ final class TestResultCollector
 
     private function process(TestMethod $test): void
     {
-        assert($this->status !== null);
-
         $this->record($test, $this->status, $this->throwable);
     }
 

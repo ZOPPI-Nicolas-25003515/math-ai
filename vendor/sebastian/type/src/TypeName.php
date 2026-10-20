@@ -9,8 +9,10 @@
  */
 namespace SebastianBergmann\Type;
 
+use function array_pop;
 use function assert;
-use function strrpos;
+use function explode;
+use function implode;
 use function substr;
 use ReflectionClass;
 
@@ -27,11 +29,6 @@ final readonly class TypeName
     private string $simpleName;
 
     /**
-     * @var non-empty-string
-     */
-    private string $qualifiedName;
-
-    /**
      * @param class-string $fullClassName
      */
     public static function fromQualifiedName(string $fullClassName): self
@@ -40,23 +37,18 @@ final readonly class TypeName
             $fullClassName = substr($fullClassName, 1);
         }
 
-        $position = strrpos($fullClassName, '\\');
+        $classNameParts = explode('\\', $fullClassName);
 
-        if ($position === false) {
-            assert($fullClassName !== '');
-
-            return new self(null, $fullClassName);
-        }
-
-        $simpleName = substr($fullClassName, $position + 1);
+        $simpleName    = array_pop($classNameParts);
+        $namespaceName = implode('\\', $classNameParts);
 
         assert($simpleName !== '');
 
-        return new self(substr($fullClassName, 0, $position), $simpleName);
+        return new self($namespaceName, $simpleName);
     }
 
     /**
-     * @param ReflectionClass<*> $type
+     * @param ReflectionClass<object> $type
      */
     public static function fromReflection(ReflectionClass $type): self
     {
@@ -81,7 +73,6 @@ final readonly class TypeName
 
         $this->namespaceName = $namespaceName;
         $this->simpleName    = $simpleName;
-        $this->qualifiedName = $namespaceName === null ? $simpleName : $namespaceName . '\\' . $simpleName;
     }
 
     public function namespaceName(): ?string
@@ -102,7 +93,9 @@ final readonly class TypeName
      */
     public function qualifiedName(): string
     {
-        return $this->qualifiedName;
+        return $this->namespaceName === null
+             ? $this->simpleName
+             : $this->namespaceName . '\\' . $this->simpleName;
     }
 
     public function isNamespaced(): bool

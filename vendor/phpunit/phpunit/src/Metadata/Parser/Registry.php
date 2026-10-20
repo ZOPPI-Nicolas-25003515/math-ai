@@ -9,8 +9,6 @@
  */
 namespace PHPUnit\Metadata\Parser;
 
-use PHPUnit\Event\Facade as EventFacade;
-
 /**
  * Attribute information is static within a single PHP process.
  * It is therefore okay to use a Singleton registry here.
@@ -30,6 +28,6 @@ final class Registry
 
     private static function build(): Parser
     {
-        return new CachingParser(new AttributeParser(EventFacade::emitter()));
+        return new CachingParser(new AttributeParser);
     }
 }

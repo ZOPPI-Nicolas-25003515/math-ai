@@ -30,21 +30,19 @@ abstract class Type
             }
         }
 
+        $typeName = gettype($value);
+
         if (is_object($value)) {
             return new ObjectType(TypeName::fromQualifiedName($value::class), $allowsNull);
         }
 
-        /*
-         * For a value that is not an object, gettype() only returns "NULL" or
-         * one of the type names that map to SimpleType.
-         */
-        $typeName = gettype($value);
+        $type = self::fromName($typeName, $allowsNull);
 
-        if ($typeName === 'NULL') {
-            return new NullType;
+        if ($type instanceof SimpleType) {
+            $type = new SimpleType($typeName, $allowsNull, $value);
         }
 
-        return new SimpleType($typeName, $allowsNull, $value);
+        return $type;
     }
 
     /**

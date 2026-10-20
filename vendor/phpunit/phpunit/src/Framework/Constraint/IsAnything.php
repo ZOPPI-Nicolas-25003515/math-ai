@@ -46,12 +46,4 @@ final class IsAnything extends Constraint
     {
         return 0;
     }
-
-    /**
-     * Returns the negated string representation of the constraint.
-     */
-    protected function negatedToString(): string
-    {
-        return 'is not anything';
-    }
 }

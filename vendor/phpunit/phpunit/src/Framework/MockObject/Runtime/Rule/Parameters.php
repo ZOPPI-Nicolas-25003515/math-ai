@@ -11,10 +11,8 @@ namespace PHPUnit\Framework\MockObject\Rule;
 
 use function array_diff_key;
 use function array_is_list;
-use function assert;
 use function count;
 use function is_int;
-use function is_string;
 use function method_exists;
 use function sprintf;
 use Exception;
@@ -25,7 +23,6 @@ use PHPUnit\Framework\Constraint\IsEqual;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\MockObject\Invocation as BaseInvocation;
 use PHPUnit\Util\Test;
-use ReflectionException;
 use ReflectionMethod;
 
 /**
@@ -41,7 +38,6 @@ final class Parameters implements ParametersRule
     private array $parameters           = [];
     private ?BaseInvocation $invocation = null;
     private null|bool|ExpectationFailedException $parameterVerificationResult;
-    private bool $useAssertionCount = true;
 
     /**
      * @param array<int|string, mixed> $parameters
@@ -90,11 +86,6 @@ final class Parameters implements ParametersRule
         $this->doVerify();
     }
 
-    public function useAssertionCount(bool $useAssertionCount): void
-    {
-        $this->useAssertionCount = $useAssertionCount;
-    }
-
     /**
      * @throws ExpectationFailedException
      */
@@ -108,11 +99,10 @@ final class Parameters implements ParametersRule
             throw new ExpectationFailedException('Doubled method does not exist.');
         }
 
-        $invocation           = $this->invocation;
-        $invocationParameters = $invocation->parameters();
-        $constraints          = $this->resolveNamedParameters($invocation);
+        $invocationParameters = $this->invocation->parameters();
+        $parameters           = $this->resolveNamedParameters($this->invocation);
 
-        if (array_diff_key($constraints, $invocationParameters) !== []) {
+        if (array_diff_key($parameters, $invocationParameters) !== []) {
             $message = 'Parameter count for invocation %s is too low.';
 
             // The user called `->with($this->anything())`, but may have meant
@@ -128,27 +118,15 @@ final class Parameters implements ParametersRule
             $this->incrementAssertionCount();
 
             throw new ExpectationFailedException(
-                sprintf($message, $invocation->toString()),
+                sprintf($message, $this->invocation->toString()),
             );
         }
 
-        $parameters = $this->parameters($invocation);
-
-        foreach ($constraints as $i => $parameter) {
-            $other = null;
-
+        foreach ($parameters as $i => $parameter) {
             if ($parameter instanceof Callback && $parameter->isVariadic()) {
                 $other = $invocationParameters;
-            } elseif (isset($invocationParameters[$i])) {
-                $other = $invocationParameters[$i];
-            }
-
-            if (isset($parameters[$i])) {
-                $parameterName = $parameters[$i];
-            } elseif (is_string($i)) {
-                $parameterName = '$' . $i;
             } else {
-                $parameterName = (string) $i;
+                $other = $invocationParameters[$i];
             }
 
             $this->incrementAssertionCount();
@@ -157,8 +135,8 @@ final class Parameters implements ParametersRule
                 $other,
                 sprintf(
                     'Parameter %s for invocation %s does not match expected value.',
-                    $parameterName,
-                    $invocation->toString(),
+                    $i,
+                    $this->invocation->toString(),
                 ),
             );
         }
@@ -185,7 +163,7 @@ final class Parameters implements ParametersRule
         $isVariadic = false;
 
         if (method_exists($invocation->object(), $invocation->methodName())) {
-            foreach (new ReflectionMethod($invocation->object(), $invocation->methodName())->getParameters() as $parameter) {
+            foreach ((new ReflectionMethod($invocation->object(), $invocation->methodName()))->getParameters() as $parameter) {
                 if ($parameter->isVariadic()) {
                     $isVariadic = true;
 
@@ -255,34 +233,6 @@ final class Parameters implements ParametersRule
 
     private function incrementAssertionCount(): void
     {
-        if ($this->useAssertionCount === false) {
-            return;
-        }
-
         Test::currentTestCase()->addToAssertionCount(1);
-    }
-
-    /**
-     * @return array<non-negative-int, non-empty-string>
-     */
-    private function parameters(BaseInvocation $invocation): array
-    {
-        $parameters = [];
-
-        try {
-            $reflector = new ReflectionMethod(
-                $invocation->className(),
-                $invocation->methodName(),
-            );
-
-            foreach ($reflector->getParameters() as $parameter) {
-                assert($parameter->getPosition() >= 0);
-
-                $parameters[$parameter->getPosition()] = '$' . $parameter->getName();
-            }
-        } catch (ReflectionException) {
-        }
-
-        return $parameters;
     }
 }

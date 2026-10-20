@@ -44,10 +44,6 @@ final readonly class IssueFilter
                 return false;
             }
 
-            if ($event->ignoredByFilter()) {
-                return false;
-            }
-
             if ($this->source->ignoreSelfDeprecations() && $event->trigger()->isSelf()) {
                 return false;
             }

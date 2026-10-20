@@ -21,7 +21,7 @@ use PhpParser\NodeVisitorAbstract;
 final class LineCountingVisitor extends NodeVisitorAbstract
 {
     /**
-     * @var positive-int
+     * @var non-negative-int
      */
     private readonly int $linesOfCode;
 
@@ -36,7 +36,7 @@ final class LineCountingVisitor extends NodeVisitorAbstract
     private array $linesWithStatements = [];
 
     /**
-     * @param positive-int $linesOfCode
+     * @param non-negative-int $linesOfCode
      */
     public function __construct(int $linesOfCode)
     {

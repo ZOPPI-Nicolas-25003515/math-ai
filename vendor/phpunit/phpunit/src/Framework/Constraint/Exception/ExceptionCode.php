@@ -9,8 +9,6 @@
  */
 namespace PHPUnit\Framework\Constraint;
 
-use function is_int;
-use function is_string;
 use function sprintf;
 use PHPUnit\Util\Exporter;
 
@@ -34,23 +32,11 @@ final class ExceptionCode extends Constraint
     }
 
     /**
-     * Returns the negated string representation of the constraint.
-     */
-    protected function negatedToString(): string
-    {
-        return 'exception code is not ' . $this->expectedCode;
-    }
-
-    /**
      * Evaluates the constraint for parameter $other. Returns true if the
      * constraint is met, false otherwise.
      */
     protected function matches(mixed $other): bool
     {
-        if (!is_int($other) && !is_string($other)) {
-            return false;
-        }
-
         return (string) $other === (string) $this->expectedCode;
     }
 
@@ -64,15 +50,6 @@ final class ExceptionCode extends Constraint
     {
         return sprintf(
             '%s is equal to expected exception code %s',
-            Exporter::export($other),
-            Exporter::export($this->expectedCode),
-        );
-    }
-
-    protected function negatedFailureDescription(mixed $other): string
-    {
-        return sprintf(
-            '%s is not equal to expected exception code %s',
             Exporter::export($other),
             Exporter::export($this->expectedCode),
         );

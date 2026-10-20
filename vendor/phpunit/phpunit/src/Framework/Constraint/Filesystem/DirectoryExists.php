@@ -10,7 +10,6 @@
 namespace PHPUnit\Framework\Constraint;
 
 use function is_dir;
-use function is_string;
 use function sprintf;
 
 /**
@@ -27,23 +26,11 @@ final class DirectoryExists extends Constraint
     }
 
     /**
-     * Returns the negated string representation of the constraint.
-     */
-    protected function negatedToString(): string
-    {
-        return 'directory does not exist';
-    }
-
-    /**
      * Evaluates the constraint for parameter $other. Returns true if the
      * constraint is met, false otherwise.
      */
     protected function matches(mixed $other): bool
     {
-        if (!is_string($other)) {
-            return false;
-        }
-
         return is_dir($other);
     }
 
@@ -57,24 +44,7 @@ final class DirectoryExists extends Constraint
     {
         return sprintf(
             'directory "%s" exists',
-            $this->path($other),
+            $other,
         );
-    }
-
-    protected function negatedFailureDescription(mixed $other): string
-    {
-        return sprintf(
-            'directory "%s" does not exist',
-            $this->path($other),
-        );
-    }
-
-    private function path(mixed $other): string
-    {
-        if (is_string($other)) {
-            return $other;
-        }
-
-        return '';
     }
 }

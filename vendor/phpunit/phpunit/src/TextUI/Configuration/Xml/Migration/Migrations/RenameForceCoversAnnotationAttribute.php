@@ -26,11 +26,9 @@ final readonly class RenameForceCoversAnnotationAttribute implements Migration
 
         assert($root instanceof DOMElement);
 
-        // @codeCoverageIgnoreStart
         if ($root->hasAttribute('requireCoverageMetadata')) {
             return;
         }
-        // @codeCoverageIgnoreEnd
 
         if (!$root->hasAttribute('forceCoversAnnotation')) {
             return;

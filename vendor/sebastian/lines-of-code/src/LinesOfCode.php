@@ -15,7 +15,7 @@ namespace SebastianBergmann\LinesOfCode;
 final readonly class LinesOfCode
 {
     /**
-     * @var positive-int
+     * @var non-negative-int
      */
     private int $linesOfCode;
 
@@ -35,7 +35,7 @@ final readonly class LinesOfCode
     private int $logicalLinesOfCode;
 
     /**
-     * @param positive-int     $linesOfCode
+     * @param non-negative-int $linesOfCode
      * @param non-negative-int $commentLinesOfCode
      * @param non-negative-int $nonCommentLinesOfCode
      * @param non-negative-int $logicalLinesOfCode
@@ -55,7 +55,7 @@ final readonly class LinesOfCode
     }
 
     /**
-     * @return positive-int
+     * @return non-negative-int
      */
     public function linesOfCode(): int
     {

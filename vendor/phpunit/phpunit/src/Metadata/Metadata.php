@@ -9,7 +9,6 @@
  */
 namespace PHPUnit\Metadata;
 
-use Closure;
 use PHPUnit\Metadata\Version\Requirement;
 use PHPUnit\Runner\Extension\Extension;
 
@@ -20,56 +19,62 @@ use PHPUnit\Runner\Extension\Extension;
  */
 abstract readonly class Metadata
 {
-    private Level $level;
+    private const int CLASS_LEVEL  = 0;
+    private const int METHOD_LEVEL = 1;
+
+    /**
+     * @var int<0, 1>
+     */
+    private int $level;
 
     public static function after(int $priority): After
     {
-        return new After(Level::METHOD_LEVEL, $priority);
+        return new After(self::METHOD_LEVEL, $priority);
     }
 
     public static function afterClass(int $priority): AfterClass
     {
-        return new AfterClass(Level::METHOD_LEVEL, $priority);
+        return new AfterClass(self::METHOD_LEVEL, $priority);
     }
 
     public static function allowMockObjectsWithoutExpectationsOnClass(): AllowMockObjectsWithoutExpectations
     {
-        return new AllowMockObjectsWithoutExpectations(Level::CLASS_LEVEL);
+        return new AllowMockObjectsWithoutExpectations(self::CLASS_LEVEL);
     }
 
     public static function allowMockObjectsWithoutExpectationsOnMethod(): AllowMockObjectsWithoutExpectations
     {
-        return new AllowMockObjectsWithoutExpectations(Level::METHOD_LEVEL);
+        return new AllowMockObjectsWithoutExpectations(self::METHOD_LEVEL);
     }
 
     public static function backupGlobalsOnClass(bool $enabled): BackupGlobals
     {
-        return new BackupGlobals(Level::CLASS_LEVEL, $enabled);
+        return new BackupGlobals(self::CLASS_LEVEL, $enabled);
     }
 
     public static function backupGlobalsOnMethod(bool $enabled): BackupGlobals
     {
-        return new BackupGlobals(Level::METHOD_LEVEL, $enabled);
+        return new BackupGlobals(self::METHOD_LEVEL, $enabled);
     }
 
     public static function backupStaticPropertiesOnClass(bool $enabled): BackupStaticProperties
     {
-        return new BackupStaticProperties(Level::CLASS_LEVEL, $enabled);
+        return new BackupStaticProperties(self::CLASS_LEVEL, $enabled);
     }
 
     public static function backupStaticPropertiesOnMethod(bool $enabled): BackupStaticProperties
     {
-        return new BackupStaticProperties(Level::METHOD_LEVEL, $enabled);
+        return new BackupStaticProperties(self::METHOD_LEVEL, $enabled);
     }
 
     public static function before(int $priority): Before
     {
-        return new Before(Level::METHOD_LEVEL, $priority);
+        return new Before(self::METHOD_LEVEL, $priority);
     }
 
     public static function beforeClass(int $priority): BeforeClass
     {
-        return new BeforeClass(Level::METHOD_LEVEL, $priority);
+        return new BeforeClass(self::METHOD_LEVEL, $priority);
     }
 
     /**
@@ -77,7 +82,7 @@ abstract readonly class Metadata
      */
     public static function coversNamespace(string $namespace): CoversNamespace
     {
-        return new CoversNamespace(Level::CLASS_LEVEL, $namespace);
+        return new CoversNamespace(self::CLASS_LEVEL, $namespace);
     }
 
     /**
@@ -85,7 +90,7 @@ abstract readonly class Metadata
      */
     public static function coversClass(string $className): CoversClass
     {
-        return new CoversClass(Level::CLASS_LEVEL, $className);
+        return new CoversClass(self::CLASS_LEVEL, $className);
     }
 
     /**
@@ -93,7 +98,7 @@ abstract readonly class Metadata
      */
     public static function coversClassesThatExtendClass(string $className): CoversClassesThatExtendClass
     {
-        return new CoversClassesThatExtendClass(Level::CLASS_LEVEL, $className);
+        return new CoversClassesThatExtendClass(self::CLASS_LEVEL, $className);
     }
 
     /**
@@ -101,7 +106,7 @@ abstract readonly class Metadata
      */
     public static function coversClassesThatImplementInterface(string $interfaceName): CoversClassesThatImplementInterface
     {
-        return new CoversClassesThatImplementInterface(Level::CLASS_LEVEL, $interfaceName);
+        return new CoversClassesThatImplementInterface(self::CLASS_LEVEL, $interfaceName);
     }
 
     /**
@@ -109,7 +114,7 @@ abstract readonly class Metadata
      */
     public static function coversTrait(string $traitName): CoversTrait
     {
-        return new CoversTrait(Level::CLASS_LEVEL, $traitName);
+        return new CoversTrait(self::CLASS_LEVEL, $traitName);
     }
 
     /**
@@ -118,7 +123,7 @@ abstract readonly class Metadata
      */
     public static function coversMethod(string $className, string $methodName): CoversMethod
     {
-        return new CoversMethod(Level::CLASS_LEVEL, $className, $methodName);
+        return new CoversMethod(self::CLASS_LEVEL, $className, $methodName);
     }
 
     /**
@@ -126,55 +131,26 @@ abstract readonly class Metadata
      */
     public static function coversFunction(string $functionName): CoversFunction
     {
-        return new CoversFunction(Level::CLASS_LEVEL, $functionName);
-    }
-
-    /**
-     * @param non-empty-string $path
-     */
-    public static function coversFile(string $path): CoversFile
-    {
-        return new CoversFile(Level::CLASS_LEVEL, $path);
-    }
-
-    /**
-     * @param non-empty-string $directory
-     */
-    public static function coversDirectory(string $directory): CoversDirectory
-    {
-        return new CoversDirectory(Level::CLASS_LEVEL, $directory);
-    }
-
-    /**
-     * @param non-empty-string $directory
-     */
-    public static function coversDirectoryRecursively(string $directory): CoversDirectoryRecursively
-    {
-        return new CoversDirectoryRecursively(Level::CLASS_LEVEL, $directory);
+        return new CoversFunction(self::CLASS_LEVEL, $functionName);
     }
 
     public static function coversNothingOnClass(): CoversNothing
     {
-        return new CoversNothing(Level::CLASS_LEVEL);
+        return new CoversNothing(self::CLASS_LEVEL);
     }
 
     public static function coversNothingOnMethod(): CoversNothing
     {
-        return new CoversNothing(Level::METHOD_LEVEL);
+        return new CoversNothing(self::METHOD_LEVEL);
     }
 
     /**
      * @param class-string     $className
      * @param non-empty-string $methodName
      */
-    public static function dataProvider(string $className, string $methodName, bool $validateArgumentCount, bool $skipWhenEmpty): DataProvider
+    public static function dataProvider(string $className, string $methodName, bool $validateArgumentCount): DataProvider
     {
-        return new DataProvider(Level::METHOD_LEVEL, $className, $methodName, $validateArgumentCount, $skipWhenEmpty);
-    }
-
-    public static function dataProviderClosure(Closure $callable, bool $validateArgumentCount): DataProviderClosure
-    {
-        return new DataProviderClosure(Level::METHOD_LEVEL, $callable, $validateArgumentCount);
+        return new DataProvider(self::METHOD_LEVEL, $className, $methodName, $validateArgumentCount);
     }
 
     /**
@@ -182,7 +158,7 @@ abstract readonly class Metadata
      */
     public static function dependsOnClass(string $className, bool $deepClone, bool $shallowClone): DependsOnClass
     {
-        return new DependsOnClass(Level::METHOD_LEVEL, $className, $deepClone, $shallowClone);
+        return new DependsOnClass(self::METHOD_LEVEL, $className, $deepClone, $shallowClone);
     }
 
     /**
@@ -191,22 +167,22 @@ abstract readonly class Metadata
      */
     public static function dependsOnMethod(string $className, string $methodName, bool $deepClone, bool $shallowClone): DependsOnMethod
     {
-        return new DependsOnMethod(Level::METHOD_LEVEL, $className, $methodName, $deepClone, $shallowClone);
+        return new DependsOnMethod(self::METHOD_LEVEL, $className, $methodName, $deepClone, $shallowClone);
     }
 
     public static function disableReturnValueGenerationForTestDoubles(): DisableReturnValueGenerationForTestDoubles
     {
-        return new DisableReturnValueGenerationForTestDoubles(Level::CLASS_LEVEL);
+        return new DisableReturnValueGenerationForTestDoubles(self::CLASS_LEVEL);
     }
 
     public static function doesNotPerformAssertionsOnClass(): DoesNotPerformAssertions
     {
-        return new DoesNotPerformAssertions(Level::CLASS_LEVEL);
+        return new DoesNotPerformAssertions(self::CLASS_LEVEL);
     }
 
     public static function doesNotPerformAssertionsOnMethod(): DoesNotPerformAssertions
     {
-        return new DoesNotPerformAssertions(Level::METHOD_LEVEL);
+        return new DoesNotPerformAssertions(self::METHOD_LEVEL);
     }
 
     /**
@@ -214,7 +190,7 @@ abstract readonly class Metadata
      */
     public static function excludeGlobalVariableFromBackupOnClass(string $globalVariableName): ExcludeGlobalVariableFromBackup
     {
-        return new ExcludeGlobalVariableFromBackup(Level::CLASS_LEVEL, $globalVariableName);
+        return new ExcludeGlobalVariableFromBackup(self::CLASS_LEVEL, $globalVariableName);
     }
 
     /**
@@ -222,7 +198,7 @@ abstract readonly class Metadata
      */
     public static function excludeGlobalVariableFromBackupOnMethod(string $globalVariableName): ExcludeGlobalVariableFromBackup
     {
-        return new ExcludeGlobalVariableFromBackup(Level::METHOD_LEVEL, $globalVariableName);
+        return new ExcludeGlobalVariableFromBackup(self::METHOD_LEVEL, $globalVariableName);
     }
 
     /**
@@ -231,7 +207,7 @@ abstract readonly class Metadata
      */
     public static function excludeStaticPropertyFromBackupOnClass(string $className, string $propertyName): ExcludeStaticPropertyFromBackup
     {
-        return new ExcludeStaticPropertyFromBackup(Level::CLASS_LEVEL, $className, $propertyName);
+        return new ExcludeStaticPropertyFromBackup(self::CLASS_LEVEL, $className, $propertyName);
     }
 
     /**
@@ -240,7 +216,7 @@ abstract readonly class Metadata
      */
     public static function excludeStaticPropertyFromBackupOnMethod(string $className, string $propertyName): ExcludeStaticPropertyFromBackup
     {
-        return new ExcludeStaticPropertyFromBackup(Level::METHOD_LEVEL, $className, $propertyName);
+        return new ExcludeStaticPropertyFromBackup(self::METHOD_LEVEL, $className, $propertyName);
     }
 
     /**
@@ -248,7 +224,7 @@ abstract readonly class Metadata
      */
     public static function groupOnClass(string $groupName): Group
     {
-        return new Group(Level::CLASS_LEVEL, $groupName);
+        return new Group(self::CLASS_LEVEL, $groupName);
     }
 
     /**
@@ -256,7 +232,7 @@ abstract readonly class Metadata
      */
     public static function groupOnMethod(string $groupName): Group
     {
-        return new Group(Level::METHOD_LEVEL, $groupName);
+        return new Group(self::METHOD_LEVEL, $groupName);
     }
 
     /**
@@ -264,7 +240,7 @@ abstract readonly class Metadata
      */
     public static function ignoreDeprecationsOnClass(?string $messagePattern = null): IgnoreDeprecations
     {
-        return new IgnoreDeprecations(Level::CLASS_LEVEL, $messagePattern);
+        return new IgnoreDeprecations(self::CLASS_LEVEL, $messagePattern);
     }
 
     /**
@@ -272,7 +248,7 @@ abstract readonly class Metadata
      */
     public static function ignoreDeprecationsOnMethod(?string $messagePattern = null): IgnoreDeprecations
     {
-        return new IgnoreDeprecations(Level::METHOD_LEVEL, $messagePattern);
+        return new IgnoreDeprecations(self::METHOD_LEVEL, $messagePattern);
     }
 
     /**
@@ -280,7 +256,7 @@ abstract readonly class Metadata
      */
     public static function ignorePhpunitDeprecationsOnClass(): IgnorePhpunitDeprecations
     {
-        return new IgnorePhpunitDeprecations(Level::CLASS_LEVEL);
+        return new IgnorePhpunitDeprecations(self::CLASS_LEVEL);
     }
 
     /**
@@ -288,43 +264,27 @@ abstract readonly class Metadata
      */
     public static function ignorePhpunitDeprecationsOnMethod(): IgnorePhpunitDeprecations
     {
-        return new IgnorePhpunitDeprecations(Level::METHOD_LEVEL);
-    }
-
-    /**
-     * @param non-empty-string $message
-     */
-    public static function invalidAttributeOnClass(string $message): InvalidAttribute
-    {
-        return new InvalidAttribute(Level::CLASS_LEVEL, $message);
-    }
-
-    /**
-     * @param non-empty-string $message
-     */
-    public static function invalidAttributeOnMethod(string $message): InvalidAttribute
-    {
-        return new InvalidAttribute(Level::METHOD_LEVEL, $message);
+        return new IgnorePhpunitDeprecations(self::METHOD_LEVEL);
     }
 
     public static function postCondition(int $priority): PostCondition
     {
-        return new PostCondition(Level::METHOD_LEVEL, $priority);
+        return new PostCondition(self::METHOD_LEVEL, $priority);
     }
 
     public static function preCondition(int $priority): PreCondition
     {
-        return new PreCondition(Level::METHOD_LEVEL, $priority);
+        return new PreCondition(self::METHOD_LEVEL, $priority);
     }
 
     public static function preserveGlobalStateOnClass(bool $enabled): PreserveGlobalState
     {
-        return new PreserveGlobalState(Level::CLASS_LEVEL, $enabled);
+        return new PreserveGlobalState(self::CLASS_LEVEL, $enabled);
     }
 
     public static function preserveGlobalStateOnMethod(bool $enabled): PreserveGlobalState
     {
-        return new PreserveGlobalState(Level::METHOD_LEVEL, $enabled);
+        return new PreserveGlobalState(self::METHOD_LEVEL, $enabled);
     }
 
     /**
@@ -332,7 +292,7 @@ abstract readonly class Metadata
      */
     public static function requiresFunctionOnClass(string $functionName): RequiresFunction
     {
-        return new RequiresFunction(Level::CLASS_LEVEL, $functionName);
+        return new RequiresFunction(self::CLASS_LEVEL, $functionName);
     }
 
     /**
@@ -340,23 +300,7 @@ abstract readonly class Metadata
      */
     public static function requiresFunctionOnMethod(string $functionName): RequiresFunction
     {
-        return new RequiresFunction(Level::METHOD_LEVEL, $functionName);
-    }
-
-    /**
-     * @param non-empty-string $className
-     */
-    public static function requiresClassOnClass(string $className): RequiresClass
-    {
-        return new RequiresClass(Level::CLASS_LEVEL, $className);
-    }
-
-    /**
-     * @param non-empty-string $className
-     */
-    public static function requiresClassOnMethod(string $className): RequiresClass
-    {
-        return new RequiresClass(Level::METHOD_LEVEL, $className);
+        return new RequiresFunction(self::METHOD_LEVEL, $functionName);
     }
 
     /**
@@ -365,7 +309,7 @@ abstract readonly class Metadata
      */
     public static function requiresMethodOnClass(string $className, string $methodName): RequiresMethod
     {
-        return new RequiresMethod(Level::CLASS_LEVEL, $className, $methodName);
+        return new RequiresMethod(self::CLASS_LEVEL, $className, $methodName);
     }
 
     /**
@@ -374,7 +318,7 @@ abstract readonly class Metadata
      */
     public static function requiresMethodOnMethod(string $className, string $methodName): RequiresMethod
     {
-        return new RequiresMethod(Level::METHOD_LEVEL, $className, $methodName);
+        return new RequiresMethod(self::METHOD_LEVEL, $className, $methodName);
     }
 
     /**
@@ -382,7 +326,7 @@ abstract readonly class Metadata
      */
     public static function requiresOperatingSystemOnClass(string $operatingSystem): RequiresOperatingSystem
     {
-        return new RequiresOperatingSystem(Level::CLASS_LEVEL, $operatingSystem);
+        return new RequiresOperatingSystem(self::CLASS_LEVEL, $operatingSystem);
     }
 
     /**
@@ -390,7 +334,7 @@ abstract readonly class Metadata
      */
     public static function requiresOperatingSystemOnMethod(string $operatingSystem): RequiresOperatingSystem
     {
-        return new RequiresOperatingSystem(Level::METHOD_LEVEL, $operatingSystem);
+        return new RequiresOperatingSystem(self::METHOD_LEVEL, $operatingSystem);
     }
 
     /**
@@ -398,7 +342,7 @@ abstract readonly class Metadata
      */
     public static function requiresOperatingSystemFamilyOnClass(string $operatingSystemFamily): RequiresOperatingSystemFamily
     {
-        return new RequiresOperatingSystemFamily(Level::CLASS_LEVEL, $operatingSystemFamily);
+        return new RequiresOperatingSystemFamily(self::CLASS_LEVEL, $operatingSystemFamily);
     }
 
     /**
@@ -406,17 +350,17 @@ abstract readonly class Metadata
      */
     public static function requiresOperatingSystemFamilyOnMethod(string $operatingSystemFamily): RequiresOperatingSystemFamily
     {
-        return new RequiresOperatingSystemFamily(Level::METHOD_LEVEL, $operatingSystemFamily);
+        return new RequiresOperatingSystemFamily(self::METHOD_LEVEL, $operatingSystemFamily);
     }
 
     public static function requiresPhpOnClass(Requirement $versionRequirement): RequiresPhp
     {
-        return new RequiresPhp(Level::CLASS_LEVEL, $versionRequirement);
+        return new RequiresPhp(self::CLASS_LEVEL, $versionRequirement);
     }
 
     public static function requiresPhpOnMethod(Requirement $versionRequirement): RequiresPhp
     {
-        return new RequiresPhp(Level::METHOD_LEVEL, $versionRequirement);
+        return new RequiresPhp(self::METHOD_LEVEL, $versionRequirement);
     }
 
     /**
@@ -424,7 +368,7 @@ abstract readonly class Metadata
      */
     public static function requiresPhpExtensionOnClass(string $extension, ?Requirement $versionRequirement): RequiresPhpExtension
     {
-        return new RequiresPhpExtension(Level::CLASS_LEVEL, $extension, $versionRequirement);
+        return new RequiresPhpExtension(self::CLASS_LEVEL, $extension, $versionRequirement);
     }
 
     /**
@@ -432,17 +376,17 @@ abstract readonly class Metadata
      */
     public static function requiresPhpExtensionOnMethod(string $extension, ?Requirement $versionRequirement): RequiresPhpExtension
     {
-        return new RequiresPhpExtension(Level::METHOD_LEVEL, $extension, $versionRequirement);
+        return new RequiresPhpExtension(self::METHOD_LEVEL, $extension, $versionRequirement);
     }
 
     public static function requiresPhpunitOnClass(Requirement $versionRequirement): RequiresPhpunit
     {
-        return new RequiresPhpunit(Level::CLASS_LEVEL, $versionRequirement);
+        return new RequiresPhpunit(self::CLASS_LEVEL, $versionRequirement);
     }
 
     public static function requiresPhpunitOnMethod(Requirement $versionRequirement): RequiresPhpunit
     {
-        return new RequiresPhpunit(Level::METHOD_LEVEL, $versionRequirement);
+        return new RequiresPhpunit(self::METHOD_LEVEL, $versionRequirement);
     }
 
     /**
@@ -450,7 +394,7 @@ abstract readonly class Metadata
      */
     public static function requiresPhpunitExtensionOnClass(string $extensionClass): RequiresPhpunitExtension
     {
-        return new RequiresPhpunitExtension(Level::CLASS_LEVEL, $extensionClass);
+        return new RequiresPhpunitExtension(self::CLASS_LEVEL, $extensionClass);
     }
 
     /**
@@ -458,39 +402,27 @@ abstract readonly class Metadata
      */
     public static function requiresPhpunitExtensionOnMethod(string $extensionClass): RequiresPhpunitExtension
     {
-        return new RequiresPhpunitExtension(Level::METHOD_LEVEL, $extensionClass);
+        return new RequiresPhpunitExtension(self::METHOD_LEVEL, $extensionClass);
     }
 
-    /**
-     * @param non-empty-string $environmentVariableName
-     */
     public static function requiresEnvironmentVariableOnClass(string $environmentVariableName, null|string $value): RequiresEnvironmentVariable
     {
-        return new RequiresEnvironmentVariable(Level::CLASS_LEVEL, $environmentVariableName, $value);
+        return new RequiresEnvironmentVariable(self::CLASS_LEVEL, $environmentVariableName, $value);
     }
 
-    /**
-     * @param non-empty-string $environmentVariableName
-     */
     public static function requiresEnvironmentVariableOnMethod(string $environmentVariableName, null|string $value): RequiresEnvironmentVariable
     {
-        return new RequiresEnvironmentVariable(Level::METHOD_LEVEL, $environmentVariableName, $value);
+        return new RequiresEnvironmentVariable(self::METHOD_LEVEL, $environmentVariableName, $value);
     }
 
-    /**
-     * @param non-empty-string $environmentVariableName
-     */
     public static function withEnvironmentVariableOnClass(string $environmentVariableName, null|string $value): WithEnvironmentVariable
     {
-        return new WithEnvironmentVariable(Level::CLASS_LEVEL, $environmentVariableName, $value);
+        return new WithEnvironmentVariable(self::CLASS_LEVEL, $environmentVariableName, $value);
     }
 
-    /**
-     * @param non-empty-string $environmentVariableName
-     */
     public static function withEnvironmentVariableOnMethod(string $environmentVariableName, null|string $value): WithEnvironmentVariable
     {
-        return new WithEnvironmentVariable(Level::METHOD_LEVEL, $environmentVariableName, $value);
+        return new WithEnvironmentVariable(self::METHOD_LEVEL, $environmentVariableName, $value);
     }
 
     /**
@@ -499,7 +431,7 @@ abstract readonly class Metadata
      */
     public static function requiresSettingOnClass(string $setting, string $value): RequiresSetting
     {
-        return new RequiresSetting(Level::CLASS_LEVEL, $setting, $value);
+        return new RequiresSetting(self::CLASS_LEVEL, $setting, $value);
     }
 
     /**
@@ -508,39 +440,27 @@ abstract readonly class Metadata
      */
     public static function requiresSettingOnMethod(string $setting, string $value): RequiresSetting
     {
-        return new RequiresSetting(Level::METHOD_LEVEL, $setting, $value);
+        return new RequiresSetting(self::METHOD_LEVEL, $setting, $value);
+    }
+
+    public static function runClassInSeparateProcess(): RunClassInSeparateProcess
+    {
+        return new RunClassInSeparateProcess(self::CLASS_LEVEL);
     }
 
     public static function runTestsInSeparateProcesses(): RunTestsInSeparateProcesses
     {
-        return new RunTestsInSeparateProcesses(Level::CLASS_LEVEL);
-    }
-
-    /**
-     * @param positive-int $times
-     * @param positive-int $failureThreshold
-     */
-    public static function repeat(int $times, int $failureThreshold): Repeat
-    {
-        return new Repeat(Level::METHOD_LEVEL, $times, $failureThreshold);
-    }
-
-    /**
-     * @param positive-int $maxAttempts
-     */
-    public static function retry(int $maxAttempts): Retry
-    {
-        return new Retry(Level::METHOD_LEVEL, $maxAttempts);
+        return new RunTestsInSeparateProcesses(self::CLASS_LEVEL);
     }
 
     public static function runInSeparateProcess(): RunInSeparateProcess
     {
-        return new RunInSeparateProcess(Level::METHOD_LEVEL);
+        return new RunInSeparateProcess(self::METHOD_LEVEL);
     }
 
     public static function test(): Test
     {
-        return new Test(Level::METHOD_LEVEL);
+        return new Test(self::METHOD_LEVEL);
     }
 
     /**
@@ -548,7 +468,7 @@ abstract readonly class Metadata
      */
     public static function testDoxOnClass(string $text): TestDox
     {
-        return new TestDox(Level::CLASS_LEVEL, $text);
+        return new TestDox(self::CLASS_LEVEL, $text);
     }
 
     /**
@@ -556,7 +476,7 @@ abstract readonly class Metadata
      */
     public static function testDoxOnMethod(string $text): TestDox
     {
-        return new TestDox(Level::METHOD_LEVEL, $text);
+        return new TestDox(self::METHOD_LEVEL, $text);
     }
 
     /**
@@ -565,7 +485,7 @@ abstract readonly class Metadata
      */
     public static function testDoxFormatter(string $className, string $methodName): TestDoxFormatter
     {
-        return new TestDoxFormatter(Level::METHOD_LEVEL, $className, $methodName);
+        return new TestDoxFormatter(self::METHOD_LEVEL, $className, $methodName);
     }
 
     /**
@@ -573,7 +493,7 @@ abstract readonly class Metadata
      */
     public static function testWith(mixed $data, ?string $name = null): TestWith
     {
-        return new TestWith(Level::METHOD_LEVEL, $data, $name);
+        return new TestWith(self::METHOD_LEVEL, $data, $name);
     }
 
     /**
@@ -581,7 +501,7 @@ abstract readonly class Metadata
      */
     public static function usesNamespace(string $namespace): UsesNamespace
     {
-        return new UsesNamespace(Level::CLASS_LEVEL, $namespace);
+        return new UsesNamespace(self::CLASS_LEVEL, $namespace);
     }
 
     /**
@@ -589,7 +509,7 @@ abstract readonly class Metadata
      */
     public static function usesClass(string $className): UsesClass
     {
-        return new UsesClass(Level::CLASS_LEVEL, $className);
+        return new UsesClass(self::CLASS_LEVEL, $className);
     }
 
     /**
@@ -597,7 +517,7 @@ abstract readonly class Metadata
      */
     public static function usesClassesThatExtendClass(string $className): UsesClassesThatExtendClass
     {
-        return new UsesClassesThatExtendClass(Level::CLASS_LEVEL, $className);
+        return new UsesClassesThatExtendClass(self::CLASS_LEVEL, $className);
     }
 
     /**
@@ -605,7 +525,7 @@ abstract readonly class Metadata
      */
     public static function usesClassesThatImplementInterface(string $interfaceName): UsesClassesThatImplementInterface
     {
-        return new UsesClassesThatImplementInterface(Level::CLASS_LEVEL, $interfaceName);
+        return new UsesClassesThatImplementInterface(self::CLASS_LEVEL, $interfaceName);
     }
 
     /**
@@ -613,7 +533,7 @@ abstract readonly class Metadata
      */
     public static function usesTrait(string $traitName): UsesTrait
     {
-        return new UsesTrait(Level::CLASS_LEVEL, $traitName);
+        return new UsesTrait(self::CLASS_LEVEL, $traitName);
     }
 
     /**
@@ -621,7 +541,7 @@ abstract readonly class Metadata
      */
     public static function usesFunction(string $functionName): UsesFunction
     {
-        return new UsesFunction(Level::CLASS_LEVEL, $functionName);
+        return new UsesFunction(self::CLASS_LEVEL, $functionName);
     }
 
     /**
@@ -630,36 +550,12 @@ abstract readonly class Metadata
      */
     public static function usesMethod(string $className, string $methodName): UsesMethod
     {
-        return new UsesMethod(Level::CLASS_LEVEL, $className, $methodName);
-    }
-
-    /**
-     * @param non-empty-string $path
-     */
-    public static function usesFile(string $path): UsesFile
-    {
-        return new UsesFile(Level::CLASS_LEVEL, $path);
-    }
-
-    /**
-     * @param non-empty-string $directory
-     */
-    public static function usesDirectory(string $directory): UsesDirectory
-    {
-        return new UsesDirectory(Level::CLASS_LEVEL, $directory);
-    }
-
-    /**
-     * @param non-empty-string $directory
-     */
-    public static function usesDirectoryRecursively(string $directory): UsesDirectoryRecursively
-    {
-        return new UsesDirectoryRecursively(Level::CLASS_LEVEL, $directory);
+        return new UsesMethod(self::CLASS_LEVEL, $className, $methodName);
     }
 
     public static function withoutErrorHandler(): WithoutErrorHandler
     {
-        return new WithoutErrorHandler(Level::METHOD_LEVEL);
+        return new WithoutErrorHandler(self::METHOD_LEVEL);
     }
 
     /**
@@ -667,22 +563,25 @@ abstract readonly class Metadata
      */
     public static function ignorePhpunitWarnings(?string $messagePattern): IgnorePhpunitWarnings
     {
-        return new IgnorePhpunitWarnings(Level::METHOD_LEVEL, $messagePattern);
+        return new IgnorePhpunitWarnings(self::METHOD_LEVEL, $messagePattern);
     }
 
-    protected function __construct(Level $level)
+    /**
+     * @param int<0, 1> $level
+     */
+    protected function __construct(int $level)
     {
         $this->level = $level;
     }
 
     public function isClassLevel(): bool
     {
-        return $this->level === Level::CLASS_LEVEL;
+        return $this->level === self::CLASS_LEVEL;
     }
 
     public function isMethodLevel(): bool
     {
-        return $this->level === Level::METHOD_LEVEL;
+        return $this->level === self::METHOD_LEVEL;
     }
 
     /**
@@ -798,30 +697,6 @@ abstract readonly class Metadata
     }
 
     /**
-     * @phpstan-assert-if-true CoversFile $this
-     */
-    public function isCoversFile(): bool
-    {
-        return false;
-    }
-
-    /**
-     * @phpstan-assert-if-true CoversDirectory $this
-     */
-    public function isCoversDirectory(): bool
-    {
-        return false;
-    }
-
-    /**
-     * @phpstan-assert-if-true CoversDirectoryRecursively $this
-     */
-    public function isCoversDirectoryRecursively(): bool
-    {
-        return false;
-    }
-
-    /**
      * @phpstan-assert-if-true CoversNothing $this
      */
     public function isCoversNothing(): bool
@@ -833,14 +708,6 @@ abstract readonly class Metadata
      * @phpstan-assert-if-true DataProvider $this
      */
     public function isDataProvider(): bool
-    {
-        return false;
-    }
-
-    /**
-     * @phpstan-assert-if-true DataProviderClosure $this
-     */
-    public function isDataProviderClosure(): bool
     {
         return false;
     }
@@ -920,25 +787,9 @@ abstract readonly class Metadata
     }
 
     /**
-     * @phpstan-assert-if-true InvalidAttribute $this
+     * @phpstan-assert-if-true RunClassInSeparateProcess $this
      */
-    public function isInvalidAttribute(): bool
-    {
-        return false;
-    }
-
-    /**
-     * @phpstan-assert-if-true Repeat $this
-     */
-    public function isRepeat(): bool
-    {
-        return false;
-    }
-
-    /**
-     * @phpstan-assert-if-true Retry $this
-     */
-    public function isRetry(): bool
+    public function isRunClassInSeparateProcess(): bool
     {
         return false;
     }
@@ -995,14 +846,6 @@ abstract readonly class Metadata
      * @phpstan-assert-if-true RequiresMethod $this
      */
     public function isRequiresMethod(): bool
-    {
-        return false;
-    }
-
-    /**
-     * @phpstan-assert-if-true RequiresClass $this
-     */
-    public function isRequiresClass(): bool
     {
         return false;
     }
@@ -1163,30 +1006,6 @@ abstract readonly class Metadata
      * @phpstan-assert-if-true UsesMethod $this
      */
     public function isUsesMethod(): bool
-    {
-        return false;
-    }
-
-    /**
-     * @phpstan-assert-if-true UsesFile $this
-     */
-    public function isUsesFile(): bool
-    {
-        return false;
-    }
-
-    /**
-     * @phpstan-assert-if-true UsesDirectory $this
-     */
-    public function isUsesDirectory(): bool
-    {
-        return false;
-    }
-
-    /**
-     * @phpstan-assert-if-true UsesDirectoryRecursively $this
-     */
-    public function isUsesDirectoryRecursively(): bool
     {
         return false;
     }

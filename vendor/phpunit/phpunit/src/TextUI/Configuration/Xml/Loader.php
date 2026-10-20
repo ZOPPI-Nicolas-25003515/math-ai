@@ -17,7 +17,6 @@ use function defined;
 use function dirname;
 use function explode;
 use function is_numeric;
-use function max;
 use function preg_match;
 use function realpath;
 use function sprintf;
@@ -32,7 +31,6 @@ use DOMElement;
 use DOMNode;
 use DOMNodeList;
 use DOMXPath;
-use PHPUnit\Event\Emitter;
 use PHPUnit\Runner\TestSuiteSorter;
 use PHPUnit\Runner\Version;
 use PHPUnit\TextUI\Configuration\Configuration;
@@ -40,16 +38,12 @@ use PHPUnit\TextUI\Configuration\Constant;
 use PHPUnit\TextUI\Configuration\ConstantCollection;
 use PHPUnit\TextUI\Configuration\Directory;
 use PHPUnit\TextUI\Configuration\DirectoryCollection;
-use PHPUnit\TextUI\Configuration\ExecutionOrderParser;
-use PHPUnit\TextUI\Configuration\ExecutionOrderSource;
 use PHPUnit\TextUI\Configuration\ExtensionBootstrap;
 use PHPUnit\TextUI\Configuration\ExtensionBootstrapCollection;
 use PHPUnit\TextUI\Configuration\File;
 use PHPUnit\TextUI\Configuration\FileCollection;
 use PHPUnit\TextUI\Configuration\FilterDirectory;
 use PHPUnit\TextUI\Configuration\FilterDirectoryCollection;
-use PHPUnit\TextUI\Configuration\FilterFile;
-use PHPUnit\TextUI\Configuration\FilterFileCollection;
 use PHPUnit\TextUI\Configuration\Group;
 use PHPUnit\TextUI\Configuration\GroupCollection;
 use PHPUnit\TextUI\Configuration\IniSetting;
@@ -69,7 +63,6 @@ use PHPUnit\TextUI\XmlConfiguration\CodeCoverage\Report\Clover;
 use PHPUnit\TextUI\XmlConfiguration\CodeCoverage\Report\Cobertura;
 use PHPUnit\TextUI\XmlConfiguration\CodeCoverage\Report\Crap4j;
 use PHPUnit\TextUI\XmlConfiguration\CodeCoverage\Report\Html as CodeCoverageHtml;
-use PHPUnit\TextUI\XmlConfiguration\CodeCoverage\Report\Jsonl;
 use PHPUnit\TextUI\XmlConfiguration\CodeCoverage\Report\OpenClover;
 use PHPUnit\TextUI\XmlConfiguration\CodeCoverage\Report\Php as CodeCoveragePhp;
 use PHPUnit\TextUI\XmlConfiguration\CodeCoverage\Report\Text as CodeCoverageText;
@@ -94,13 +87,6 @@ use Throwable;
  */
 final readonly class Loader
 {
-    private Emitter $emitter;
-
-    public function __construct(Emitter $emitter)
-    {
-        $this->emitter = $emitter;
-    }
-
     /**
      * @throws Exception
      */
@@ -120,7 +106,6 @@ final readonly class Loader
 
         try {
             $xsdFilename = (new SchemaFinder)->find(Version::series());
-            // @codeCoverageIgnoreStart
         } catch (CannotFindSchemaException $e) {
             throw new Exception(
                 $e->getMessage(),
@@ -128,7 +113,6 @@ final readonly class Loader
                 $e,
             );
         }
-        // @codeCoverageIgnoreEnd
 
         $configurationFileRealpath = realpath($filename);
 
@@ -310,7 +294,7 @@ final readonly class Loader
         //  - c:/windows
         if (defined('PHP_WINDOWS_VERSION_BUILD') &&
             $path !== '' &&
-            ($path[0] === '\\' || (strlen($path) >= 3 && preg_match('#^[A-Z]:[/\\\]#i', substr($path, 0, 3)) === 1))) {
+            ($path[0] === '\\' || (strlen($path) >= 3 && preg_match('#^[A-Z]:[/\\\]#i', substr($path, 0, 3))))) {
             return $path;
         }
 
@@ -362,13 +346,9 @@ final readonly class Loader
             $identifyIssueTrigger               = $this->parseBooleanAttribute($element, 'identifyIssueTrigger', true);
         }
 
-        $deprecationTriggerElement = $this->element($xpath, 'source/deprecationTrigger');
-
         $deprecationTriggers = [
-            'functions'               => [],
-            'methods'                 => [],
-            'ignoreUndefinedTriggers' => $deprecationTriggerElement !== null &&
-                $this->parseBooleanAttribute($deprecationTriggerElement, 'ignoreUndefinedTriggers', false),
+            'functions' => [],
+            'methods'   => [],
         ];
 
         $functionNodes = $xpath->query('source/deprecationTrigger/function');
@@ -378,13 +358,7 @@ final readonly class Loader
         foreach ($functionNodes as $functionNode) {
             assert($functionNode instanceof DOMElement);
 
-            $functionName = $functionNode->textContent;
-
-            if ($functionName === '') {
-                continue;
-            }
-
-            $deprecationTriggers['functions'][] = $functionName;
+            $deprecationTriggers['functions'][] = $functionNode->textContent;
         }
 
         $methodNodes = $xpath->query('source/deprecationTrigger/method');
@@ -394,47 +368,7 @@ final readonly class Loader
         foreach ($methodNodes as $methodNode) {
             assert($methodNode instanceof DOMElement);
 
-            $methodName = $methodNode->textContent;
-
-            if ($methodName === '') {
-                continue;
-            }
-
-            $deprecationTriggers['methods'][] = $methodName;
-        }
-
-        $issueTriggerResolvers     = [];
-        $issueTriggerResolverNodes = $xpath->query('source/issueTriggerResolvers/issueTriggerResolver');
-
-        assert($issueTriggerResolverNodes instanceof DOMNodeList);
-
-        foreach ($issueTriggerResolverNodes as $node) {
-            assert($node instanceof DOMElement);
-
-            $className = $node->getAttribute('className');
-
-            if ($className === '') {
-                continue;
-            }
-
-            $issueTriggerResolvers[] = $className;
-        }
-
-        $deprecationFilters     = [];
-        $deprecationFilterNodes = $xpath->query('source/deprecationFilters/deprecationFilter');
-
-        assert($deprecationFilterNodes instanceof DOMNodeList);
-
-        foreach ($deprecationFilterNodes as $node) {
-            assert($node instanceof DOMElement);
-
-            $className = $node->getAttribute('className');
-
-            if ($className === '') {
-                continue;
-            }
-
-            $deprecationFilters[] = $className;
+            $deprecationTriggers['methods'][] = $methodNode->textContent;
         }
 
         return new Source(
@@ -458,16 +392,12 @@ final readonly class Loader
             $ignoreDirectDeprecations,
             $ignoreIndirectDeprecations,
             $identifyIssueTrigger,
-            $issueTriggerResolvers,
-            $deprecationFilters,
         );
     }
 
     private function codeCoverage(string $filename, DOMXPath $xpath): CodeCoverage
     {
-        $driver                    = null;
         $pathCoverage              = false;
-        $branchCoverage            = false;
         $includeUncoveredFiles     = true;
         $ignoreDeprecatedCodeUnits = false;
         $disableCodeCoverageIgnore = false;
@@ -475,17 +405,9 @@ final readonly class Loader
         $element = $this->element($xpath, 'coverage');
 
         if ($element !== null) {
-            $driver = $this->parseStringAttribute($element, 'driver');
-
             $pathCoverage = $this->parseBooleanAttribute(
                 $element,
                 'pathCoverage',
-                false,
-            );
-
-            $branchCoverage = $this->parseBooleanAttribute(
-                $element,
-                'branchCoverage',
                 false,
             );
 
@@ -547,7 +469,7 @@ final readonly class Loader
                         (string) $this->parseStringAttribute($element, 'outputFile'),
                     ),
                 ),
-                $this->parseNonNegativeIntegerAttribute($element, 'threshold', 30),
+                $this->parseIntegerAttribute($element, 'threshold', 30),
             );
         }
 
@@ -557,56 +479,22 @@ final readonly class Loader
         if ($element !== null) {
             $defaultColors     = Colors::default();
             $defaultThresholds = Thresholds::default();
-            $outputDirectory   = $this->parseStringAttribute($element, 'outputDirectory');
-
-            if ($outputDirectory !== null) {
-                $outputDirectory = new Directory(
-                    $this->toAbsolutePath(
-                        $filename,
-                        $outputDirectory,
-                    ),
-                );
-            }
 
             $html = new CodeCoverageHtml(
-                $outputDirectory,
-                $this->parseBooleanAttribute($element, 'classView', true),
-                $this->parseBooleanAttribute($element, 'fileView', true),
-                $this->parseNonNegativeIntegerAttribute($element, 'lowUpperBound', max(0, $defaultThresholds->lowUpperBound())),
-                $this->parseNonNegativeIntegerAttribute($element, 'highLowerBound', max(0, $defaultThresholds->highLowerBound())),
-                $this->parseColorAttributeWithDefault($element, 'colorSuccessLow', $defaultColors->successLow()),
-                $this->parseColorAttributeWithDefault($element, 'colorSuccessLowDark', $defaultColors->successLowDark()),
-                $this->parseColorAttributeWithDefault($element, 'colorSuccessMedium', $defaultColors->successMedium()),
-                $this->parseColorAttributeWithDefault($element, 'colorSuccessMediumDark', $defaultColors->successMediumDark()),
-                $this->parseColorAttributeWithDefault($element, 'colorSuccessHigh', $defaultColors->successHigh()),
-                $this->parseColorAttributeWithDefault($element, 'colorSuccessHighDark', $defaultColors->successHighDark()),
-                $this->parseColorAttributeWithDefault($element, 'colorSuccessBar', $defaultColors->successBar()),
-                $this->parseColorAttributeWithDefault($element, 'colorSuccessBarDark', $defaultColors->successBarDark()),
-                $this->parseColorAttributeWithDefault($element, 'colorWarning', $defaultColors->warning()),
-                $this->parseColorAttributeWithDefault($element, 'colorWarningDark', $defaultColors->warningDark()),
-                $this->parseColorAttributeWithDefault($element, 'colorWarningBar', $defaultColors->warningBar()),
-                $this->parseColorAttributeWithDefault($element, 'colorWarningBarDark', $defaultColors->warningBarDark()),
-                $this->parseColorAttributeWithDefault($element, 'colorDanger', $defaultColors->danger()),
-                $this->parseColorAttributeWithDefault($element, 'colorDangerDark', $defaultColors->dangerDark()),
-                $this->parseColorAttributeWithDefault($element, 'colorDangerBar', $defaultColors->dangerBar()),
-                $this->parseColorAttributeWithDefault($element, 'colorDangerBarDark', $defaultColors->dangerBarDark()),
-                $this->parseColorAttributeWithDefault($element, 'colorBreadcrumbs', $defaultColors->breadcrumbs()),
-                $this->parseColorAttributeWithDefault($element, 'colorBreadcrumbsDark', $defaultColors->breadcrumbsDark()),
-                $this->parseNullableNonEmptyStringAttribute($element, 'customCssFile'),
-            );
-        }
-
-        $jsonl   = null;
-        $element = $this->element($xpath, 'coverage/report/jsonl');
-
-        if ($element !== null) {
-            $jsonl = new Jsonl(
                 new Directory(
                     $this->toAbsolutePath(
                         $filename,
                         (string) $this->parseStringAttribute($element, 'outputDirectory'),
                     ),
                 ),
+                $this->parseIntegerAttribute($element, 'lowUpperBound', $defaultThresholds->lowUpperBound()),
+                $this->parseIntegerAttribute($element, 'highLowerBound', $defaultThresholds->highLowerBound()),
+                $this->parseStringAttributeWithDefault($element, 'colorSuccessLow', $defaultColors->successLow()),
+                $this->parseStringAttributeWithDefault($element, 'colorSuccessMedium', $defaultColors->successMedium()),
+                $this->parseStringAttributeWithDefault($element, 'colorSuccessHigh', $defaultColors->successHigh()),
+                $this->parseStringAttributeWithDefault($element, 'colorWarning', $defaultColors->warning()),
+                $this->parseStringAttributeWithDefault($element, 'colorDanger', $defaultColors->danger()),
+                $this->parseStringAttribute($element, 'customCssFile'),
             );
         }
 
@@ -670,9 +558,7 @@ final readonly class Loader
         }
 
         return new CodeCoverage(
-            $driver,
             $pathCoverage,
-            $branchCoverage,
             $includeUncoveredFiles,
             $ignoreDeprecatedCodeUnits,
             $disableCodeCoverageIgnore,
@@ -680,7 +566,6 @@ final readonly class Loader
             $cobertura,
             $crap4j,
             $html,
-            $jsonl,
             $openClover,
             $php,
             $text,
@@ -731,36 +616,17 @@ final readonly class Loader
                 continue;
             }
 
-            $prefix = '';
-
-            if ($directoryNode->hasAttribute('prefix')) {
-                $prefix = $directoryNode->getAttribute('prefix');
-            }
-
-            $suffix = '.php';
-
-            if ($directoryNode->hasAttribute('suffix')) {
-                $candidateSuffix = $directoryNode->getAttribute('suffix');
-
-                if ($candidateSuffix !== '') {
-                    $suffix = $candidateSuffix;
-                }
-            }
-
-            $includeInCodeCoverage = !$directoryNode->hasAttribute('includeInCodeCoverage') || $directoryNode->getAttribute('includeInCodeCoverage') !== 'false';
-
             $directories[] = new FilterDirectory(
                 $this->toAbsolutePath($filename, $directoryPath),
-                $prefix,
-                $suffix,
-                $includeInCodeCoverage,
+                $directoryNode->hasAttribute('prefix') ? $directoryNode->getAttribute('prefix') : '',
+                $directoryNode->hasAttribute('suffix') ? $directoryNode->getAttribute('suffix') : '.php',
             );
         }
 
         return FilterDirectoryCollection::fromArray($directories);
     }
 
-    private function readFilterFiles(string $filename, DOMXPath $xpath, string $query): FilterFileCollection
+    private function readFilterFiles(string $filename, DOMXPath $xpath, string $query): FileCollection
     {
         $files = [];
 
@@ -769,19 +635,16 @@ final readonly class Loader
         assert($fileNodes instanceof DOMNodeList);
 
         foreach ($fileNodes as $fileNode) {
-            assert($fileNode instanceof DOMElement);
+            assert($fileNode instanceof DOMNode);
 
             $filePath = $fileNode->textContent;
 
             if ($filePath !== '') {
-                $files[] = new FilterFile(
-                    $this->toAbsolutePath($filename, $filePath),
-                    !$fileNode->hasAttribute('includeInCodeCoverage') || $fileNode->getAttribute('includeInCodeCoverage') !== 'false',
-                );
+                $files[] = new File($this->toAbsolutePath($filename, $filePath));
             }
         }
 
-        return FilterFileCollection::fromArray($files);
+        return FileCollection::fromArray($files);
     }
 
     private function groups(DOMXPath $xpath): Groups
@@ -796,13 +659,7 @@ final readonly class Loader
         foreach ($groupNodes as $groupNode) {
             assert($groupNode instanceof DOMNode);
 
-            $groupName = $groupNode->textContent;
-
-            if ($groupName === '') {
-                continue;
-            }
-
-            $include[] = new Group($groupName);
+            $include[] = new Group($groupNode->textContent);
         }
 
         $groupNodes = $xpath->query('groups/exclude/group');
@@ -812,36 +669,13 @@ final readonly class Loader
         foreach ($groupNodes as $groupNode) {
             assert($groupNode instanceof DOMNode);
 
-            $groupName = $groupNode->textContent;
-
-            if ($groupName === '') {
-                continue;
-            }
-
-            $exclude[] = new Group($groupName);
+            $exclude[] = new Group($groupNode->textContent);
         }
 
         return new Groups(
             GroupCollection::fromArray($include),
             GroupCollection::fromArray($exclude),
         );
-    }
-
-    private function parseRecordTestRunHistoryAttribute(DOMElement $element): bool
-    {
-        if ($element->hasAttribute('recordTestRunHistory')) {
-            return $this->parseBooleanAttribute($element, 'recordTestRunHistory', true);
-        }
-
-        if ($element->hasAttribute('cacheResult')) {
-            $this->emitter->testRunnerTriggeredPhpunitDeprecation(
-                'The "cacheResult" attribute is deprecated and will be removed in PHPUnit 14. Use "recordTestRunHistory" instead.',
-            );
-
-            return $this->parseBooleanAttribute($element, 'cacheResult', true);
-        }
-
-        return true;
     }
 
     private function parseBooleanAttribute(DOMElement $element, string $attribute, bool $default): bool
@@ -868,58 +702,6 @@ final readonly class Loader
         );
     }
 
-    /**
-     * @param non-negative-int $default
-     *
-     * @return non-negative-int
-     */
-    private function parseNonNegativeIntegerAttribute(DOMElement $element, string $attribute, int $default): int
-    {
-        if (!$element->hasAttribute($attribute)) {
-            return $default;
-        }
-
-        $value = $element->getAttribute($attribute);
-
-        if (!is_numeric($value)) {
-            return $default;
-        }
-
-        $intValue = (int) $value;
-
-        if ($intValue < 0) {
-            return $default;
-        }
-
-        return $intValue;
-    }
-
-    /**
-     * @param positive-int $default
-     *
-     * @return positive-int
-     */
-    private function parsePositiveIntegerAttribute(DOMElement $element, string $attribute, int $default): int
-    {
-        if (!$element->hasAttribute($attribute)) {
-            return $default;
-        }
-
-        $value = $element->getAttribute($attribute);
-
-        if (!is_numeric($value)) {
-            return $default;
-        }
-
-        $intValue = (int) $value;
-
-        if ($intValue < 1) {
-            return $default;
-        }
-
-        return $intValue;
-    }
-
     private function parseStringAttribute(DOMElement $element, string $attribute): ?string
     {
         if (!$element->hasAttribute($attribute)) {
@@ -929,61 +711,13 @@ final readonly class Loader
         return $element->getAttribute($attribute);
     }
 
-    /**
-     * @return null|non-empty-string
-     */
-    private function parseNullableNonEmptyStringAttribute(DOMElement $element, string $attribute): ?string
+    private function parseStringAttributeWithDefault(DOMElement $element, string $attribute, string $default): string
     {
-        if (!$element->hasAttribute($attribute)) {
-            return null;
-        }
-
-        $value = $element->getAttribute($attribute);
-
-        if ($value === '') {
-            return null;
-        }
-
-        return $value;
-    }
-
-    /**
-     * @throws Exception
-     *
-     * @return non-empty-string
-     */
-    private function parseColorAttributeWithDefault(DOMElement $element, string $attribute, string $default): string
-    {
-        // @codeCoverageIgnoreStart
-        if ($default === '') {
-            throw new Exception(sprintf('Default value for "%s" must not be empty', $attribute));
-        }
-        // @codeCoverageIgnoreEnd
-
         if (!$element->hasAttribute($attribute)) {
             return $default;
         }
 
-        $value = $element->getAttribute($attribute);
-
-        if ($value === '') {
-            return $default;
-        }
-
-        return $value;
-    }
-
-    /**
-     * @throws Exception
-     *
-     * @return '!='|'<'|'<='|'<>'|'='|'=='|'>'|'>='|'eq'|'ge'|'gt'|'le'|'lt'|'ne'
-     */
-    private function parseVersionOperator(string $operator): string
-    {
-        return match ($operator) {
-            '!=', '<', '<=', '<>', '=', '==', '>', '>=', 'eq', 'ge', 'gt', 'le', 'lt', 'ne' => $operator,
-            default                                                                         => throw new Exception(sprintf('Invalid version comparison operator: "%s"', $operator)),
-        };
+        return $element->getAttribute($attribute);
     }
 
     private function parseInteger(string $value, int $default): int
@@ -1022,14 +756,8 @@ final readonly class Loader
         foreach ($iniNodes as $ini) {
             assert($ini instanceof DOMElement);
 
-            $iniName = $ini->getAttribute('name');
-
-            if ($iniName === '') {
-                continue;
-            }
-
             $iniSettings[] = new IniSetting(
-                $iniName,
+                $ini->getAttribute('name'),
                 $ini->getAttribute('value'),
             );
         }
@@ -1043,16 +771,10 @@ final readonly class Loader
         foreach ($constNodes as $constNode) {
             assert($constNode instanceof DOMElement);
 
-            $constName = $constNode->getAttribute('name');
-
-            if ($constName === '') {
-                continue;
-            }
-
             $value = $constNode->getAttribute('value');
 
             $constants[] = new Constant(
-                $constName,
+                $constNode->getAttribute('name'),
                 $this->valueFromString($value),
             );
         }
@@ -1076,12 +798,7 @@ final readonly class Loader
             foreach ($varNodes as $var) {
                 assert($var instanceof DOMElement);
 
-                $name = $var->getAttribute('name');
-
-                if ($name === '') {
-                    continue;
-                }
-
+                $name     = $var->getAttribute('name');
                 $value    = $var->getAttribute('value');
                 $force    = false;
                 $verbatim = false;
@@ -1119,55 +836,71 @@ final readonly class Loader
 
     private function phpunit(string $filename, DOMDocument $document, DOMXPath $xpath): PHPUnit
     {
-        $documentElement = $document->documentElement;
-
-        assert($documentElement !== null);
-
         $executionOrder      = TestSuiteSorter::ORDER_DEFAULT;
         $defectsFirst        = false;
-        $resolveDependencies = $this->parseBooleanAttribute($documentElement, 'resolveDependencies', true);
+        $resolveDependencies = $this->parseBooleanAttribute($document->documentElement, 'resolveDependencies', true);
 
-        $configuredExecutionOrder = $this->parseStringAttribute($documentElement, 'executionOrder');
+        if ($document->documentElement->hasAttribute('executionOrder')) {
+            foreach (explode(',', $document->documentElement->getAttribute('executionOrder')) as $order) {
+                switch ($order) {
+                    case 'default':
+                        $executionOrder      = TestSuiteSorter::ORDER_DEFAULT;
+                        $defectsFirst        = false;
+                        $resolveDependencies = true;
 
-        if ($configuredExecutionOrder !== null) {
-            $parsedExecutionOrder = new ExecutionOrderParser($this->emitter)->parse(
-                $configuredExecutionOrder,
-                ExecutionOrderSource::XmlAttribute,
-                $executionOrder,
-                TestSuiteSorter::ORDER_DEFAULT,
-                $resolveDependencies,
-            );
+                        break;
 
-            foreach ($parsedExecutionOrder->unknownTokens() as $unknownToken) {
-                $this->emitter->testRunnerTriggeredPhpunitDeprecation(
-                    sprintf(
-                        'Using "%s" for the executionOrder attribute is deprecated and will be an error in PHPUnit 14. The value is ignored.',
-                        $unknownToken,
-                    ),
-                );
+                    case 'depends':
+                        $resolveDependencies = true;
+
+                        break;
+
+                    case 'no-depends':
+                        $resolveDependencies = false;
+
+                        break;
+
+                    case 'defects':
+                        $defectsFirst = true;
+
+                        break;
+
+                    case 'duration':
+                        $executionOrder = TestSuiteSorter::ORDER_DURATION;
+
+                        break;
+
+                    case 'random':
+                        $executionOrder = TestSuiteSorter::ORDER_RANDOMIZED;
+
+                        break;
+
+                    case 'reverse':
+                        $executionOrder = TestSuiteSorter::ORDER_REVERSED;
+
+                        break;
+
+                    case 'size':
+                        $executionOrder = TestSuiteSorter::ORDER_SIZE;
+
+                        break;
+                }
             }
-
-            $executionOrder      = $parsedExecutionOrder->executionOrder();
-            $defectsFirst        = $parsedExecutionOrder->executionOrderDefects() === TestSuiteSorter::ORDER_DEFECTS_FIRST;
-            $resolveDependencies = $parsedExecutionOrder->resolveDependencies();
-
-            assert($executionOrder !== null);
-            assert($resolveDependencies !== null);
         }
 
-        $cacheDirectory = $this->parseStringAttribute($documentElement, 'cacheDirectory');
+        $cacheDirectory = $this->parseStringAttribute($document->documentElement, 'cacheDirectory');
 
         if ($cacheDirectory !== null) {
             $cacheDirectory = $this->toAbsolutePath($filename, $cacheDirectory);
         }
 
-        $bootstrap = $this->parseStringAttribute($documentElement, 'bootstrap');
+        $bootstrap = $this->parseStringAttribute($document->documentElement, 'bootstrap');
 
         if ($bootstrap !== null) {
             $bootstrap = $this->toAbsolutePath($filename, $bootstrap);
         }
 
-        $extensionsDirectory = $this->parseStringAttribute($documentElement, 'extensionsDirectory');
+        $extensionsDirectory = $this->parseStringAttribute($document->documentElement, 'extensionsDirectory');
 
         if ($extensionsDirectory !== null) {
             $extensionsDirectory = $this->toAbsolutePath($filename, $extensionsDirectory);
@@ -1175,53 +908,23 @@ final readonly class Loader
 
         $backupStaticProperties = false;
 
-        if ($documentElement->hasAttribute('backupStaticProperties')) {
-            $backupStaticProperties = $this->parseBooleanAttribute($documentElement, 'backupStaticProperties', false);
+        if ($document->documentElement->hasAttribute('backupStaticProperties')) {
+            $backupStaticProperties = $this->parseBooleanAttribute($document->documentElement, 'backupStaticProperties', false);
         }
 
         $requireCoverageMetadata = false;
 
-        if ($documentElement->hasAttribute('requireCoverageMetadata')) {
-            $requireCoverageMetadata = $this->parseBooleanAttribute($documentElement, 'requireCoverageMetadata', false);
-        }
-
-        $requireCoverageMetadataOnSmallTests = $requireCoverageMetadata;
-
-        if ($documentElement->hasAttribute('requireCoverageMetadataOnSmallTests')) {
-            $requireCoverageMetadataOnSmallTests = $this->parseBooleanAttribute($documentElement, 'requireCoverageMetadataOnSmallTests', false);
-        }
-
-        $requireCoverageMetadataOnMediumTests = $requireCoverageMetadata;
-
-        if ($documentElement->hasAttribute('requireCoverageMetadataOnMediumTests')) {
-            $requireCoverageMetadataOnMediumTests = $this->parseBooleanAttribute($documentElement, 'requireCoverageMetadataOnMediumTests', false);
-        }
-
-        $requireCoverageMetadataOnLargeTests = $requireCoverageMetadata;
-
-        if ($documentElement->hasAttribute('requireCoverageMetadataOnLargeTests')) {
-            $requireCoverageMetadataOnLargeTests = $this->parseBooleanAttribute($documentElement, 'requireCoverageMetadataOnLargeTests', false);
-        }
-
-        $requireSealedMockObjects = false;
-
-        if ($documentElement->hasAttribute('requireSealedMockObjects')) {
-            $requireSealedMockObjects = $this->parseBooleanAttribute($documentElement, 'requireSealedMockObjects', false);
+        if ($document->documentElement->hasAttribute('requireCoverageMetadata')) {
+            $requireCoverageMetadata = $this->parseBooleanAttribute($document->documentElement, 'requireCoverageMetadata', false);
         }
 
         $beStrictAboutCoverageMetadata = false;
 
-        if ($documentElement->hasAttribute('beStrictAboutCoverageMetadata')) {
-            $beStrictAboutCoverageMetadata = $this->parseBooleanAttribute($documentElement, 'beStrictAboutCoverageMetadata', false);
+        if ($document->documentElement->hasAttribute('beStrictAboutCoverageMetadata')) {
+            $beStrictAboutCoverageMetadata = $this->parseBooleanAttribute($document->documentElement, 'beStrictAboutCoverageMetadata', false);
         }
 
-        $requireCoverageContribution = false;
-
-        if ($documentElement->hasAttribute('requireCoverageContribution')) {
-            $requireCoverageContribution = $this->parseBooleanAttribute($documentElement, 'requireCoverageContribution', false);
-        }
-
-        $shortenArraysForExportThreshold = $this->parseIntegerAttribute($documentElement, 'shortenArraysForExportThreshold', 10);
+        $shortenArraysForExportThreshold = $this->parseIntegerAttribute($document->documentElement, 'shortenArraysForExportThreshold', 10);
 
         if ($shortenArraysForExportThreshold < 0) {
             $shortenArraysForExportThreshold = 0;
@@ -1229,106 +932,76 @@ final readonly class Loader
 
         return new PHPUnit(
             $cacheDirectory,
-            $this->parseRecordTestRunHistoryAttribute($documentElement),
+            $this->parseBooleanAttribute($document->documentElement, 'cacheResult', true),
             $this->parseColumns($document),
             $this->parseColors($document),
-            $this->parseBooleanAttribute($documentElement, 'stderr', false),
-            $this->parseBooleanAttribute($documentElement, 'displayDetailsOnAllIssues', false),
-            $this->parseBooleanAttribute($documentElement, 'displayDetailsOnIncompleteTests', false),
-            $this->parseBooleanAttribute($documentElement, 'displayDetailsOnSkippedTests', false),
-            $this->parseBooleanAttribute($documentElement, 'displayDetailsOnTestsThatTriggerDeprecations', false),
-            $this->parseBooleanAttribute($documentElement, 'displayDetailsOnPhpunitDeprecations', false),
-            $this->parseBooleanAttribute($documentElement, 'displayDetailsOnPhpunitNotices', false),
-            $this->parseBooleanAttribute($documentElement, 'displayDetailsOnTestsThatTriggerErrors', false),
-            $this->parseBooleanAttribute($documentElement, 'displayDetailsOnTestsThatTriggerNotices', false),
-            $this->parseBooleanAttribute($documentElement, 'displayDetailsOnTestsThatTriggerWarnings', false),
-            $this->parseBooleanAttribute($documentElement, 'reverseDefectList', false),
+            $this->parseBooleanAttribute($document->documentElement, 'stderr', false),
+            $this->parseBooleanAttribute($document->documentElement, 'displayDetailsOnAllIssues', false),
+            $this->parseBooleanAttribute($document->documentElement, 'displayDetailsOnIncompleteTests', false),
+            $this->parseBooleanAttribute($document->documentElement, 'displayDetailsOnSkippedTests', false),
+            $this->parseBooleanAttribute($document->documentElement, 'displayDetailsOnTestsThatTriggerDeprecations', false),
+            $this->parseBooleanAttribute($document->documentElement, 'displayDetailsOnPhpunitDeprecations', false),
+            $this->parseBooleanAttribute($document->documentElement, 'displayDetailsOnPhpunitNotices', false),
+            $this->parseBooleanAttribute($document->documentElement, 'displayDetailsOnTestsThatTriggerErrors', false),
+            $this->parseBooleanAttribute($document->documentElement, 'displayDetailsOnTestsThatTriggerNotices', false),
+            $this->parseBooleanAttribute($document->documentElement, 'displayDetailsOnTestsThatTriggerWarnings', false),
+            $this->parseBooleanAttribute($document->documentElement, 'reverseDefectList', false),
             $requireCoverageMetadata,
-            $requireCoverageMetadataOnSmallTests,
-            $requireCoverageMetadataOnMediumTests,
-            $requireCoverageMetadataOnLargeTests,
-            $requireSealedMockObjects,
             $bootstrap,
             $this->bootstrapForTestSuite($filename, $xpath),
-            $this->parseBooleanAttribute($documentElement, 'processIsolation', false),
-            $this->parseBooleanAttribute($documentElement, 'failOnAllIssues', false),
-            $this->parseBooleanAttribute($documentElement, 'failOnDeprecation', false),
-            $documentElement->hasAttribute('failOnDeprecation'),
-            $this->parseBooleanAttribute($documentElement, 'failOnSelfDeprecation', false),
-            $documentElement->hasAttribute('failOnSelfDeprecation'),
-            $this->parseBooleanAttribute($documentElement, 'failOnDirectDeprecation', false),
-            $documentElement->hasAttribute('failOnDirectDeprecation'),
-            $this->parseBooleanAttribute($documentElement, 'failOnIndirectDeprecation', false),
-            $documentElement->hasAttribute('failOnIndirectDeprecation'),
-            $this->parseBooleanAttribute($documentElement, 'failOnPhpunitDeprecation', false),
-            $documentElement->hasAttribute('failOnPhpunitDeprecation'),
-            $this->parseBooleanAttribute($documentElement, 'failOnPhpunitNotice', false),
-            $documentElement->hasAttribute('failOnPhpunitNotice'),
-            $this->parseBooleanAttribute($documentElement, 'failOnPhpunitWarning', true),
-            $documentElement->hasAttribute('failOnPhpunitWarning'),
-            $this->parseBooleanAttribute($documentElement, 'failOnEmptyTestSuite', false),
-            $documentElement->hasAttribute('failOnEmptyTestSuite'),
-            $this->parseBooleanAttribute($documentElement, 'failOnIncomplete', false),
-            $documentElement->hasAttribute('failOnIncomplete'),
-            $this->parseBooleanAttribute($documentElement, 'failOnNotice', false),
-            $documentElement->hasAttribute('failOnNotice'),
-            $this->parseBooleanAttribute($documentElement, 'failOnRisky', false),
-            $documentElement->hasAttribute('failOnRisky'),
-            $this->parseBooleanAttribute($documentElement, 'failOnSkipped', false),
-            $documentElement->hasAttribute('failOnSkipped'),
-            $this->parseBooleanAttribute($documentElement, 'failOnWarning', false),
-            $documentElement->hasAttribute('failOnWarning'),
-            (int) $this->parseBooleanAttribute($documentElement, 'stopOnDefect', false),
-            (int) $this->parseBooleanAttribute($documentElement, 'stopOnDeprecation', false),
-            (int) $this->parseBooleanAttribute($documentElement, 'stopOnError', false),
-            (int) $this->parseBooleanAttribute($documentElement, 'stopOnFailure', false),
-            (int) $this->parseBooleanAttribute($documentElement, 'stopOnIncomplete', false),
-            (int) $this->parseBooleanAttribute($documentElement, 'stopOnNotice', false),
-            (int) $this->parseBooleanAttribute($documentElement, 'stopOnRisky', false),
-            (int) $this->parseBooleanAttribute($documentElement, 'stopOnSkipped', false),
-            (int) $this->parseBooleanAttribute($documentElement, 'stopOnWarning', false),
+            $this->parseBooleanAttribute($document->documentElement, 'processIsolation', false),
+            $this->parseBooleanAttribute($document->documentElement, 'failOnAllIssues', false),
+            $this->parseBooleanAttribute($document->documentElement, 'failOnDeprecation', false),
+            $this->parseBooleanAttribute($document->documentElement, 'failOnPhpunitDeprecation', false),
+            $this->parseBooleanAttribute($document->documentElement, 'failOnPhpunitNotice', false),
+            $this->parseBooleanAttribute($document->documentElement, 'failOnPhpunitWarning', true),
+            $this->parseBooleanAttribute($document->documentElement, 'failOnEmptyTestSuite', false),
+            $document->documentElement->hasAttribute('failOnEmptyTestSuite'),
+            $this->parseBooleanAttribute($document->documentElement, 'failOnIncomplete', false),
+            $this->parseBooleanAttribute($document->documentElement, 'failOnNotice', false),
+            $this->parseBooleanAttribute($document->documentElement, 'failOnRisky', false),
+            $this->parseBooleanAttribute($document->documentElement, 'failOnSkipped', false),
+            $this->parseBooleanAttribute($document->documentElement, 'failOnWarning', false),
+            $this->parseBooleanAttribute($document->documentElement, 'stopOnDefect', false),
+            $this->parseBooleanAttribute($document->documentElement, 'stopOnDeprecation', false),
+            $this->parseBooleanAttribute($document->documentElement, 'stopOnError', false),
+            $this->parseBooleanAttribute($document->documentElement, 'stopOnFailure', false),
+            $this->parseBooleanAttribute($document->documentElement, 'stopOnIncomplete', false),
+            $this->parseBooleanAttribute($document->documentElement, 'stopOnNotice', false),
+            $this->parseBooleanAttribute($document->documentElement, 'stopOnRisky', false),
+            $this->parseBooleanAttribute($document->documentElement, 'stopOnSkipped', false),
+            $this->parseBooleanAttribute($document->documentElement, 'stopOnWarning', false),
             $extensionsDirectory,
-            $this->parseBooleanAttribute($documentElement, 'beStrictAboutChangesToGlobalState', false),
-            $this->parseBooleanAttribute($documentElement, 'beStrictAboutOutputDuringTests', false),
-            $this->parseBooleanAttribute($documentElement, 'beStrictAboutTestsThatDoNotTestAnything', true),
+            $this->parseBooleanAttribute($document->documentElement, 'beStrictAboutChangesToGlobalState', false),
+            $this->parseBooleanAttribute($document->documentElement, 'beStrictAboutOutputDuringTests', false),
+            $this->parseBooleanAttribute($document->documentElement, 'beStrictAboutTestsThatDoNotTestAnything', true),
             $beStrictAboutCoverageMetadata,
-            $requireCoverageContribution,
-            $this->parseBooleanAttribute($documentElement, 'enforceTimeLimit', false),
-            $this->parseNonNegativeIntegerAttribute($documentElement, 'defaultTimeLimit', 1),
-            $this->parsePositiveIntegerAttribute($documentElement, 'timeoutForSmallTests', 1),
-            $this->parsePositiveIntegerAttribute($documentElement, 'timeoutForMediumTests', 10),
-            $this->parsePositiveIntegerAttribute($documentElement, 'timeoutForLargeTests', 60),
-            $this->parseNullableNonEmptyStringAttribute($documentElement, 'defaultTestSuite'),
+            $this->parseBooleanAttribute($document->documentElement, 'enforceTimeLimit', false),
+            $this->parseIntegerAttribute($document->documentElement, 'defaultTimeLimit', 1),
+            $this->parseIntegerAttribute($document->documentElement, 'timeoutForSmallTests', 1),
+            $this->parseIntegerAttribute($document->documentElement, 'timeoutForMediumTests', 10),
+            $this->parseIntegerAttribute($document->documentElement, 'timeoutForLargeTests', 60),
+            $this->parseStringAttribute($document->documentElement, 'defaultTestSuite'),
             $executionOrder,
             $resolveDependencies,
             $defectsFirst,
-            $this->parseBooleanAttribute($documentElement, 'backupGlobals', false),
+            $this->parseBooleanAttribute($document->documentElement, 'backupGlobals', false),
             $backupStaticProperties,
-            $this->parseBooleanAttribute($documentElement, 'testdox', false),
-            $this->parseBooleanAttribute($documentElement, 'testdoxSummary', false),
-            $this->parseBooleanAttribute($documentElement, 'controlGarbageCollector', false),
-            $this->parsePositiveIntegerAttribute($documentElement, 'numberOfTestsBeforeGarbageCollection', 100),
+            $this->parseBooleanAttribute($document->documentElement, 'testdox', false),
+            $this->parseBooleanAttribute($document->documentElement, 'testdoxSummary', false),
+            $this->parseBooleanAttribute($document->documentElement, 'controlGarbageCollector', false),
+            $this->parseIntegerAttribute($document->documentElement, 'numberOfTestsBeforeGarbageCollection', 100),
             $shortenArraysForExportThreshold,
-            $this->parsePositiveIntegerAttribute($documentElement, 'diffContext', 3),
-            $this->parseBooleanAttribute($documentElement, 'warnWhenPhpIsNotConfiguredForDevelopment', false),
-            $this->parseBooleanAttribute($documentElement, 'cacheTestIndex', false),
         );
     }
 
-    /**
-     * @return non-empty-string
-     */
     private function parseColors(DOMDocument $document): string
     {
-        $documentElement = $document->documentElement;
-
-        assert($documentElement !== null);
-
-        if (!$documentElement->hasAttribute('colors')) {
+        if (!$document->documentElement->hasAttribute('colors')) {
             return Configuration::COLOR_DEFAULT;
         }
 
-        if ($this->booleanFromString($documentElement->getAttribute('colors'), false)) {
+        if ($this->booleanFromString($document->documentElement->getAttribute('colors'), false)) {
             return Configuration::COLOR_ALWAYS;
         }
 
@@ -1337,14 +1010,10 @@ final readonly class Loader
 
     private function parseColumns(DOMDocument $document): int|string
     {
-        $documentElement = $document->documentElement;
-
-        assert($documentElement !== null);
-
         $columns = 80;
 
-        if ($documentElement->hasAttribute('columns')) {
-            $columns = $documentElement->getAttribute('columns');
+        if ($document->documentElement->hasAttribute('columns')) {
+            $columns = $document->documentElement->getAttribute('columns');
 
             if ($columns !== 'max') {
                 $columns = $this->parseInteger($columns, 80);
@@ -1413,11 +1082,7 @@ final readonly class Loader
                 $suffix = 'Test.php';
 
                 if ($directoryNode->hasAttribute('suffix')) {
-                    $candidateSuffix = $directoryNode->getAttribute('suffix');
-
-                    if ($candidateSuffix !== '') {
-                        $suffix = $candidateSuffix;
-                    }
+                    $suffix = $directoryNode->getAttribute('suffix');
                 }
 
                 $phpVersion = PHP_VERSION;
@@ -1429,9 +1094,7 @@ final readonly class Loader
                 $phpVersionOperator = new VersionComparisonOperator('>=');
 
                 if ($directoryNode->hasAttribute('phpVersionOperator')) {
-                    $phpVersionOperator = new VersionComparisonOperator(
-                        $this->parseVersionOperator($directoryNode->getAttribute('phpVersionOperator')),
-                    );
+                    $phpVersionOperator = new VersionComparisonOperator($directoryNode->getAttribute('phpVersionOperator'));
                 }
 
                 $groups = [];
@@ -1478,9 +1141,7 @@ final readonly class Loader
                 $phpVersionOperator = new VersionComparisonOperator('>=');
 
                 if ($fileNode->hasAttribute('phpVersionOperator')) {
-                    $phpVersionOperator = new VersionComparisonOperator(
-                        $this->parseVersionOperator($fileNode->getAttribute('phpVersionOperator')),
-                    );
+                    $phpVersionOperator = new VersionComparisonOperator($fileNode->getAttribute('phpVersionOperator'));
                 }
 
                 $groups = [];
@@ -1576,11 +1237,7 @@ final readonly class Loader
      */
     private function ensureConfigurationValidatesAgainstAtLeastOneSchema(DOMDocument $document, string $configurationFile, ValidationResult $validationResult): void
     {
-        $documentElement = $document->documentElement;
-
-        assert($documentElement !== null);
-
-        if ($documentElement->localName === 'phpunit') {
+        if ($document->documentElement->localName === 'phpunit') {
             return;
         }
 
@@ -1590,16 +1247,12 @@ final readonly class Loader
         foreach ($schemaFinder->available() as $version) {
             try {
                 $xsdFilename = $schemaFinder->find($version);
-                // @codeCoverageIgnoreStart
             } catch (CannotFindSchemaException) {
                 continue;
             }
-            // @codeCoverageIgnoreEnd
 
             if (!$validator->validate($document, $xsdFilename)->hasValidationErrors()) {
-                // @codeCoverageIgnoreStart
                 return;
-                // @codeCoverageIgnoreEnd
             }
         }
 

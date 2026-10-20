@@ -39,17 +39,6 @@ final class Exception extends Constraint
     }
 
     /**
-     * Returns the negated string representation of the constraint.
-     */
-    protected function negatedToString(): string
-    {
-        return sprintf(
-            'exception of type "%s" is not thrown',
-            $this->className,
-        );
-    }
-
-    /**
      * Evaluates the constraint for parameter $other. Returns true if the
      * constraint is met, false otherwise.
      */
@@ -68,38 +57,22 @@ final class Exception extends Constraint
      */
     protected function failureDescription(mixed $other): string
     {
-        if (!$other instanceof Throwable) {
+        if ($other === null) {
             return sprintf(
                 'exception of type "%s" is thrown',
                 $this->className,
             );
         }
 
-        $message = '. Message was: "' . $other->getMessage() . '" at'
-            . "\n" . Filter::stackTraceFromThrowableAsString($other);
+        $message = '';
+
+        if ($other instanceof Throwable) {
+            $message = '. Message was: "' . $other->getMessage() . '" at'
+                . "\n" . Filter::stackTraceFromThrowableAsString($other);
+        }
 
         return sprintf(
             'exception of type "%s" matches expected exception "%s"%s',
-            $other::class,
-            $this->className,
-            $message,
-        );
-    }
-
-    /**
-     * @throws \PHPUnit\Framework\Exception
-     */
-    protected function negatedFailureDescription(mixed $other): string
-    {
-        if (!$other instanceof Throwable) {
-            return $this->negatedToString();
-        }
-
-        $message = '. Message was: "' . $other->getMessage() . '" at'
-            . "\n" . Filter::stackTraceFromThrowableAsString($other);
-
-        return sprintf(
-            'exception of type "%s" does not match expected exception "%s"%s',
             $other::class,
             $this->className,
             $message,

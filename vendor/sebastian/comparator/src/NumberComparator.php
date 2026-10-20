@@ -18,10 +18,6 @@ use function number_format;
 use BcMath\Number;
 
 /**
- * An object exporter is not consulted for the representation of the
- * BcMath\Number objects that are compared: the representation this comparator
- * provides for them always has precedence.
- *
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for sebastian/comparator
  *
  * @internal This class is not covered by the backward compatibility promise for sebastian/comparator
@@ -43,13 +39,13 @@ final class NumberComparator extends ObjectComparator
     public function assertEquals(mixed $expected, mixed $actual, float $delta = 0.0, bool $canonicalize = false, bool $ignoreCase = false, array &$processed = []): void
     {
         if (!$expected instanceof Number) {
-            assert(is_int($expected) || is_string($expected) && is_numeric($expected));
+            assert((is_string($expected) && is_numeric($expected)) || is_int($expected));
 
             $expected = new Number($expected);
         }
 
         if (!$actual instanceof Number) {
-            assert(is_int($actual) || is_string($actual) && is_numeric($actual));
+            assert((is_string($actual) && is_numeric($actual)) || is_int($actual));
 
             $actual = new Number($actual);
         }
@@ -64,7 +60,6 @@ final class NumberComparator extends ObjectComparator
                 (string) $expected,
                 (string) $actual,
                 'Failed asserting that two Number objects are equal.',
-                $this->contextLines(),
             );
         }
     }

@@ -25,22 +25,20 @@ final readonly class HookedProperty
     private Type $type;
     private bool $getHook;
     private bool $setHook;
-    private bool $finalGetHook;
-    private bool $finalSetHook;
+    private bool $virtual;
     private ?Type $setterType;
 
     /**
      * @param non-empty-string $name
      */
-    public function __construct(string $name, Type $type, bool $getHook, bool $setHook, bool $finalGetHook, bool $finalSetHook, ?Type $setterType)
+    public function __construct(string $name, Type $type, bool $getHook, bool $setHook, bool $virtual, ?Type $setterType)
     {
-        $this->name         = $name;
-        $this->type         = $type;
-        $this->getHook      = $getHook;
-        $this->setHook      = $setHook;
-        $this->finalGetHook = $finalGetHook;
-        $this->finalSetHook = $finalSetHook;
-        $this->setterType   = $setterType;
+        $this->name       = $name;
+        $this->type       = $type;
+        $this->getHook    = $getHook;
+        $this->setHook    = $setHook;
+        $this->virtual    = $virtual;
+        $this->setterType = $setterType;
     }
 
     public function name(): string
@@ -65,28 +63,16 @@ final readonly class HookedProperty
 
     public function shouldGenerateGetHook(): bool
     {
-        return $this->getHook || $this->setHook && !$this->finalGetHook;
+        return $this->getHook || !$this->virtual && $this->setHook;
     }
 
     public function shouldGenerateSetHook(): bool
     {
-        return $this->setHook || $this->getHook && !$this->finalSetHook;
+        return $this->setHook || !$this->virtual && $this->getHook;
     }
 
-    public function hasSetterType(): bool
+    public function setterType(): ?Type
     {
-        return $this->setterType !== null;
-    }
-
-    /**
-     * @throws RuntimeException
-     */
-    public function setterType(): Type
-    {
-        if ($this->setterType === null) {
-            throw new RuntimeException;
-        }
-
         return $this->setterType;
     }
 }

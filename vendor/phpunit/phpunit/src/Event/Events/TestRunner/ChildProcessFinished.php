@@ -9,7 +9,6 @@
  */
 namespace PHPUnit\Event\TestRunner;
 
-use function sprintf;
 use PHPUnit\Event\Event;
 use PHPUnit\Event\Telemetry;
 
@@ -21,17 +20,15 @@ use PHPUnit\Event\Telemetry;
 final readonly class ChildProcessFinished implements Event
 {
     private Telemetry\Info $telemetryInfo;
-    private ChildProcessReason $reason;
     private string $stdout;
     private string $stderr;
 
     /**
      * @internal This method is not covered by the backward compatibility promise for PHPUnit
      */
-    public function __construct(Telemetry\Info $telemetryInfo, ChildProcessReason $reason, string $stdout, string $stderr)
+    public function __construct(Telemetry\Info $telemetryInfo, string $stdout, string $stderr)
     {
         $this->telemetryInfo = $telemetryInfo;
-        $this->reason        = $reason;
         $this->stdout        = $stdout;
         $this->stderr        = $stderr;
     }
@@ -39,11 +36,6 @@ final readonly class ChildProcessFinished implements Event
     public function telemetryInfo(): Telemetry\Info
     {
         return $this->telemetryInfo;
-    }
-
-    public function reason(): ChildProcessReason
-    {
-        return $this->reason;
     }
 
     public function stdout(): string
@@ -61,9 +53,6 @@ final readonly class ChildProcessFinished implements Event
      */
     public function asString(): string
     {
-        return sprintf(
-            'Child Process Finished (%s)',
-            $this->reason->value,
-        );
+        return 'Child Process Finished';
     }
 }

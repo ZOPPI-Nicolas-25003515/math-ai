@@ -27,7 +27,7 @@ final readonly class Validator
     {
         $buffer = file_get_contents($xsdFilename);
 
-        assert($buffer !== false && $buffer !== '');
+        assert($buffer !== false);
 
         $originalErrorHandling = libxml_use_internal_errors(true);
 

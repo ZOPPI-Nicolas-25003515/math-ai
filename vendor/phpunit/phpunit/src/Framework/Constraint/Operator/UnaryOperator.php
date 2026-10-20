@@ -48,7 +48,13 @@ abstract class UnaryOperator extends Operator
             return $this->operator() . '( ' . $constraint->toString() . ' )';
         }
 
-        return $this->operandToString($constraint);
+        $string = $constraint->toStringInContext($this, 0);
+
+        if ($string === '') {
+            return $this->transformString($constraint->toString());
+        }
+
+        return $string;
     }
 
     /**
@@ -79,30 +85,6 @@ abstract class UnaryOperator extends Operator
             return $this->operator() . '( ' . $constraint->failureDescription($other) . ' )';
         }
 
-        return $this->operandFailureDescription($constraint, $other);
-    }
-
-    /**
-     * Returns the string representation of $constraint in context of this
-     * operator.
-     */
-    protected function operandToString(Constraint $constraint): string
-    {
-        $string = $constraint->toStringInContext($this, 0);
-
-        if ($string === '') {
-            return $this->transformString($constraint->toString());
-        }
-
-        return $string;
-    }
-
-    /**
-     * Returns the failure description of $constraint in context of this
-     * operator.
-     */
-    protected function operandFailureDescription(Constraint $constraint, mixed $other): string
-    {
         $string = $constraint->failureDescriptionInContext($this, 0, $other);
 
         if ($string === '') {

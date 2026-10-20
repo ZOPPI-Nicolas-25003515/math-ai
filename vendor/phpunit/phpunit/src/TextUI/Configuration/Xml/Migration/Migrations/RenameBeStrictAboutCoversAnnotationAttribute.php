@@ -26,11 +26,9 @@ final readonly class RenameBeStrictAboutCoversAnnotationAttribute implements Mig
 
         assert($root instanceof DOMElement);
 
-        // @codeCoverageIgnoreStart
         if ($root->hasAttribute('beStrictAboutCoverageMetadata')) {
             return;
         }
-        // @codeCoverageIgnoreEnd
 
         if (!$root->hasAttribute('beStrictAboutCoversAnnotation')) {
             return;

@@ -47,50 +47,11 @@ final readonly class Finished implements Event
      */
     public function asString(): string
     {
-        if ($this->testSuite->isForRetriedTestMethod()) {
-            return sprintf(
-                'Test Suite for Retried Test Method Finished (%s, up to %d attempts)',
-                $this->testSuite->name(),
-                $this->testSuite->maxAttempts(),
-            );
-        }
-
-        if ($this->testSuite->isForRetriedPhpt()) {
-            return sprintf(
-                'Test Suite for Retried PHPT Finished (%s, up to %d attempts)',
-                $this->testSuite->name(),
-                $this->testSuite->maxAttempts(),
-            );
-        }
-
-        $prefix = 'Test Suite Finished';
-        $unit   = 'test';
-
-        if ($this->testSuite->isForTestMethodWithDataProvider()) {
-            $prefix = 'Test Suite for Test Method with Data Provider Finished';
-            $unit   = 'data set';
-        } elseif ($this->testSuite->isForRepeatedTestMethod()) {
-            $prefix = 'Test Suite for Repeated Test Method Finished';
-            $unit   = 'repetition';
-        } elseif ($this->testSuite->isForRepeatedPhpt()) {
-            $prefix = 'Test Suite for Repeated PHPT Finished';
-            $unit   = 'repetition';
-        }
-
-        $count  = $this->testSuite->count();
-        $plural = '';
-
-        if ($count !== 1) {
-            $plural = 's';
-        }
-
         return sprintf(
-            '%s (%s, %d %s%s)',
-            $prefix,
+            'Test Suite Finished (%s, %d test%s)',
             $this->testSuite->name(),
-            $count,
-            $unit,
-            $plural,
+            $this->testSuite->count(),
+            $this->testSuite->count() !== 1 ? 's' : '',
         );
     }
 }

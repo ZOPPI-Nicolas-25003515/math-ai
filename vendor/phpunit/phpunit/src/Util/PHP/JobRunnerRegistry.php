@@ -10,8 +10,8 @@
 namespace PHPUnit\Util\PHP;
 
 use PHPUnit\Event\Facade;
+use PHPUnit\Framework\ChildProcessResultProcessor;
 use PHPUnit\Framework\Test;
-use PHPUnit\Framework\TestRunner\ChildProcessResultProcessor;
 use PHPUnit\Runner\CodeCoverage;
 use PHPUnit\TestRunner\TestResult\PassedTests;
 
@@ -46,16 +46,13 @@ final class JobRunnerRegistry
     private static function runner(): JobRunner
     {
         if (self::$runner === null) {
-            $emitter = Facade::emitter();
-
             self::$runner = new JobRunner(
                 new ChildProcessResultProcessor(
                     Facade::instance(),
-                    $emitter,
+                    Facade::emitter(),
                     PassedTests::instance(),
                     CodeCoverage::instance(),
                 ),
-                $emitter,
             );
         }
 

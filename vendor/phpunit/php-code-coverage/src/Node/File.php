@@ -11,10 +11,10 @@ namespace SebastianBergmann\CodeCoverage\Node;
 
 use function array_filter;
 use function count;
+use function range;
+use SebastianBergmann\CodeCoverage\CodeCoverage;
 use SebastianBergmann\CodeCoverage\Data\ProcessedBranchCoverageData;
 use SebastianBergmann\CodeCoverage\Data\ProcessedClassType;
-use SebastianBergmann\CodeCoverage\Data\ProcessedCodeCoverageData;
-use SebastianBergmann\CodeCoverage\Data\ProcessedFunctionCoverageData;
 use SebastianBergmann\CodeCoverage\Data\ProcessedFunctionType;
 use SebastianBergmann\CodeCoverage\Data\ProcessedMethodType;
 use SebastianBergmann\CodeCoverage\Data\ProcessedPathCoverageData;
@@ -25,18 +25,12 @@ use SebastianBergmann\CodeCoverage\StaticAnalysis\Function_;
 use SebastianBergmann\CodeCoverage\StaticAnalysis\LinesOfCode;
 use SebastianBergmann\CodeCoverage\StaticAnalysis\Method;
 use SebastianBergmann\CodeCoverage\StaticAnalysis\Trait_;
-use SebastianBergmann\CodeCoverage\Test\TestSizes;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for phpunit/php-code-coverage
  *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise for phpunit/php-code-coverage
- *
- * @phpstan-import-type TestDataType from Builder
- * @phpstan-import-type TestIndexType from ProcessedCodeCoverageData
+ * @phpstan-import-type TestType from CodeCoverage
  * @phpstan-import-type LinesType from AnalysisResult
- * @phpstan-import-type TestSizeSet from TestSizes
- * @phpstan-import-type TestSizeCounts from TestSizes
  */
 final class File extends AbstractNode
 {
@@ -46,30 +40,21 @@ final class File extends AbstractNode
     private string $sha1;
 
     /**
-     * @var array<positive-int, ?array<TestIndexType, positive-int>>
+     * @var array<int, ?list<non-empty-string>>
      */
     private array $lineCoverageData;
-
-    /**
-     * @var array<non-empty-string, ProcessedFunctionCoverageData>
-     */
     private array $functionCoverageData;
 
     /**
-     * @var array<TestIndexType, TestDataType>
+     * @var array<string, TestType>
      */
     private readonly array $testData;
-    private int $numExecutableLines = 0;
-    private int $numExecutedLines   = 0;
-
-    /**
-     * @var TestSizeCounts
-     */
-    private array $numExecutedLinesByTestSize = TestSizes::ZERO_COUNTS;
-    private int $numExecutableBranches        = 0;
-    private int $numExecutedBranches          = 0;
-    private int $numExecutablePaths           = 0;
-    private int $numExecutedPaths             = 0;
+    private int $numExecutableLines    = 0;
+    private int $numExecutedLines      = 0;
+    private int $numExecutableBranches = 0;
+    private int $numExecutedBranches   = 0;
+    private int $numExecutablePaths    = 0;
+    private int $numExecutedPaths      = 0;
 
     /**
      * @var array<string, ProcessedClassType>
@@ -86,101 +71,38 @@ final class File extends AbstractNode
      */
     private array $functions = [];
     private readonly LinesOfCode $linesOfCode;
-    private readonly bool $hasBranchCoverageData;
-    private readonly bool $collectsHitCounts;
-    private ?int $numClasses      = null;
-    private int $numTestedClasses = 0;
+    private ?int $numClasses         = null;
+    private int $numTestedClasses    = 0;
+    private ?int $numTraits          = null;
+    private int $numTestedTraits     = 0;
+    private ?int $numMethods         = null;
+    private ?int $numTestedMethods   = null;
+    private ?int $numTestedFunctions = null;
 
     /**
-     * @var TestSizeCounts
-     */
-    private array $numTestedClassesByTestSize = TestSizes::ZERO_COUNTS;
-    private ?int $numTraits                   = null;
-    private int $numTestedTraits              = 0;
-
-    /**
-     * @var TestSizeCounts
-     */
-    private array $numTestedTraitsByTestSize = TestSizes::ZERO_COUNTS;
-    private ?int $numMethods                 = null;
-    private ?int $numTestedMethods           = null;
-
-    /**
-     * @var ?TestSizeCounts
-     */
-    private ?array $numTestedMethodsByTestSize = null;
-    private int $numTestedFunctions            = 0;
-
-    /**
-     * @var TestSizeCounts
-     */
-    private array $numTestedFunctionsByTestSize = TestSizes::ZERO_COUNTS;
-
-    /**
-     * @var array<int, array<int, ProcessedClassType|ProcessedFunctionType|ProcessedMethodType|ProcessedTraitType>>
+     * @var array<int, array|array{0: Class_, 1: string}|array{0: Function_|ProcessedFunctionType|ProcessedMethodType}|array{0: Trait_, 1: string}>
      */
     private array $codeUnitsByLine = [];
 
     /**
-     * @var array<string, Class_>
+     * @param non-empty-string                    $sha1
+     * @param array<int, ?list<non-empty-string>> $lineCoverageData
+     * @param array<string, TestType>             $testData
+     * @param array<string, Class_>               $classes
+     * @param array<string, Trait_>               $traits
+     * @param array<string, Function_>            $functions
      */
-    private readonly array $rawClasses;
-
-    /**
-     * @var array<string, Trait_>
-     */
-    private readonly array $rawTraits;
-
-    /**
-     * Resolves the size of each test to the bit that represents it, so that the
-     * string comparisons are not repeated for every covering test of every
-     * executed line. The result is the same for every file of a report, which
-     * is why Builder resolves it once and passes it to every file.
-     *
-     * @param array<TestIndexType, TestDataType> $testData
-     *
-     * @return array<TestIndexType, TestSizeSet>
-     */
-    public static function sizeBitByTestIndex(array $testData): array
-    {
-        $sizeBitByTestIndex = [];
-
-        foreach ($testData as $testIndex => $data) {
-            $sizeBit = TestSizes::bitFor($data['size']);
-
-            if ($sizeBit !== 0) {
-                $sizeBitByTestIndex[$testIndex] = $sizeBit;
-            }
-        }
-
-        return $sizeBitByTestIndex;
-    }
-
-    /**
-     * @param non-empty-string                                         $sha1
-     * @param array<positive-int, ?array<TestIndexType, positive-int>> $lineCoverageData
-     * @param array<non-empty-string, ProcessedFunctionCoverageData>   $functionCoverageData
-     * @param array<TestIndexType, TestDataType>                       $testData
-     * @param array<string, Class_>                                    $classes
-     * @param array<string, Trait_>                                    $traits
-     * @param array<string, Function_>                                 $functions
-     * @param ?array<TestIndexType, TestSizeSet>                       $sizeBitByTestIndex   derived from $testData when not given
-     */
-    public function __construct(string $name, AbstractNode $parent, string $sha1, array $lineCoverageData, array $functionCoverageData, array $testData, array $classes, array $traits, array $functions, LinesOfCode $linesOfCode, bool $hasBranchCoverageData = false, bool $collectsHitCounts = false, ?array $sizeBitByTestIndex = null)
+    public function __construct(string $name, AbstractNode $parent, string $sha1, array $lineCoverageData, array $functionCoverageData, array $testData, array $classes, array $traits, array $functions, LinesOfCode $linesOfCode)
     {
         parent::__construct($name, $parent);
 
-        $this->sha1                  = $sha1;
-        $this->lineCoverageData      = $lineCoverageData;
-        $this->functionCoverageData  = $functionCoverageData;
-        $this->testData              = $testData;
-        $this->linesOfCode           = $linesOfCode;
-        $this->hasBranchCoverageData = $hasBranchCoverageData;
-        $this->collectsHitCounts     = $collectsHitCounts;
-        $this->rawClasses            = $classes;
-        $this->rawTraits             = $traits;
+        $this->sha1                 = $sha1;
+        $this->lineCoverageData     = $lineCoverageData;
+        $this->functionCoverageData = $functionCoverageData;
+        $this->testData             = $testData;
+        $this->linesOfCode          = $linesOfCode;
 
-        $this->calculateStatistics($classes, $traits, $functions, $sizeBitByTestIndex ?? self::sizeBitByTestIndex($testData));
+        $this->calculateStatistics($classes, $traits, $functions);
     }
 
     public function count(): int
@@ -197,43 +119,24 @@ final class File extends AbstractNode
     }
 
     /**
-     * @return array<positive-int, ?array<TestIndexType, positive-int>>
+     * @return array<int, ?list<non-empty-string>>
      */
     public function lineCoverageData(): array
     {
         return $this->lineCoverageData;
     }
 
-    /**
-     * @return array<non-empty-string, ProcessedFunctionCoverageData>
-     */
     public function functionCoverageData(): array
     {
         return $this->functionCoverageData;
     }
 
     /**
-     * @return array<TestIndexType, TestDataType>
+     * @return array<string, TestType>
      */
     public function testData(): array
     {
         return $this->testData;
-    }
-
-    /**
-     * @return array<string, Class_>
-     */
-    public function rawClasses(): array
-    {
-        return $this->rawClasses;
-    }
-
-    /**
-     * @return array<string, Trait_>
-     */
-    public function rawTraits(): array
-    {
-        return $this->rawTraits;
     }
 
     /**
@@ -275,14 +178,6 @@ final class File extends AbstractNode
         return $this->numExecutedLines;
     }
 
-    /**
-     * @param TestSizeSet $testSizes
-     */
-    public function numberOfExecutedLinesByTestSize(int $testSizes): int
-    {
-        return $this->numExecutedLinesByTestSize[$testSizes];
-    }
-
     public function numberOfExecutableBranches(): int
     {
         return $this->numExecutableBranches;
@@ -301,26 +196,6 @@ final class File extends AbstractNode
     public function numberOfExecutedPaths(): int
     {
         return $this->numExecutedPaths;
-    }
-
-    public function hasBranchCoverageData(): bool
-    {
-        return $this->hasBranchCoverageData;
-    }
-
-    /**
-     * Whether the values in lineCoverageData() are exact execution counts (the driver that
-     * collected the data counts how often a line was executed) or only mean "executed at
-     * least once".
-     */
-    public function collectsHitCounts(): bool
-    {
-        return $this->collectsHitCounts;
-    }
-
-    public function numberOfFilesWithoutBranchCoverageData(): int
-    {
-        return $this->hasBranchCoverageData ? 0 : 1;
     }
 
     public function numberOfClasses(): int
@@ -347,14 +222,6 @@ final class File extends AbstractNode
         return $this->numTestedClasses;
     }
 
-    /**
-     * @param TestSizeSet $testSizes
-     */
-    public function numberOfTestedClassesByTestSize(int $testSizes): int
-    {
-        return $this->numTestedClassesByTestSize[$testSizes];
-    }
-
     public function numberOfTraits(): int
     {
         if ($this->numTraits === null) {
@@ -377,14 +244,6 @@ final class File extends AbstractNode
     public function numberOfTestedTraits(): int
     {
         return $this->numTestedTraits;
-    }
-
-    /**
-     * @param TestSizeSet $testSizes
-     */
-    public function numberOfTestedTraitsByTestSize(int $testSizes): int
-    {
-        return $this->numTestedTraitsByTestSize[$testSizes];
     }
 
     public function numberOfMethods(): int
@@ -439,34 +298,6 @@ final class File extends AbstractNode
         return $this->numTestedMethods;
     }
 
-    /**
-     * @param TestSizeSet $testSizes
-     */
-    public function numberOfTestedMethodsByTestSize(int $testSizes): int
-    {
-        if ($this->numTestedMethodsByTestSize === null) {
-            $this->numTestedMethodsByTestSize = TestSizes::ZERO_COUNTS;
-
-            foreach ([$this->classes, $this->traits] as $classesOrTraits) {
-                foreach ($classesOrTraits as $classOrTrait) {
-                    foreach ($classOrTrait->methods as $method) {
-                        if ($method->executableLines === 0) {
-                            continue;
-                        }
-
-                        foreach (TestSizes::COMBINATIONS as $combination) {
-                            if ($method->executedLinesByTestSize[$combination] === $method->executableLines) {
-                                $this->numTestedMethodsByTestSize[$combination]++;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return $this->numTestedMethodsByTestSize[$testSizes];
-    }
-
     public function numberOfFunctions(): int
     {
         return count($this->functions);
@@ -474,169 +305,123 @@ final class File extends AbstractNode
 
     public function numberOfTestedFunctions(): int
     {
-        return $this->numTestedFunctions;
-    }
+        if ($this->numTestedFunctions === null) {
+            $this->numTestedFunctions = 0;
 
-    /**
-     * @param TestSizeSet $testSizes
-     */
-    public function numberOfTestedFunctionsByTestSize(int $testSizes): int
-    {
-        return $this->numTestedFunctionsByTestSize[$testSizes];
-    }
-
-    /**
-     * @param array<string, Class_>             $classes
-     * @param array<string, Trait_>             $traits
-     * @param array<string, Function_>          $functions
-     * @param array<TestIndexType, TestSizeSet> $sizeBitByTestIndex
-     */
-    private function calculateStatistics(array $classes, array $traits, array $functions, array $sizeBitByTestIndex): void
-    {
-        $this->processClasses($classes);
-        $this->processTraits($traits);
-        $this->processFunctions($functions);
-
-        $linesOfCode = $this->linesOfCode->linesOfCode();
-
-        for ($lineNumber = 1; $lineNumber <= $linesOfCode; $lineNumber++) {
-            $lineData = $this->lineCoverageData[$lineNumber] ?? null;
-
-            if ($lineData === null) {
-                continue;
-            }
-
-            $codeUnits = $this->codeUnitsByLine[$lineNumber] ?? [];
-
-            foreach ($codeUnits as $codeUnit) {
-                $codeUnit->executableLines++;
-            }
-
-            $this->numExecutableLines++;
-
-            if ($lineData === []) {
-                continue;
-            }
-
-            foreach ($codeUnits as $codeUnit) {
-                $codeUnit->executedLines++;
-            }
-
-            $this->numExecutedLines++;
-
-            if ($sizeBitByTestIndex === []) {
-                continue;
-            }
-
-            $coveringTestSizes = 0;
-
-            foreach ($lineData as $testIndex => $hits) {
-                $coveringTestSizes |= $sizeBitByTestIndex[$testIndex] ?? 0;
-
-                if ($coveringTestSizes === TestSizes::ALL) {
-                    break;
-                }
-            }
-
-            if ($coveringTestSizes === 0) {
-                continue;
-            }
-
-            foreach (TestSizes::COMBINATIONS as $combination) {
-                if (($combination & $coveringTestSizes) === 0) {
-                    continue;
-                }
-
-                $this->numExecutedLinesByTestSize[$combination]++;
-
-                foreach ($codeUnits as $codeUnit) {
-                    $codeUnit->executedLinesByTestSize[$combination]++;
+            foreach ($this->functions as $function) {
+                if ($function->executableLines > 0 &&
+                    $function->coverage === 100) {
+                    $this->numTestedFunctions++;
                 }
             }
         }
 
-        foreach ($this->traits as $trait) {
-            foreach ($trait->methods as $method) {
+        return $this->numTestedFunctions;
+    }
+
+    /**
+     * @param array<string, Class_>    $classes
+     * @param array<string, Trait_>    $traits
+     * @param array<string, Function_> $functions
+     */
+    private function calculateStatistics(array $classes, array $traits, array $functions): void
+    {
+        foreach (range(1, $this->linesOfCode->linesOfCode()) as $lineNumber) {
+            $this->codeUnitsByLine[$lineNumber] = [];
+        }
+
+        $this->processClasses($classes);
+        $this->processTraits($traits);
+        $this->processFunctions($functions);
+
+        foreach (range(1, $this->linesOfCode->linesOfCode()) as $lineNumber) {
+            if (isset($this->lineCoverageData[$lineNumber])) {
+                foreach ($this->codeUnitsByLine[$lineNumber] as &$codeUnit) {
+                    $codeUnit->executableLines++;
+                }
+
+                unset($codeUnit);
+
+                $this->numExecutableLines++;
+
+                if (count($this->lineCoverageData[$lineNumber]) > 0) {
+                    foreach ($this->codeUnitsByLine[$lineNumber] as &$codeUnit) {
+                        $codeUnit->executedLines++;
+                    }
+
+                    unset($codeUnit);
+
+                    $this->numExecutedLines++;
+                }
+            }
+        }
+
+        foreach ($this->traits as &$trait) {
+            foreach ($trait->methods as &$method) {
                 $methodLineCoverage   = $method->executableLines > 0 ? ($method->executedLines / $method->executableLines) * 100 : 100;
                 $methodBranchCoverage = $method->executableBranches > 0 ? ($method->executedBranches / $method->executableBranches) * 100 : 0;
                 $methodPathCoverage   = $method->executablePaths > 0 ? ($method->executedPaths / $method->executablePaths) * 100 : 0;
 
                 $method->coverage = $methodBranchCoverage > 0 ? $methodBranchCoverage : $methodLineCoverage;
-                $method->crap     = new CrapIndex($method->ccn, $methodPathCoverage > 0 ? $methodPathCoverage : $methodLineCoverage)->asString();
+                $method->crap     = (new CrapIndex($method->ccn, $methodPathCoverage > 0 ? $methodPathCoverage : $methodLineCoverage))->asString();
 
                 $trait->ccn += $method->ccn;
             }
+
+            unset($method);
 
             $traitBranchCoverage = $trait->executableBranches > 0 ? ($trait->executedBranches / $trait->executableBranches) * 100 : 0;
             $traitLineCoverage   = $trait->executableLines > 0 ? ($trait->executedLines / $trait->executableLines) * 100 : 100;
             $traitPathCoverage   = $trait->executablePaths > 0 ? ($trait->executedPaths / $trait->executablePaths) * 100 : 0;
 
             $trait->coverage = $traitBranchCoverage > 0 ? $traitBranchCoverage : $traitLineCoverage;
-            $trait->crap     = new CrapIndex($trait->ccn, $traitPathCoverage > 0 ? $traitPathCoverage : $traitLineCoverage)->asString();
+            $trait->crap     = (new CrapIndex($trait->ccn, $traitPathCoverage > 0 ? $traitPathCoverage : $traitLineCoverage))->asString();
 
             if ($trait->executableLines > 0 && $trait->coverage === 100) {
                 $this->numTestedTraits++;
             }
-
-            if ($trait->executableLines > 0) {
-                foreach (TestSizes::COMBINATIONS as $combination) {
-                    if ($trait->executedLinesByTestSize[$combination] === $trait->executableLines) {
-                        $this->numTestedTraitsByTestSize[$combination]++;
-                    }
-                }
-            }
         }
 
-        foreach ($this->classes as $class) {
-            foreach ($class->methods as $method) {
+        unset($trait);
+
+        foreach ($this->classes as &$class) {
+            foreach ($class->methods as &$method) {
                 $methodLineCoverage   = $method->executableLines > 0 ? ($method->executedLines / $method->executableLines) * 100 : 100;
                 $methodBranchCoverage = $method->executableBranches > 0 ? ($method->executedBranches / $method->executableBranches) * 100 : 0;
                 $methodPathCoverage   = $method->executablePaths > 0 ? ($method->executedPaths / $method->executablePaths) * 100 : 0;
 
                 $method->coverage = $methodBranchCoverage > 0 ? $methodBranchCoverage : $methodLineCoverage;
-                $method->crap     = new CrapIndex($method->ccn, $methodPathCoverage > 0 ? $methodPathCoverage : $methodLineCoverage)->asString();
+                $method->crap     = (new CrapIndex($method->ccn, $methodPathCoverage > 0 ? $methodPathCoverage : $methodLineCoverage))->asString();
 
                 $class->ccn += $method->ccn;
             }
+
+            unset($method);
 
             $classLineCoverage   = $class->executableLines > 0 ? ($class->executedLines / $class->executableLines) * 100 : 100;
             $classBranchCoverage = $class->executableBranches > 0 ? ($class->executedBranches / $class->executableBranches) * 100 : 0;
             $classPathCoverage   = $class->executablePaths > 0 ? ($class->executedPaths / $class->executablePaths) * 100 : 0;
 
             $class->coverage = $classBranchCoverage > 0 ? $classBranchCoverage : $classLineCoverage;
-            $class->crap     = new CrapIndex($class->ccn, $classPathCoverage > 0 ? $classPathCoverage : $classLineCoverage)->asString();
+            $class->crap     = (new CrapIndex($class->ccn, $classPathCoverage > 0 ? $classPathCoverage : $classLineCoverage))->asString();
 
             if ($class->executableLines > 0 && $class->coverage === 100) {
                 $this->numTestedClasses++;
             }
-
-            if ($class->executableLines > 0) {
-                foreach (TestSizes::COMBINATIONS as $combination) {
-                    if ($class->executedLinesByTestSize[$combination] === $class->executableLines) {
-                        $this->numTestedClassesByTestSize[$combination]++;
-                    }
-                }
-            }
         }
 
-        foreach ($this->functions as $function) {
+        unset($class);
+
+        foreach ($this->functions as &$function) {
             $functionLineCoverage   = $function->executableLines > 0 ? ($function->executedLines / $function->executableLines) * 100 : 100;
             $functionBranchCoverage = $function->executableBranches > 0 ? ($function->executedBranches / $function->executableBranches) * 100 : 0;
             $functionPathCoverage   = $function->executablePaths > 0 ? ($function->executedPaths / $function->executablePaths) * 100 : 0;
 
             $function->coverage = $functionBranchCoverage > 0 ? $functionBranchCoverage : $functionLineCoverage;
-            $function->crap     = new CrapIndex($function->ccn, $functionPathCoverage > 0 ? $functionPathCoverage : $functionLineCoverage)->asString();
+            $function->crap     = (new CrapIndex($function->ccn, $functionPathCoverage > 0 ? $functionPathCoverage : $functionLineCoverage))->asString();
 
             if ($function->coverage === 100) {
                 $this->numTestedFunctions++;
-            }
-
-            if ($function->executableLines > 0) {
-                foreach (TestSizes::COMBINATIONS as $combination) {
-                    if ($function->executedLinesByTestSize[$combination] === $function->executableLines) {
-                        $this->numTestedFunctionsByTestSize[$combination]++;
-                    }
-                }
             }
         }
     }
@@ -649,7 +434,7 @@ final class File extends AbstractNode
         $link = $this->id() . '.html#';
 
         foreach ($classes as $className => $class) {
-            $classData = new ProcessedClassType(
+            $this->classes[$className] = new ProcessedClassType(
                 $className,
                 $class->namespace(),
                 [],
@@ -666,28 +451,24 @@ final class File extends AbstractNode
                 $link . $class->startLine(),
             );
 
-            $this->classes[$className] = $classData;
-
             foreach ($class->methods() as $methodName => $method) {
-                $methodData                      = $this->newMethod($className, $method, $link);
-                $classData->methods[$methodName] = $methodData;
+                $methodData                                      = $this->newMethod($className, $method, $link);
+                $this->classes[$className]->methods[$methodName] = $methodData;
 
-                $classData->executableBranches += $methodData->executableBranches;
-                $classData->executedBranches   += $methodData->executedBranches;
-                $classData->executablePaths    += $methodData->executablePaths;
-                $classData->executedPaths      += $methodData->executedPaths;
+                $this->classes[$className]->executableBranches += $methodData->executableBranches;
+                $this->classes[$className]->executedBranches   += $methodData->executedBranches;
+                $this->classes[$className]->executablePaths    += $methodData->executablePaths;
+                $this->classes[$className]->executedPaths      += $methodData->executedPaths;
 
                 $this->numExecutableBranches += $methodData->executableBranches;
                 $this->numExecutedBranches   += $methodData->executedBranches;
                 $this->numExecutablePaths    += $methodData->executablePaths;
                 $this->numExecutedPaths      += $methodData->executedPaths;
 
-                $methodEndLine = $method->endLine();
-
-                for ($lineNumber = $method->startLine(); $lineNumber <= $methodEndLine; $lineNumber++) {
+                foreach (range($method->startLine(), $method->endLine()) as $lineNumber) {
                     $this->codeUnitsByLine[$lineNumber] = [
-                        $classData,
-                        $methodData,
+                        &$this->classes[$className],
+                        &$this->classes[$className]->methods[$methodName],
                     ];
                 }
             }
@@ -702,7 +483,7 @@ final class File extends AbstractNode
         $link = $this->id() . '.html#';
 
         foreach ($traits as $traitName => $trait) {
-            $traitData = new ProcessedTraitType(
+            $this->traits[$traitName] = new ProcessedTraitType(
                 $traitName,
                 $trait->namespace(),
                 [],
@@ -719,28 +500,24 @@ final class File extends AbstractNode
                 $link . $trait->startLine(),
             );
 
-            $this->traits[$traitName] = $traitData;
-
             foreach ($trait->methods() as $methodName => $method) {
-                $methodData                      = $this->newMethod($traitName, $method, $link);
-                $traitData->methods[$methodName] = $methodData;
+                $methodData                                     = $this->newMethod($traitName, $method, $link);
+                $this->traits[$traitName]->methods[$methodName] = $methodData;
 
-                $traitData->executableBranches += $methodData->executableBranches;
-                $traitData->executedBranches   += $methodData->executedBranches;
-                $traitData->executablePaths    += $methodData->executablePaths;
-                $traitData->executedPaths      += $methodData->executedPaths;
+                $this->traits[$traitName]->executableBranches += $methodData->executableBranches;
+                $this->traits[$traitName]->executedBranches   += $methodData->executedBranches;
+                $this->traits[$traitName]->executablePaths    += $methodData->executablePaths;
+                $this->traits[$traitName]->executedPaths      += $methodData->executedPaths;
 
                 $this->numExecutableBranches += $methodData->executableBranches;
                 $this->numExecutedBranches   += $methodData->executedBranches;
                 $this->numExecutablePaths    += $methodData->executablePaths;
                 $this->numExecutedPaths      += $methodData->executedPaths;
 
-                $methodEndLine = $method->endLine();
-
-                for ($lineNumber = $method->startLine(); $lineNumber <= $methodEndLine; $lineNumber++) {
+                foreach (range($method->startLine(), $method->endLine()) as $lineNumber) {
                     $this->codeUnitsByLine[$lineNumber] = [
-                        $traitData,
-                        $methodData,
+                        &$this->traits[$traitName],
+                        &$this->traits[$traitName]->methods[$methodName],
                     ];
                 }
             }
@@ -755,7 +532,7 @@ final class File extends AbstractNode
         $link = $this->id() . '.html#';
 
         foreach ($functions as $functionName => $function) {
-            $functionData = new ProcessedFunctionType(
+            $this->functions[$functionName] = new ProcessedFunctionType(
                 $functionName,
                 $function->namespace(),
                 $function->signature(),
@@ -773,20 +550,16 @@ final class File extends AbstractNode
                 $link . $function->startLine(),
             );
 
-            $this->functions[$functionName] = $functionData;
-
-            $functionEndLine = $function->endLine();
-
-            for ($lineNumber = $function->startLine(); $lineNumber <= $functionEndLine; $lineNumber++) {
-                $this->codeUnitsByLine[$lineNumber] = [$functionData];
+            foreach (range($function->startLine(), $function->endLine()) as $lineNumber) {
+                $this->codeUnitsByLine[$lineNumber] = [&$this->functions[$functionName]];
             }
 
             if (isset($this->functionCoverageData[$functionName])) {
-                $functionData->executableBranches = count(
+                $this->functions[$functionName]->executableBranches = count(
                     $this->functionCoverageData[$functionName]->branches,
                 );
 
-                $functionData->executedBranches = count(
+                $this->functions[$functionName]->executedBranches = count(
                     array_filter(
                         $this->functionCoverageData[$functionName]->branches,
                         static function (ProcessedBranchCoverageData $branch)
@@ -795,12 +568,14 @@ final class File extends AbstractNode
                         },
                     ),
                 );
+            }
 
-                $functionData->executablePaths = count(
+            if (isset($this->functionCoverageData[$functionName])) {
+                $this->functions[$functionName]->executablePaths = count(
                     $this->functionCoverageData[$functionName]->paths,
                 );
 
-                $functionData->executedPaths = count(
+                $this->functions[$functionName]->executedPaths = count(
                     array_filter(
                         $this->functionCoverageData[$functionName]->paths,
                         static function (ProcessedPathCoverageData $path)
@@ -811,10 +586,10 @@ final class File extends AbstractNode
                 );
             }
 
-            $this->numExecutableBranches += $functionData->executableBranches;
-            $this->numExecutedBranches   += $functionData->executedBranches;
-            $this->numExecutablePaths    += $functionData->executablePaths;
-            $this->numExecutedPaths      += $functionData->executedPaths;
+            $this->numExecutableBranches += $this->functions[$functionName]->executableBranches;
+            $this->numExecutedBranches   += $this->functions[$functionName]->executedBranches;
+            $this->numExecutablePaths    += $this->functions[$functionName]->executablePaths;
+            $this->numExecutedPaths      += $this->functions[$functionName]->executedPaths;
         }
     }
 

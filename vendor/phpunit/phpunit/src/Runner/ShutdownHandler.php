@@ -48,9 +48,6 @@ final class ShutdownHandler
         register_shutdown_function(
             static function () use ($pid): void
             {
-                // This runs during PHP's shutdown sequence, after code coverage
-                // data has been collected; it is covered by end-to-end tests
-                // @codeCoverageIgnoreStart
                 $message = rtrim(self::$message);
 
                 if ($message === '' || $pid !== getmypid()) {
@@ -60,7 +57,6 @@ final class ShutdownHandler
                 print $message . PHP_EOL;
 
                 exit(2);
-                // @codeCoverageIgnoreEnd
             },
         );
     }

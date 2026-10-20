@@ -47,17 +47,6 @@ final class IsType extends Constraint
     }
 
     /**
-     * Returns the negated string representation of the constraint.
-     */
-    protected function negatedToString(): string
-    {
-        return sprintf(
-            'is not of type %s',
-            $this->type->value,
-        );
-    }
-
-    /**
      * Evaluates the constraint for parameter $other. Returns true if the
      * constraint is met, false otherwise.
      */
@@ -106,9 +95,7 @@ final class IsType extends Constraint
                 return is_iterable($other);
 
             default:
-                // @codeCoverageIgnoreStart
                 return false;
-                // @codeCoverageIgnoreEnd
         }
     }
 }

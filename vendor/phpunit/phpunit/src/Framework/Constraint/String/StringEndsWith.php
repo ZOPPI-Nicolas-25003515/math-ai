@@ -9,7 +9,6 @@
  */
 namespace PHPUnit\Framework\Constraint;
 
-use function is_string;
 use function str_ends_with;
 use PHPUnit\Framework\EmptyStringException;
 
@@ -41,26 +40,11 @@ final class StringEndsWith extends Constraint
     }
 
     /**
-     * Returns the negated string representation of the constraint.
-     *
-     * Authoring the negation here keeps the suffix out of the negation
-     * entirely.
-     */
-    protected function negatedToString(): string
-    {
-        return 'does not end with "' . $this->suffix . '"';
-    }
-
-    /**
      * Evaluates the constraint for parameter $other. Returns true if the
      * constraint is met, false otherwise.
      */
     protected function matches(mixed $other): bool
     {
-        if (!is_string($other)) {
-            return false;
-        }
-
-        return str_ends_with($other, $this->suffix);
+        return str_ends_with((string) $other, $this->suffix);
     }
 }

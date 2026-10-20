@@ -9,9 +9,8 @@
  */
 namespace PHPUnit\Runner;
 
-use function array_slice;
+use function array_diff;
 use function basename;
-use function count;
 use function get_declared_classes;
 use function realpath;
 use function str_ends_with;
@@ -29,9 +28,9 @@ use ReflectionClass;
 final class TestSuiteLoader
 {
     /**
-     * @var ?non-negative-int
+     * @var list<class-string>
      */
-    private static ?int $numberOfDeclaredClasses = null;
+    private static array $declaredClasses = [];
 
     /**
      * @var array<non-empty-string, list<class-string>>
@@ -45,13 +44,7 @@ final class TestSuiteLoader
      */
     public function load(string $suiteClassFile): ReflectionClass
     {
-        $resolved = realpath($suiteClassFile);
-
-        if ($resolved === false) {
-            throw new ClassCannotBeFoundException($suiteClassFile, $suiteClassFile);
-        }
-
-        $suiteClassFile = $resolved;
+        $suiteClassFile = realpath($suiteClassFile);
         $suiteClassName = $this->classNameFromFileName($suiteClassFile);
         $loadedClasses  = $this->loadSuiteClassFile($suiteClassFile);
 
@@ -116,57 +109,34 @@ final class TestSuiteLoader
             return self::$fileToClassesMap[$suiteClassFile];
         }
 
-        if (self::$numberOfDeclaredClasses === null) {
-            /*
-             * Classes that were declared before the first test class file was
-             * loaded, by the bootstrap script for instance, are mapped to the
-             * files that declare them as well. Without this, a test class file
-             * whose class has already been declared would have to be searched
-             * for among all declared classes.
-             */
-            $declaredClasses = get_declared_classes();
-
-            self::mapClassesToTheFilesThatDeclareThem($declaredClasses);
-
-            self::$numberOfDeclaredClasses = count($declaredClasses);
+        if (self::$declaredClasses === []) {
+            self::$declaredClasses = get_declared_classes();
         }
 
         require_once $suiteClassFile;
 
-        $declaredClasses = get_declared_classes();
-
-        /*
-         * Classes are declared in the order in which they are encountered and
-         * they cannot be undeclared. The classes that were declared while the
-         * file was loaded are therefore at the end of the list.
-         */
-        self::mapClassesToTheFilesThatDeclareThem(
-            array_slice($declaredClasses, self::$numberOfDeclaredClasses),
+        $loadedClasses = array_diff(
+            get_declared_classes(),
+            self::$declaredClasses,
         );
 
-        self::$numberOfDeclaredClasses = count($declaredClasses);
+        foreach ($loadedClasses as $loadedClass) {
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $class = new ReflectionClass($loadedClass);
+
+            if (!isset(self::$fileToClassesMap[$class->getFileName()])) {
+                self::$fileToClassesMap[$class->getFileName()] = [];
+            }
+
+            self::$fileToClassesMap[$class->getFileName()][] = $class->getName();
+        }
+
+        self::$declaredClasses = get_declared_classes();
 
         if (!isset(self::$fileToClassesMap[$suiteClassFile])) {
-            return $declaredClasses;
+            return self::$declaredClasses;
         }
 
         return self::$fileToClassesMap[$suiteClassFile];
-    }
-
-    /**
-     * @param array<class-string> $classes
-     */
-    private static function mapClassesToTheFilesThatDeclareThem(array $classes): void
-    {
-        foreach ($classes as $class) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $fileName = new ReflectionClass($class)->getFileName();
-
-            if ($fileName === false || $fileName === '') {
-                continue;
-            }
-
-            self::$fileToClassesMap[$fileName][] = $class;
-        }
     }
 }

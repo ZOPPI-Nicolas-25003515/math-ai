@@ -11,7 +11,7 @@ namespace SebastianBergmann\Comparator;
 
 use function gettype;
 use function sprintf;
-use SebastianBergmann\Exporter\ObjectNotSupportedException;
+use SebastianBergmann\Exporter\Exporter;
 
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for sebastian/comparator
@@ -27,7 +27,6 @@ final class TypeComparator extends Comparator
 
     /**
      * @throws ComparisonFailure
-     * @throws ObjectNotSupportedException
      */
     public function assertEquals(mixed $expected, mixed $actual, float $delta = 0.0, bool $canonicalize = false, bool $ignoreCase = false): void
     {
@@ -40,10 +39,9 @@ final class TypeComparator extends Comparator
                 '',
                 sprintf(
                     '%s does not match expected type "%s".',
-                    $this->exporter()->shortenedExport($actual),
+                    (new Exporter)->shortenedExport($actual),
                     gettype($expected),
                 ),
-                $this->contextLines(),
             );
         }
     }

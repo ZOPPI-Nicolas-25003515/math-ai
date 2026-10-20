@@ -9,48 +9,15 @@
  */
 namespace PHPUnit\Util;
 
-use function array_unshift;
 use PHPUnit\TextUI\Configuration\Registry as ConfigurationRegistry;
-use SebastianBergmann\Comparator\Factory as ComparatorFactory;
 use SebastianBergmann\Exporter\Exporter as OriginalExporter;
-use SebastianBergmann\Exporter\ObjectExporter;
-use SebastianBergmann\Exporter\ObjectExporterChain;
 
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
 final class Exporter
 {
-    /**
-     * @var list<ObjectExporter>
-     */
-    private static array $objectExporters                         = [];
-    private static ?OriginalExporter $exporter                    = null;
-    private static ?OriginalExporter $exporterOfComparatorFactory = null;
-
-    public static function registerObjectExporter(ObjectExporter $objectExporter): void
-    {
-        array_unshift(self::$objectExporters, $objectExporter);
-
-        self::updateComparatorFactory();
-    }
-
-    public static function unregisterObjectExporter(ObjectExporter $objectExporter): void
-    {
-        $objectExporters = [];
-
-        foreach (self::$objectExporters as $registeredObjectExporter) {
-            if ($registeredObjectExporter === $objectExporter) {
-                continue;
-            }
-
-            $objectExporters[] = $registeredObjectExporter;
-        }
-
-        self::$objectExporters = $objectExporters;
-
-        self::updateComparatorFactory();
-    }
+    private static ?OriginalExporter $exporter = null;
 
     public static function export(mixed $value): string
     {
@@ -76,45 +43,14 @@ final class Exporter
         );
     }
 
-    private static function updateComparatorFactory(): void
-    {
-        self::$exporter = null;
-
-        $comparatorFactory = ComparatorFactory::getInstance();
-
-        if (self::$objectExporters === []) {
-            if (self::$exporterOfComparatorFactory !== null) {
-                $comparatorFactory->setExporter(self::$exporterOfComparatorFactory);
-
-                self::$exporterOfComparatorFactory = null;
-            }
-
-            return;
-        }
-
-        if (self::$exporterOfComparatorFactory === null) {
-            self::$exporterOfComparatorFactory = $comparatorFactory->exporter();
-        }
-
-        $comparatorFactory->setExporter(self::exporter());
-    }
-
     private static function exporter(): OriginalExporter
     {
         if (self::$exporter !== null) {
             return self::$exporter;
         }
 
-        $objectExporter = null;
-
-        if (self::$objectExporters !== []) {
-            $objectExporter = new ObjectExporterChain(self::$objectExporters);
-        }
-
         self::$exporter = new OriginalExporter(
             ConfigurationRegistry::get()->shortenArraysForExportThreshold(),
-            40,
-            $objectExporter,
         );
 
         return self::$exporter;

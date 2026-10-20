@@ -9,8 +9,6 @@
  */
 namespace PHPUnit\Framework\Constraint;
 
-use function assert;
-use function is_string;
 use function sprintf;
 use function str_contains;
 use PHPUnit\Util\Exporter;
@@ -38,29 +36,13 @@ final class ExceptionMessageIsOrContains extends Constraint
         return 'exception message contains ' . Exporter::export($this->expectedMessage);
     }
 
-    /**
-     * Returns the negated string representation of the constraint.
-     */
-    protected function negatedToString(): string
-    {
-        if ($this->expectedMessage === '') {
-            return 'exception message is not empty';
-        }
-
-        return 'exception message does not contain ' . Exporter::export($this->expectedMessage);
-    }
-
     protected function matches(mixed $other): bool
     {
         if ($this->expectedMessage === '') {
             return $other === '';
         }
 
-        if (!is_string($other)) {
-            return false;
-        }
-
-        return str_contains($other, $this->expectedMessage);
+        return str_contains((string) $other, $this->expectedMessage);
     }
 
     /**
@@ -71,39 +53,15 @@ final class ExceptionMessageIsOrContains extends Constraint
      */
     protected function failureDescription(mixed $other): string
     {
-        if (is_string($other)) {
-            $message = $other;
-        } else {
-            $message = '';
-        }
-
         if ($this->expectedMessage === '') {
             return sprintf(
                 "exception message is empty but is '%s'",
-                $message,
-            );
-        }
-
-        return sprintf(
-            "exception message '%s' contains '%s'",
-            $message,
-            $this->expectedMessage,
-        );
-    }
-
-    protected function negatedFailureDescription(mixed $other): string
-    {
-        assert(is_string($other));
-
-        if ($this->expectedMessage === '') {
-            return sprintf(
-                "exception message is not empty but is '%s'",
                 $other,
             );
         }
 
         return sprintf(
-            "exception message '%s' does not contain '%s'",
+            "exception message '%s' contains '%s'",
             $other,
             $this->expectedMessage,
         );

@@ -13,11 +13,10 @@ use const FILE_APPEND;
 use const LOCK_EX;
 use const PHP_EOL;
 use const PHP_OS_FAMILY;
-use function explode;
 use function file_put_contents;
 use function implode;
+use function preg_split;
 use function str_repeat;
-use function str_replace;
 use function strlen;
 use PHPUnit\Event\Event;
 use PHPUnit\Event\Tracer\Tracer;
@@ -49,7 +48,11 @@ final readonly class EventLogger implements Tracer
             $flags |= LOCK_EX;
         }
 
-        $lines = explode("\n", str_replace(["\r\n", "\r"], "\n", $event->asString()));
+        $lines = preg_split('/\r\n|\r|\n/', $event->asString());
+
+        if ($lines === false) {
+            $lines = [];
+        }
 
         file_put_contents(
             $this->path,

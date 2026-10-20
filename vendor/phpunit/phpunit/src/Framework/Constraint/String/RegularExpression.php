@@ -9,7 +9,6 @@
  */
 namespace PHPUnit\Framework\Constraint;
 
-use function is_string;
 use function preg_last_error_msg;
 use function preg_match;
 use function sprintf;
@@ -39,20 +38,6 @@ final class RegularExpression extends Constraint
     }
 
     /**
-     * Returns the negated string representation of the constraint.
-     *
-     * Authoring the negation here keeps the pattern out of the negation
-     * entirely.
-     */
-    protected function negatedToString(): string
-    {
-        return sprintf(
-            'does not match PCRE pattern "%s"',
-            $this->pattern,
-        );
-    }
-
-    /**
      * Evaluates the constraint for parameter $other. Returns true if the
      * constraint is met, false otherwise.
      *
@@ -60,10 +45,6 @@ final class RegularExpression extends Constraint
      */
     protected function matches(mixed $other): bool
     {
-        if (!is_string($other)) {
-            return false;
-        }
-
         $matches = @preg_match($this->pattern, $other);
 
         if ($matches === false) {

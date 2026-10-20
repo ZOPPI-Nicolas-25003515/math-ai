@@ -9,7 +9,6 @@
  */
 namespace SebastianBergmann\CodeCoverage\Report;
 
-use function array_sum;
 use function count;
 use function is_string;
 use function ksort;
@@ -17,29 +16,21 @@ use function max;
 use function range;
 use function time;
 use DOMDocument;
-use SebastianBergmann\CodeCoverage\Node\Directory;
+use SebastianBergmann\CodeCoverage\CodeCoverage;
 use SebastianBergmann\CodeCoverage\Node\File;
-use SebastianBergmann\CodeCoverage\Util\EnsuresUtf8;
 use SebastianBergmann\CodeCoverage\Util\Filesystem;
 use SebastianBergmann\CodeCoverage\Util\Xml;
 use SebastianBergmann\CodeCoverage\WriteOperationFailedException;
 
-/**
- * @internal This class is not covered by the backward compatibility promise for phpunit/php-code-coverage
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise for phpunit/php-code-coverage
- */
 final class Clover
 {
-    use EnsuresUtf8;
-
     /**
      * @param null|non-empty-string $target
      * @param null|non-empty-string $name
      *
      * @throws WriteOperationFailedException
      */
-    public function process(Directory $report, ?string $target = null, ?string $name = null): string
+    public function process(CodeCoverage $coverage, ?string $target = null, ?string $name = null): string
     {
         $time = (string) time();
 
@@ -53,12 +44,13 @@ final class Clover
         $xmlProject->setAttribute('timestamp', $time);
 
         if (is_string($name)) {
-            $xmlProject->setAttribute('name', $this->ensureUtf8($name));
+            $xmlProject->setAttribute('name', $name);
         }
 
         $xmlCoverage->appendChild($xmlProject);
 
         $packages = [];
+        $report   = $coverage->getReport();
 
         foreach ($report as $item) {
             if (!$item instanceof File) {
@@ -68,7 +60,7 @@ final class Clover
             /* @var File $item */
 
             $xmlFile = $xmlDocument->createElement('file');
-            $xmlFile->setAttribute('name', $this->ensureUtf8($item->pathAsString()));
+            $xmlFile->setAttribute('name', $item->pathAsString());
 
             $classes      = $item->classesAndTraits();
             $coverageData = $item->lineCoverageData();
@@ -105,7 +97,7 @@ final class Clover
 
                     foreach (range($method->startLine, $method->endLine) as $line) {
                         if (isset($coverageData[$line])) {
-                            $methodCount = max($methodCount, array_sum($coverageData[$line]));
+                            $methodCount = max($methodCount, count($coverageData[$line]));
                         }
                     }
 
@@ -120,8 +112,8 @@ final class Clover
                 }
 
                 $xmlClass = $xmlDocument->createElement('class');
-                $xmlClass->setAttribute('name', $this->ensureUtf8($className));
-                $xmlClass->setAttribute('namespace', $this->ensureUtf8($namespace));
+                $xmlClass->setAttribute('name', $className);
+                $xmlClass->setAttribute('namespace', $namespace);
 
                 $xmlFile->appendChild($xmlClass);
 
@@ -144,7 +136,7 @@ final class Clover
                 }
 
                 $lines[$line] = [
-                    'count' => array_sum($data), 'type' => 'stmt',
+                    'count' => count($data), 'type' => 'stmt',
                 ];
             }
 
@@ -156,7 +148,7 @@ final class Clover
                 $xmlLine->setAttribute('type', $data['type']);
 
                 if (isset($data['name'])) {
-                    $xmlLine->setAttribute('name', $this->ensureUtf8($data['name']));
+                    $xmlLine->setAttribute('name', $data['name']);
                 }
 
                 if (isset($data['visibility'])) {
@@ -199,7 +191,7 @@ final class Clover
                         'package',
                     );
 
-                    $packages[$namespace]->setAttribute('name', $this->ensureUtf8($namespace));
+                    $packages[$namespace]->setAttribute('name', $namespace);
                     $xmlProject->appendChild($packages[$namespace]);
                 }
 

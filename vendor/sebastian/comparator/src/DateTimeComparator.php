@@ -20,10 +20,6 @@ use DateTimeImmutable;
 use DateTimeZone;
 
 /**
- * An object exporter is not consulted for the representation of the
- * DateTime and DateTimeImmutable objects that are compared: the
- * representation this comparator provides for them always has precedence.
- *
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for sebastian/comparator
  *
  * @internal This class is not covered by the backward compatibility promise for sebastian/comparator
@@ -77,7 +73,6 @@ final class DateTimeComparator extends ObjectComparator
                 $expected->format('Y-m-d\TH:i:s.uO'),
                 $actual->format('Y-m-d\TH:i:s.uO'),
                 'Failed asserting that two DateTime objects are equal.',
-                $this->contextLines(),
             );
         }
     }

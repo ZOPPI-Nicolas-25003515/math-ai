@@ -12,8 +12,7 @@ namespace PHPUnit\TextUI;
 use function mt_srand;
 use PHPUnit\Event;
 use PHPUnit\Framework\TestSuite;
-use PHPUnit\Runner\ExecutionOrder\ReorderPipeline;
-use PHPUnit\Runner\TestRunHistory\TestRunHistory;
+use PHPUnit\Runner\ResultCache\ResultCache;
 use PHPUnit\Runner\TestSuiteSorter;
 use PHPUnit\TextUI\Configuration\Configuration;
 use Throwable;
@@ -25,54 +24,47 @@ use Throwable;
  */
 final class TestRunner
 {
-    private readonly Event\Emitter $emitter;
-
-    public function __construct(Event\Emitter $emitter)
-    {
-        $this->emitter = $emitter;
-    }
-
     /**
      * @throws RuntimeException
      */
-    public function run(Configuration $configuration, TestRunHistory $testRunHistory, TestSuite $suite): void
+    public function run(Configuration $configuration, ResultCache $resultCache, TestSuite $suite): void
     {
         try {
-            $this->emitter->testRunnerStarted();
+            Event\Facade::emitter()->testRunnerStarted();
 
             if ($configuration->executionOrder() === TestSuiteSorter::ORDER_RANDOMIZED) {
                 mt_srand($configuration->randomOrderSeed());
             }
 
-            $testRunHistory->load();
+            if ($configuration->executionOrder() !== TestSuiteSorter::ORDER_DEFAULT ||
+                $configuration->executionOrderDefects() !== TestSuiteSorter::ORDER_DEFAULT ||
+                $configuration->resolveDependencies()) {
+                $resultCache->load();
 
-            $pipeline = ReorderPipeline::fromConfiguration(
-                $configuration->executionOrder(),
-                $configuration->executionOrderDefects(),
-                $configuration->resolveDependencies(),
-            );
+                (new TestSuiteSorter($resultCache))->reorderTestsInSuite(
+                    $suite,
+                    $configuration->executionOrder(),
+                    $configuration->resolveDependencies(),
+                    $configuration->executionOrderDefects(),
+                );
 
-            if (!$pipeline->isEmpty()) {
-                new TestSuiteSorter($testRunHistory)->apply($suite, $pipeline);
-
-                $this->emitter->testSuiteSorted(
+                Event\Facade::emitter()->testSuiteSorted(
                     $configuration->executionOrder(),
                     $configuration->executionOrderDefects(),
                     $configuration->resolveDependencies(),
-                    $pipeline->describe(),
                 );
             }
 
-            new TestSuiteFilterProcessor($this->emitter)->process($configuration, $suite);
+            (new TestSuiteFilterProcessor)->process($configuration, $suite);
 
-            $this->emitter->testRunnerExecutionStarted(
+            Event\Facade::emitter()->testRunnerExecutionStarted(
                 Event\TestSuite\TestSuiteBuilder::from($suite),
             );
 
             $suite->run();
 
-            $this->emitter->testRunnerExecutionFinished();
-            $this->emitter->testRunnerFinished();
+            Event\Facade::emitter()->testRunnerExecutionFinished();
+            Event\Facade::emitter()->testRunnerFinished();
         } catch (Throwable $t) {
             throw new RuntimeException(
                 $t->getMessage(),

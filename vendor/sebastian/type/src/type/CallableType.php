@@ -9,6 +9,7 @@
  */
 namespace SebastianBergmann\Type;
 
+use function assert;
 use function class_exists;
 use function count;
 use function explode;
@@ -16,10 +17,10 @@ use function function_exists;
 use function is_array;
 use function is_object;
 use function is_string;
-use function method_exists;
 use function str_contains;
 use Closure;
-use ReflectionMethod;
+use ReflectionClass;
+use ReflectionObject;
 
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for this library
@@ -95,80 +96,86 @@ final class CallableType extends Type
 
     private function hasInvokeMethod(ObjectType $type): bool
     {
-        return method_exists($type->className()->qualifiedName(), '__invoke');
+        $className = $type->className()->qualifiedName();
+
+        assert(class_exists($className));
+
+        return (new ReflectionClass($className))->hasMethod('__invoke');
     }
 
     private function isFunction(SimpleType $type): bool
     {
-        $value = $type->value();
-
-        if (!is_string($value)) {
+        if (!is_string($type->value())) {
             return false;
         }
 
-        return function_exists($value);
+        return function_exists($type->value());
     }
 
     private function isObjectCallback(SimpleType $type): bool
     {
-        $value = $type->value();
-
-        if (!is_array($value)) {
+        if (!is_array($type->value())) {
             return false;
         }
 
-        if (count($value) !== 2) {
+        if (count($type->value()) !== 2) {
             return false;
         }
 
-        if (!isset($value[0], $value[1])) {
+        if (!isset($type->value()[0], $type->value()[1])) {
             return false;
         }
 
-        if (!is_object($value[0]) || !is_string($value[1])) {
+        if (!is_object($type->value()[0]) || !is_string($type->value()[1])) {
             return false;
         }
 
-        return method_exists($value[0], $value[1]);
+        [$object, $methodName] = $type->value();
+
+        return (new ReflectionObject($object))->hasMethod($methodName);
     }
 
     private function isClassCallback(SimpleType $type): bool
     {
-        $value = $type->value();
-
-        if (is_string($value)) {
-            if (!str_contains($value, '::')) {
-                return false;
-            }
-
-            [$className, $methodName] = explode('::', $value);
-        } elseif (is_array($value)) {
-            if (count($value) !== 2) {
-                return false;
-            }
-
-            if (!isset($value[0], $value[1])) {
-                return false;
-            }
-
-            if (!is_string($value[0]) || !is_string($value[1])) {
-                return false;
-            }
-
-            [$className, $methodName] = $value;
-        } else {
+        if (!is_string($type->value()) && !is_array($type->value())) {
             return false;
+        }
+
+        if (is_string($type->value())) {
+            if (!str_contains($type->value(), '::')) {
+                return false;
+            }
+
+            [$className, $methodName] = explode('::', $type->value());
+        }
+
+        if (is_array($type->value())) {
+            if (count($type->value()) !== 2) {
+                return false;
+            }
+
+            if (!isset($type->value()[0], $type->value()[1])) {
+                return false;
+            }
+
+            if (!is_string($type->value()[0]) || !is_string($type->value()[1])) {
+                return false;
+            }
+
+            [$className, $methodName] = $type->value();
         }
 
         if (!class_exists($className)) {
             return false;
         }
 
-        if (!method_exists($className, $methodName)) {
+        $class = new ReflectionClass($className);
+
+        if (!$class->hasMethod($methodName)) {
             return false;
         }
 
-        $method = new ReflectionMethod($className, $methodName);
+        $method = $class->getMethod($methodName);
 
         return $method->isPublic() && $method->isStatic();
     }

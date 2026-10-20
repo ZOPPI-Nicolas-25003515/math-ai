@@ -31,21 +31,11 @@ final class Version
     public static function id(): string
     {
         if (self::$pharVersion !== '') {
-            // @codeCoverageIgnoreStart
             return self::$pharVersion;
-            // @codeCoverageIgnoreEnd
         }
 
         if (self::$version === '') {
-            $path = dirname(__DIR__, 2);
-
-            if ($path === '') {
-                // @codeCoverageIgnoreStart
-                $path = '.';
-                // @codeCoverageIgnoreEnd
-            }
-
-            self::$version = new VersionId('13.4.3', $path)->asString();
+            self::$version = (new VersionId('12.5.40', dirname(__DIR__, 2)))->asString();
         }
 
         return self::$version;

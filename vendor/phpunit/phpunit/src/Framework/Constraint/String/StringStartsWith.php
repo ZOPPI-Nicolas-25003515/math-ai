@@ -9,7 +9,6 @@
  */
 namespace PHPUnit\Framework\Constraint;
 
-use function is_string;
 use function str_starts_with;
 use PHPUnit\Framework\EmptyStringException;
 
@@ -41,26 +40,11 @@ final class StringStartsWith extends Constraint
     }
 
     /**
-     * Returns the negated string representation of the constraint.
-     *
-     * Authoring the negation here keeps the prefix out of the negation
-     * entirely.
-     */
-    protected function negatedToString(): string
-    {
-        return 'does not start with "' . $this->prefix . '"';
-    }
-
-    /**
      * Evaluates the constraint for parameter $other. Returns true if the
      * constraint is met, false otherwise.
      */
     protected function matches(mixed $other): bool
     {
-        if (!is_string($other)) {
-            return false;
-        }
-
-        return str_starts_with($other, $this->prefix);
+        return str_starts_with((string) $other, $this->prefix);
     }
 }

@@ -22,7 +22,6 @@ final readonly class ShellExitCodeCalculator
     private const int SUCCESS_EXIT   = 0;
     private const int FAILURE_EXIT   = 1;
     private const int EXCEPTION_EXIT = 2;
-    private const int TIMEOUT_EXIT   = 124;
 
     public function calculate(Configuration $configuration, TestResult $result): int
     {
@@ -56,34 +55,6 @@ final readonly class ShellExitCodeCalculator
 
         if ($configuration->doNotFailOnDeprecation()) {
             $failOnDeprecation = false;
-        }
-
-        $failOnSelfDeprecation     = $failOnDeprecation;
-        $failOnDirectDeprecation   = $failOnDeprecation;
-        $failOnIndirectDeprecation = $failOnDeprecation;
-
-        if ($configuration->failOnSelfDeprecation()) {
-            $failOnSelfDeprecation = true;
-        }
-
-        if ($configuration->doNotFailOnSelfDeprecation()) {
-            $failOnSelfDeprecation = false;
-        }
-
-        if ($configuration->failOnDirectDeprecation()) {
-            $failOnDirectDeprecation = true;
-        }
-
-        if ($configuration->doNotFailOnDirectDeprecation()) {
-            $failOnDirectDeprecation = false;
-        }
-
-        if ($configuration->failOnIndirectDeprecation()) {
-            $failOnIndirectDeprecation = true;
-        }
-
-        if ($configuration->doNotFailOnIndirectDeprecation()) {
-            $failOnIndirectDeprecation = false;
         }
 
         if ($configuration->failOnPhpunitDeprecation()) {
@@ -168,19 +139,7 @@ final readonly class ShellExitCodeCalculator
             $returnCode = self::FAILURE_EXIT;
         }
 
-        if ($failOnSelfDeprecation && $result->hasSelfDeprecations()) {
-            $returnCode = self::FAILURE_EXIT;
-        }
-
-        if ($failOnDirectDeprecation && $result->hasDirectDeprecations()) {
-            $returnCode = self::FAILURE_EXIT;
-        }
-
-        if ($failOnIndirectDeprecation && $result->hasIndirectDeprecations()) {
-            $returnCode = self::FAILURE_EXIT;
-        }
-
-        if ($failOnDeprecation && $result->hasDeprecationsWithUnknownTrigger()) {
+        if ($failOnDeprecation && $result->hasPhpOrUserDeprecations()) {
             $returnCode = self::FAILURE_EXIT;
         }
 
@@ -218,10 +177,6 @@ final readonly class ShellExitCodeCalculator
 
         if ($result->hasErrors()) {
             $returnCode = self::EXCEPTION_EXIT;
-        }
-
-        if ($result->wasTimeLimitExceeded()) {
-            $returnCode = self::TIMEOUT_EXIT;
         }
 
         return $returnCode;

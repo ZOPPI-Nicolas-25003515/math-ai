@@ -9,18 +9,14 @@
  */
 namespace SebastianBergmann\CodeCoverage\Data;
 
-use function array_map;
 use NoDiscard;
+use SebastianBergmann\CodeCoverage\Driver\XdebugDriver;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for phpunit/php-code-coverage
  *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise for phpunit/php-code-coverage
- *
- * @phpstan-import-type TestIndexType from ProcessedCodeCoverageData
- * @phpstan-import-type FunctionCoverageType from RawCodeCoverageData
- * @phpstan-import-type BranchCoverageType from RawCodeCoverageData
- * @phpstan-import-type PathCoverageType from RawCodeCoverageData
+ * @phpstan-import-type TestIdType from ProcessedCodeCoverageData
+ * @phpstan-import-type XdebugFunctionCoverageType from XdebugDriver
  */
 final readonly class ProcessedFunctionCoverageData
 {
@@ -31,27 +27,20 @@ final readonly class ProcessedFunctionCoverageData
     public array $paths;
 
     /**
-     * @param FunctionCoverageType $xdebugCoverageData
+     * @param XdebugFunctionCoverageType $xdebugCoverageData
      */
     public static function fromXdebugCoverage(array $xdebugCoverageData): self
     {
-        $branches = array_map(
-            /** @param BranchCoverageType $branch */
-            static function (array $branch): ProcessedBranchCoverageData
-            {
-                return ProcessedBranchCoverageData::fromXdebugCoverage($branch);
-            },
-            $xdebugCoverageData['branches'],
-        );
+        $branches = [];
 
-        $paths = array_map(
-            /** @param PathCoverageType $path */
-            static function (array $path): ProcessedPathCoverageData
-            {
-                return ProcessedPathCoverageData::fromXdebugCoverage($path);
-            },
-            $xdebugCoverageData['paths'],
-        );
+        foreach ($xdebugCoverageData['branches'] as $branchId => $branch) {
+            $branches[$branchId] = ProcessedBranchCoverageData::fromXdebugCoverage($branch);
+        }
+        $paths = [];
+
+        foreach ($xdebugCoverageData['paths'] as $pathId => $path) {
+            $paths[$pathId] = ProcessedPathCoverageData::fromXdebugCoverage($path);
+        }
 
         return new self(
             $branches,
@@ -113,52 +102,18 @@ final readonly class ProcessedFunctionCoverageData
     }
 
     /**
-     * @param array<TestIndexType, TestIndexType> $remap
+     * @param TestIdType $testCaseId
      */
-    #[NoDiscard]
-    public function withRemappedTestIndexes(array $remap): self
+    public function recordBranchHit(int $branchId, string $testCaseId): void
     {
-        $branches = [];
-
-        foreach ($this->branches as $branchId => $branch) {
-            $branches[$branchId] = $branch->withRemappedTestIndexes($remap);
-        }
-
-        $paths = [];
-
-        foreach ($this->paths as $pathId => $path) {
-            $paths[$pathId] = $path->withRemappedTestIndexes($remap);
-        }
-
-        return new self(
-            $branches,
-            $paths,
-        );
+        $this->branches[$branchId]->recordHit($testCaseId);
     }
 
     /**
-     * @param TestIndexType $testIndex
-     * @param positive-int  $count
+     * @param TestIdType $testCaseId
      */
-    public function recordBranchHit(int $branchId, int $testIndex, int $count): void
+    public function recordPathHit(int $pathId, string $testCaseId): void
     {
-        if (!isset($this->branches[$branchId])) {
-            return;
-        }
-
-        $this->branches[$branchId]->recordHit($testIndex, $count);
-    }
-
-    /**
-     * @param TestIndexType $testIndex
-     * @param positive-int  $count
-     */
-    public function recordPathHit(int $pathId, int $testIndex, int $count): void
-    {
-        if (!isset($this->paths[$pathId])) {
-            return;
-        }
-
-        $this->paths[$pathId]->recordHit($testIndex, $count);
+        $this->paths[$pathId]->recordHit($testCaseId);
     }
 }

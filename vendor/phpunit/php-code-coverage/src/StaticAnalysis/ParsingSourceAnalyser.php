@@ -11,36 +11,29 @@ namespace SebastianBergmann\CodeCoverage\StaticAnalysis;
 
 use const T_COMMENT;
 use const T_DOC_COMMENT;
-use function array_intersect_key;
-use function array_replace;
+use function array_merge;
+use function array_unique;
 use function assert;
 use function is_array;
-use function ksort;
 use function max;
+use function range;
+use function sort;
+use function sprintf;
 use function substr_count;
 use function token_get_all;
 use function trim;
 use PhpParser\Error;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
-use PhpParser\Parser;
 use PhpParser\ParserFactory;
+use SebastianBergmann\CodeCoverage\ParserException;
 use SebastianBergmann\LinesOfCode\LineCountingVisitor;
 
 /**
  * @internal This interface is not covered by the backward compatibility promise for phpunit/php-code-coverage
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise for phpunit/php-code-coverage
  */
 final readonly class ParsingSourceAnalyser implements SourceAnalyser
 {
-    private Parser $parser;
-
-    public function __construct()
-    {
-        $this->parser = (new ParserFactory)->createForHostVersion();
-    }
-
     /**
      * @param non-empty-string $sourceCodeFile
      */
@@ -48,10 +41,16 @@ final readonly class ParsingSourceAnalyser implements SourceAnalyser
     {
         $linesOfCode = max(substr_count($sourceCode, "\n") + 1, substr_count($sourceCode, "\r") + 1);
 
+        if ($linesOfCode === 0 && $sourceCode !== '') {
+            $linesOfCode = 1;
+        }
+
         assert($linesOfCode > 0);
 
+        $parser = (new ParserFactory)->createForHostVersion();
+
         try {
-            $nodes = $this->parser->parse($sourceCode);
+            $nodes = $parser->parse($sourceCode);
 
             assert($nodes !== null);
 
@@ -60,7 +59,6 @@ final readonly class ParsingSourceAnalyser implements SourceAnalyser
             $lineCountingVisitor           = new LineCountingVisitor($linesOfCode);
             $ignoredLinesFindingVisitor    = new IgnoredLinesFindingVisitor($useAnnotationsForIgnoringCode, $ignoreDeprecatedCode);
             $executableLinesFindingVisitor = new ExecutableLinesFindingVisitor($sourceCode);
-            $deadCodeFindingVisitor        = new DeadCodeFindingVisitor;
 
             $traverser->addVisitor(new NameResolver);
             $traverser->addVisitor(new AttributeParentConnectingVisitor);
@@ -68,37 +66,35 @@ final readonly class ParsingSourceAnalyser implements SourceAnalyser
             $traverser->addVisitor($lineCountingVisitor);
             $traverser->addVisitor($ignoredLinesFindingVisitor);
             $traverser->addVisitor($executableLinesFindingVisitor);
-            $traverser->addVisitor($deadCodeFindingVisitor);
 
             /* @noinspection UnusedFunctionResultInspection */
             $traverser->traverse($nodes);
+            // @codeCoverageIgnoreStart
         } catch (Error $error) {
-            return $this->resultForFileThatCannotBeParsed(
-                $sourceCodeFile,
-                $sourceCode,
-                $useAnnotationsForIgnoringCode,
-                $linesOfCode,
+            throw new ParserException(
+                sprintf(
+                    'Cannot parse %s: %s',
+                    $sourceCodeFile,
+                    $error->getMessage(),
+                ),
+                $error->getCode(),
                 $error,
             );
         }
+        // @codeCoverageIgnoreEnd
 
-        $ignoredLines = array_replace(
-            $this->findLinesIgnoredByLineBasedAnnotations(
-                $sourceCodeFile,
-                $sourceCode,
-                $useAnnotationsForIgnoringCode,
+        $ignoredLines = array_unique(
+            array_merge(
+                $this->findLinesIgnoredByLineBasedAnnotations(
+                    $sourceCodeFile,
+                    $sourceCode,
+                    $useAnnotationsForIgnoringCode,
+                ),
+                $ignoredLinesFindingVisitor->ignoredLines(),
             ),
-            $ignoredLinesFindingVisitor->ignoredLines(),
         );
 
-        ksort($ignoredLines);
-
-        $executableLines = $executableLinesFindingVisitor->executableLinesGroupedByBranch();
-
-        $deadLines = array_intersect_key(
-            $deadCodeFindingVisitor->deadLines(),
-            $executableLines,
-        );
+        sort($ignoredLines);
 
         return new AnalysisResult(
             $codeUnitFindingVisitor->interfaces(),
@@ -110,52 +106,13 @@ final readonly class ParsingSourceAnalyser implements SourceAnalyser
                 $lineCountingVisitor->result()->commentLinesOfCode(),
                 $lineCountingVisitor->result()->nonCommentLinesOfCode(),
             ),
-            $executableLines,
-            $executableLinesFindingVisitor->branchOperatorLines(),
-            $deadLines,
+            $executableLinesFindingVisitor->executableLinesGroupedByBranch(),
             $ignoredLines,
         );
     }
 
     /**
-     * A file that cannot be parsed gets a degraded analysis result: no code
-     * units, no executable lines, and no dead lines. Lines ignored using
-     * line-based annotations are still found, because that scan is based on
-     * token_get_all() and does not require the parser.
-     *
-     * @param non-empty-string $sourceCodeFile
-     * @param positive-int     $linesOfCode
-     */
-    private function resultForFileThatCannotBeParsed(string $sourceCodeFile, string $sourceCode, bool $useAnnotationsForIgnoringCode, int $linesOfCode, Error $error): AnalysisResult
-    {
-        $ignoredLines = $this->findLinesIgnoredByLineBasedAnnotations(
-            $sourceCodeFile,
-            $sourceCode,
-            $useAnnotationsForIgnoringCode,
-        );
-
-        ksort($ignoredLines);
-
-        $parseError = $error->getMessage();
-
-        assert($parseError !== '');
-
-        return new AnalysisResult(
-            [],
-            [],
-            [],
-            [],
-            new LinesOfCode($linesOfCode, 0, $linesOfCode),
-            [],
-            [],
-            [],
-            $ignoredLines,
-            $parseError,
-        );
-    }
-
-    /**
-     * @return array<int, true>
+     * @return array<int, int>
      */
     private function findLinesIgnoredByLineBasedAnnotations(string $filename, string $source, bool $useAnnotationsForIgnoringCode): array
     {
@@ -172,28 +129,32 @@ final readonly class ParsingSourceAnalyser implements SourceAnalyser
                 continue;
             }
 
-            $annotation = trim($token[1], "/ \n\r\t\0\x0B");
+            $comment = trim($token[1]);
 
-            if ($annotation === '@codeCoverageIgnore') {
-                $result[$token[2]] = true;
+            if ($comment === '// @codeCoverageIgnore' ||
+                $comment === '//@codeCoverageIgnore') {
+                $result[] = $token[2];
 
                 continue;
             }
 
-            if ($annotation === '@codeCoverageIgnoreStart') {
+            if ($comment === '// @codeCoverageIgnoreStart' ||
+                $comment === '//@codeCoverageIgnoreStart') {
                 $start = $token[2];
 
                 continue;
             }
 
-            if ($annotation === '@codeCoverageIgnoreEnd') {
+            if ($comment === '// @codeCoverageIgnoreEnd' ||
+                $comment === '//@codeCoverageIgnoreEnd') {
                 if (false === $start) {
                     $start = $token[2];
                 }
 
-                for ($line = $start; $line <= $token[2]; $line++) {
-                    $result[$line] = true;
-                }
+                $result = array_merge(
+                    $result,
+                    range($start, $token[2]),
+                );
             }
         }
 

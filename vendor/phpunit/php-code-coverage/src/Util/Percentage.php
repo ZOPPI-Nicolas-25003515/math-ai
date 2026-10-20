@@ -9,14 +9,10 @@
  */
 namespace SebastianBergmann\CodeCoverage\Util;
 
-use function round;
 use function sprintf;
-use RoundingMode;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for phpunit/php-code-coverage
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise for phpunit/php-code-coverage
  */
 final readonly class Percentage
 {
@@ -46,16 +42,7 @@ final readonly class Percentage
     public function asString(): string
     {
         if ($this->total > 0) {
-            return sprintf('%01.2F%%', $this->asFloatRoundedTowardsZero());
-        }
-
-        return '';
-    }
-
-    public function asStringWithoutPercentSign(): string
-    {
-        if ($this->total > 0) {
-            return sprintf('%01.2F', $this->asFloatRoundedTowardsZero());
+            return sprintf('%01.2F%%', $this->asFloat());
         }
 
         return '';
@@ -64,19 +51,9 @@ final readonly class Percentage
     public function asFixedWidthString(): string
     {
         if ($this->total > 0) {
-            return sprintf('%6.2F%%', $this->asFloatRoundedTowardsZero());
+            return sprintf('%6.2F%%', $this->asFloat());
         }
 
         return '';
-    }
-
-    /**
-     * Rounding towards zero ensures that a percentage is never displayed
-     * as reached (for instance "100.00%") when it is actually below that
-     * threshold (for instance 99.999%).
-     */
-    private function asFloatRoundedTowardsZero(): float
-    {
-        return round($this->asFloat(), 2, RoundingMode::TowardsZero);
     }
 }

@@ -34,8 +34,7 @@ final readonly class Generator
          displayDetailsOnPhpunitDeprecations="true"
          failOnPhpunitDeprecation="true"
          failOnRisky="true"
-         failOnWarning="true"
-         warnWhenPhpIsNotConfiguredForDevelopment="true">
+         failOnWarning="true">
     <testsuites>
         <testsuite name="default">
             <directory>{tests_directory}</directory>

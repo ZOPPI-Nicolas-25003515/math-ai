@@ -39,16 +39,10 @@ final readonly class Sanitizer
      */
     public static function sanitizeControlCharacters(string $value): string
     {
-        $sanitized = preg_replace_callback(
+        return preg_replace_callback(
             '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]|\r(?!\n)|\xC2[\x80-\x9F]|\xE2\x80[\xAA-\xAE]|\xE2\x81[\xA6-\xA9]/',
             static fn (array $matches) => sprintf('\u{%04X}', mb_ord($matches[0], 'UTF-8')),
             $value,
         );
-
-        if ($sanitized === null) {
-            return $value;
-        }
-
-        return $sanitized;
     }
 }
