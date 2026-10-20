@@ -5,6 +5,7 @@ use Core\View;
 use App\Model\UserRepository;
 
 final class AccountsettingsController {
+
     public function __construct(private readonly ?UserRepository $repository){}
 
     public function settingsForm(): void
@@ -16,7 +17,7 @@ final class AccountsettingsController {
             exit;
         }
 
-        $user = $this->repository->findTeacherByEmail($email);
+        $user = $this->repository->findByEmail($email);
 
         if ($user === null) {
             unset($_SESSION['email'], $_SESSION['id']);
@@ -24,7 +25,7 @@ final class AccountsettingsController {
             exit;
         }
 
-        echo View::show('Accountsettings', [
+        echo View::show('AccountSettings', [
             'email' => $user->getEmail(),
             'errors' => [],
         ]);
@@ -41,7 +42,7 @@ final class AccountsettingsController {
         }
 
         if (trim((string) $password) === '') {
-            echo View::show('Accountsettings', [
+            echo View::show('AccountSettings', [
                 'email' => $email,
                 'errors' => ['Le mot de passe est requis pour supprimer le compte.'],
             ]);
@@ -49,9 +50,9 @@ final class AccountsettingsController {
         }
 
         try {
-            $this->repository->deleteTeacher($email, (string) $password);
+            $this->repository->deleteUser($email, (string) $password);
         } catch (\InvalidArgumentException $e) {
-            echo View::show('Accountsettings', [
+            echo View::show('AccountSettings', [
                 'email' => $email,
                 'errors' => [$e->getMessage()],
             ]);
