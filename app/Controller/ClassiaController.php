@@ -3,7 +3,7 @@ namespace App\Controller;
 
 use Core\View;
 
-final class CoursiaController
+final class ClasssiaController
 {
     public function coursiaForme(): void
     {
