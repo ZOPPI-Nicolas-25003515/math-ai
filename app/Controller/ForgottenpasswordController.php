@@ -1,6 +1,6 @@
 <?php
 namespace App\Controller;
-use Core\View;
+use Core\{View,Request,Response};
 use App\Model\UserRepository;
 use App\Model\UserMail;
 final class ForgottenpasswordController

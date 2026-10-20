@@ -3,7 +3,7 @@
 $root = __DIR__;
 require_once $root . '/../vendor/autoload.php'; //AutoLoader de composer
 require_once $root . '/../core/AutoLoader.php';
-use Core\View;
+use Core\{View,Request,Response};
 use Core\Controller;
 use Core\Db;
 
@@ -13,8 +13,8 @@ use App\Controller\{AnalyseiaController,
     ExerciseiaController,
     AiassistantController,
     HomeController,
-    LoginteacherController,
-    RegisterteacherController,
+    LoginController,
+    RegisterController,
     ForgottenpasswordController,
     ResetpasswordController,
     AccountsettingsController,
@@ -36,8 +36,8 @@ session_start();
 $repository = new UserRepository();
 $controllers = [
     HomeController::class     => fn() => new HomeController(),
-    LoginteacherController::class      => fn() => new LoginteacherController($repository),
-    RegisterteacherController::class => fn() => new RegisterteacherController($repository),
+    LoginController::class      => fn() => new LoginController($repository),
+    RegisterController::class => fn() => new RegisterController($repository),
     ForgottenpasswordController::class => fn() => new ForgottenpasswordController($repository),
     ResetpasswordController::class => fn() => new ResetpasswordController($repository),
     AccountsettingsController::class => fn() => new AccountsettingsController($repository),
@@ -58,24 +58,19 @@ $controllers = [
     RegisternotaffiliatedController::class => fn() => new RegisternotaffiliatedController($repository),
     AddclassroomController::class => fn() => new AddclassroomController($repository),
 ];
-
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';   // "/login?x=1" -> "/login"
-$path = rtrim($path, '/') ?: '/';
-
+$request = Request::fromGlobals();
+$path = $request->path;
+$method = $request->method;
+$response = null;
 $routes = require $root . '/../core/config/routes.php';
-$method = $_SERVER['REQUEST_METHOD'];
 View::openBuffer();
 foreach ($routes as [$routeMethod, $routePath, [$class, $action]]) {
     if ($routeMethod === $method && $path === $routePath) {
         $controller = $controllers[$class]();
-        $controller->$action();
-        $ViewContent = View::getBufferContent();
-        View::show('Layout',array('body' => $ViewContent));
-        exit;
+        $response = $controller->$action();
+        break;
     }
 
+    if ($response == null) $response = View::render('404', ['path' => $request->path], 404);
 }
-View::closeBuffer();
-http_response_code(404);
-View::show('404', ['path' => $path]);
 

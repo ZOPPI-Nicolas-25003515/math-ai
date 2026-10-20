@@ -1,10 +1,9 @@
 <?php
 
 namespace App\Controller;
-
+use Core\{View,Request,Response};
 use App\Model\UserRepository;
 use App\Model\UserValidate;
-use Core\View;
 
 class RegisternotaffiliatedController
 {

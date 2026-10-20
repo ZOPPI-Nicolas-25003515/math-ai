@@ -1,46 +1,30 @@
 <?php
 namespace App\Controller;
-use Core\View;
+use Core\{View,Request,Response};
 use App\Model\UserRepository;
-final class LoginteacherController
+final class LoginController
 {
     public function __construct(private readonly UserRepository $repository) {}
-    public function loginteacherAction(): void
+    public function loginAction(Request $request): Response
     {
         $errors = [];
 
-        if (!empty($_POST)) {
-            $email = filter_var(trim($_POST['email'] ?? ''),FILTER_VALIDATE_EMAIL);
-            $password = $_POST['password'] ?? '';
-            
-            if ($email === false) {
-                $errors[] = 'L\'adresse email est invalide.';
-            }
-
-            if (empty($errors)) {
-                $user = $this->repository->findByEmail($email);
-
-                if ($user !== null && $user->verifyPassword($password)) {
-                    $_SESSION['id'] = $user->id;
-                    $_SESSION['email'] = $user->mail;
-                    $_SESSION['role'] = 'teacher';
-                    header('Location: /');
-                    exit;
-                } else {
-                    $errors[] = 'Email ou mot de passe incorrect.';
-                }
-            }
+        $email = $request->post('email');
+        $password = $request->post('password');
+        $user = $this->repository->findByEmail($email);
+        if ($user !== null && $user->verifyPassword($password)) {
+            $request->setSession('user', ['id' => $user->id, 'email' => $user->email]);
+            return Response::redirect('/');
         }
-        echo View::show('Login', array('errors' => $errors, 'formData' => $_POST));
+        return View::render('Login', ['error' => 'Email ou mot de passe incorrect.', 'email' => $email]);
     }
-
-    public function loginteacherForm(): void {
-        echo View::show('Login', array('errors' => [], 'formData' => []));
+    public function loginForm(): Response {
+        return View::render('Login', array('errors' => [], 'formData' => []));
     }
-    public function logoutAction(): void
+    public function logoutAction(Request $request): Response
     {
         session_destroy();
-        header('Location: /');
-        exit;
+        unset($request);
+        return Response::redirect('/');
     }
 }
