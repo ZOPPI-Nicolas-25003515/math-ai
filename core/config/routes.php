@@ -11,7 +11,7 @@ use App\Controller\{HomeController,
     AssistantiaController,
     AnalyseiaController,
     ExerciceiaController,
-    CoursiaController};
+    ClassiaController};
 
 return [
     ['GET', '/', [HomeController::class, 'homeForm']],
@@ -32,5 +32,5 @@ return [
     ['POST', '/assistantia', [AssistantiaController::class, 'mathAction']],
     ['GET', '/analyseia', [AnalyseiaController::class, 'analyseiaForme']],
     ['GET', '/exerciceia', [ExerciceiaController::class, 'exerciceiaForme']],
-    ['GET', '/coursia', [CoursiaController::class, 'coursiaForme']],
+    ['GET', '/coursia', [ClassiaController::class, 'coursiaForme']],
 ];
