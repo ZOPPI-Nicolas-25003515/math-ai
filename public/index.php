@@ -1,16 +1,18 @@
 <?php
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 $root = __DIR__;
 require_once $root . '/../vendor/autoload.php'; //AutoLoader de composer
 require_once $root . '/../core/AutoLoader.php';
 use Core\View;
 use Core\Controller;
 use Core\Db;
-use App\Controller\{AnalyseiaController,
+use App\Controller\{
+    LoginController,
+    RegisterController,
+    ForgottenpasswordController,
+    ResetpasswordController,
+    AccountsettingsController,
+    AnalyseiaController,
     AssistantiaController,
     ClassiaController,
     ExerciseiaController,

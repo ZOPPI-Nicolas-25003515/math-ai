@@ -1,4 +1,4 @@
 User-agent: * 
 Allow: /
 
-Sitemap: https://webserver-s301.alwaysdata.net/sitemap.xml
+Sitemap: https://mathai.alwaysdata.net/sitemap.xml
