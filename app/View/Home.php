@@ -8,7 +8,7 @@ if($isLogged) {?>
 <div class="infoCard-grid">
     <a class="cardTitle" href="/analyseia">
         <div class="infoCard">
-            <h2>analyse la reponse de l'ia</h2>
+            <h2>analyse la réponse de l'IA</h2>
             <p>
                 Paragraphe
             </p>
