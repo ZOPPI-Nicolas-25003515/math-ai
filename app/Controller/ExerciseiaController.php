@@ -3,9 +3,9 @@ namespace App\Controller;
 
 use Core\View;
 
-final class ExerciceiaController
+final class ExerciseiaController
 {
-    public function exerciceiaForme(): void
+    public function exerciseiaForme(): void
     {
         echo View::show('Exerciceia');
     }
