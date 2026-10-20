@@ -16,7 +16,7 @@ final class ResetpasswordController
         if (!empty($_POST)) {
             $password = $_POST['password'] ?? '';
             $confirmation = $_POST['confirmation'] ?? '';
-            $reset_token = $_GET['token'] ?? $_POST['reset_token'] ?? '';
+            $reset_token =$_POST['token'] ?? '';
             $userReset = new UserValidate('', $password, $confirmation);
 
             $errLength = $userReset->checkPasswordLength();
@@ -34,7 +34,7 @@ final class ResetpasswordController
                 if (!empty($user)) {
                     $_SESSION['id'] = $user->id;
                     $_SESSION['email'] = $user->email;
-                    header('{Location: /home');
+                    header('Location: /');
                     $message = 'Votre mot de passe a été modifié.';
                     exit;
                 }
@@ -43,11 +43,11 @@ final class ResetpasswordController
                 }
             }
         }
-        echo View::show('Resetpassword', array('errors' => $errors, 'formData' => $_POST));
+        echo View::show('Resetpassword', array('errors' => $errors, 'formData' => $_POST, 'token' => $reset_token));
     }
 
     public function resetpasswordForm(): void{
-        echo View::show('Resetpassword', array('errors' => [], 'formData' => []));
+        echo View::show('Resetpassword', array('errors' => [], 'formData' => [], 'token' => $_GET['token'] ?? ''));
     }
 
 }
