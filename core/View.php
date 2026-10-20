@@ -1,6 +1,7 @@
 <?php
 
 namespace Core;
+
 final class View
 {
     public static function openBuffer(): void
@@ -18,17 +19,14 @@ final class View
         return ob_clean();
     }
 
-    /**
-     * @param array<string, mixed> $A_array
-     */
-    public static function show(string $S_location,array $A_array = []):void
+    public static function render(string $view,array $data = [], int $status = 200):Response
     {
-        $data = [];
-        $S_file = __DIR__ . '/../app/View/' . $S_location . '.php';
         $data += ['LoginUser' => $_SESSION['user'] ?? null];
-        $A_view = $A_array;
-        extract($A_view, EXTR_SKIP);
-        require $S_file;
+        extract($data, EXTR_SKIP);
+        self::openBuffer();
+        require dirname(__DIR__) . '/views/' . $view . '.php';
+        $body =self::getBufferContent();
+
+        return new Response($status, $body);
     }
 }
-?>

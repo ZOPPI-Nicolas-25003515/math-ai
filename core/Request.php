@@ -2,11 +2,11 @@
 
 namespace Core;
 final class Request {
-    private string $method;
-    private string $path;
-    private array $get;
-    private array $post;
-    private array $session;
+    public string $method;
+    public string $path;
+   public array $get;
+    public array $post;
+    public array $session;
 
     public function __construct(string $method, string $path,array $get, array $post, array $session) {
         $this->method = $method;
@@ -31,9 +31,9 @@ final class Request {
         return $this->session[$key] ?? $default;
     }
 
-    public function setSession(string $key, string $value = null): void {
-        $this->session[$key] = $value;
-        $_SESSION[$key] = $value;
+    public function setSession(string $key, array $values = null): void {
+        $this->session[$key] = $values;
+        $_SESSION[$key] = $values;
     }
 
 }

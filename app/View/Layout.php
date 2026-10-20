@@ -1,5 +1,5 @@
 <?php
-$A_view = $A_view ?? [];
+$body= $body ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -25,7 +25,7 @@ $A_view = $A_view ?? [];
 </header>
 
 <main>
-    <?= $A_view['body'] ?>
+    <?=$body ?>
 </main>
 
 <footer class="footer">
