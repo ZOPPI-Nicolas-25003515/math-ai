@@ -9,7 +9,7 @@ use Core\Db;
 use App\Controller\{AnalyseiaController,
     AssistantiaController,
     ClassiaController,
-    ExerciceiaController,
+    ExerciseiaController,
     HomeController,
     LoginController,
     RegisterController,
