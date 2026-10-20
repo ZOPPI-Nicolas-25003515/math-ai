@@ -30,7 +30,7 @@ return [
     ['GET', '/mentions', [MentionsController::class, 'mentionsForm']],
     ['GET', '/assistantia', [AssistantiaController::class, 'mathForm']],
     ['POST', '/assistantia', [AssistantiaController::class, 'mathAction']],
-    ['GET', '/analyseia', [AnalyseiaController::class, 'analyseiaForme']],
-    ['GET', '/exerciseia', [ExerciseiaController::class, 'exerciseiaForme']],
-    ['GET', '/classia', [ClassiaController::class, 'classiaForme']],
+    ['GET', '/analyseia', [AnalyseiaController::class, 'analyseiaForm']],
+    ['GET', '/exerciseia', [ExerciseiaController::class, 'exerciseiaForm']],
+    ['GET', '/classia', [ClassiaController::class, 'classiaForm']],
 ];
