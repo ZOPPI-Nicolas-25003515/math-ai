@@ -8,6 +8,7 @@ $A_view = $A_view ?? [];
     <link rel="icon" type="image/x-icon" href="/res/image/logoMathAi.ico">
     <title><?= htmlspecialchars($title ?? 'MathIA') ?></title>
     <link rel="stylesheet" href= "/res/css/style.css">
+    <script src="/res/js/main.js" defer></script>
 </head>
 
 <body>
@@ -19,7 +20,7 @@ $A_view = $A_view ?? [];
             <a href="/login">Connexion</a>
             <a href="/register">Inscription</a>
         <?php } else { ?>
-            <a href="/logout">Déconnexion</a>
+            <a href="/settings">Profile</a>
         <?php } ?>
     </nav>
 </header>
