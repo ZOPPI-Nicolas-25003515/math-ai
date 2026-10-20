@@ -5,7 +5,7 @@ use Core\View;
 
 final class ClasssiaController
 {
-    public function classiaForme(): void
+    public function classiaForm(): void
     {
         echo View::show('Coursia');
     }
