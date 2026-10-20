@@ -6,7 +6,11 @@ require_once $root . '/../core/AutoLoader.php';
 use Core\View;
 use Core\Controller;
 use Core\Db;
-use App\Controller\{HomeController,
+use App\Controller\{AnalyseiaController,
+    AssistantiaController,
+    CoursiaController,
+    ExerciceiaController,
+    HomeController,
     LoginController,
     RegisterController,
     ForgottenpasswordController,
@@ -26,7 +30,11 @@ $controllers = [
     ResetPasswordController::class => fn() => new ResetpasswordController($repository),
     ContactController::class => fn() => new ContactController(),
     MentionsController::class => fn() => new MentionsController(),
-    SitemapController::class => fn() => new SitemapController()
+    SitemapController::class => fn() => new SitemapController(),
+    AssistantiaController::class => fn() => new AssistantiaController(),
+    AnalyseiaController::class => fn() => new AnalyseiaController(),
+    ExerciceiaController::class => fn() => new ExerciceiaController(),
+    CoursiaController::class => fn() => new CoursiaController(),
 ];
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';   // "/login?x=1" -> "/login"

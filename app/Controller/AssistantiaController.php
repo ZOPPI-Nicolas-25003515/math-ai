@@ -1,9 +1,9 @@
-
 <?php
 
 namespace App\Controller;
 
 use App\Service\OpenRouterService;
+use Core\View;
 
 class AssistantiaController
 {
