@@ -1,11 +1,11 @@
-
 <?php
 
 namespace App\Controller;
+namespace App\Service;
 
 use App\Service\OpenRouterService;
 
-class AssistantiaController
+final class AssistantiaController
 {
     public function mathForm(): void
     {

@@ -11,10 +11,12 @@ use App\Controller\{HomeController,
     RegisterController,
     ForgottenpasswordController,
     ResetpasswordController,
+    AccountsettingsController,
     ContactController,
     MentionsController,
     SitemapController};
 use App\Model\UserRepository;
+use App\Service\AssistantiaController;
 
 session_start();
 $repository = new UserRepository();
@@ -24,9 +26,11 @@ $controllers = [
     RegisterController::class => fn() => new RegisterController($repository),
     ForgottenpasswordController::class => fn() => new ForgottenpasswordController($repository),
     ResetPasswordController::class => fn() => new ResetpasswordController($repository),
+    AccountsettingsController::class => fn() => new AccountsettingsController($repository),
     ContactController::class => fn() => new ContactController(),
     MentionsController::class => fn() => new MentionsController(),
-    SitemapController::class => fn() => new SitemapController()
+    SitemapController::class => fn() => new SitemapController(),
+    AssistantiaController::class => fn() => new AssistantiaController(),
 ];
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';   // "/login?x=1" -> "/login"
