@@ -4,7 +4,7 @@
 
     <!-- si on veut ajouter faut que ce soit de ce format, loc est obligatoire, le reste est facultatif-->
     <url>
-        <loc>https://webserver-s301.alwaysdata.net/</loc>
+        <loc>https://mathai.alwaysdata.net/</loc>
         <lastmod>2026-10-04</lastmod>
         <changefreq>never</changefreq>
         <priority>1.0</priority>
