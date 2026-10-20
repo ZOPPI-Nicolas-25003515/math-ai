@@ -5,7 +5,7 @@ use Core\View;
 
 final class ExerciseiaController
 {
-    public function exerciseiaForme(): void
+    public function exerciseiaForm(): void
     {
         echo View::show('Exerciceia');
     }
