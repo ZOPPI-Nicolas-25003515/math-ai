@@ -51,4 +51,5 @@ foreach ($routes as [$routeMethod, $routePath, [$class, $action]]) {
 
     if ($response == null) $response = View::render('404', ['path' => $request->path], 404);
 }
+$response->send();
 

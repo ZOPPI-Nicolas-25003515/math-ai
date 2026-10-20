@@ -3,8 +3,8 @@ namespace App\Controller;
 use Core\{View,Request,Response};
 final class MentionsController
 {
-    public function mentionsForm(): void
+    public function mentionsForm(): Response
     {
-        echo View::show('Mentions');
+        return View::render('Mentions');
     }
 }

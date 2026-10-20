@@ -6,7 +6,7 @@ use PDOException;
 final class Db {
     private static ?PDO $pdo = null;
     public static function getPDO(): PDO{
-        require_once __DIR__  . '/env.php';
+        require_once __DIR__ . '/Env.php';
         chargerEnv(__DIR__.'/../.env');
         try {
             // Construction du DSN (Data Source Name)

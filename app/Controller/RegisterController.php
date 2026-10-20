@@ -17,11 +17,11 @@ final class RegisterController {
             //$s_name = trim($_POST['name'] ?? ''); Nous ajouterons en effet un nom et prénom plus tard.
 
             $userValidate = new UserValidate($email,$password,$confirmation);
-            
+
             $emailError = $userValidate->checkEmailValidity();
             $passwordError = $userValidate->checkPasswordLength();
             $confirmationError = $userValidate->passwordConfirmation();
-            
+
             if (!empty($emailError)) $errors[] = $emailError;
             if (!empty($passwordError)) $errors[] = $passwordError;
             if (!empty($confirmationError)) $errors[] = $confirmationError;

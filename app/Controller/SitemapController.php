@@ -3,8 +3,8 @@ namespace App\Controller;
 use Core\{View,Request,Response};
 final class SitemapController
 {
-    public function sitemapForm(): void
+    public function sitemapForm(): Response
     {
-        echo View::show('Sitemap');
+        return View::render('Sitemap');
     }
 }
