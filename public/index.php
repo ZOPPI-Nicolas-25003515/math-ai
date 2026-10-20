@@ -33,7 +33,7 @@ $controllers = [
     SitemapController::class => fn() => new SitemapController(),
     AssistantiaController::class => fn() => new AssistantiaController(),
     AnalyseiaController::class => fn() => new AnalyseiaController(),
-    ExerciceiaController::class => fn() => new ExerciceiaController(),
+    ExerciseiaController::class => fn() => new ExerciseiaController(),
     ClassiaController::class => fn() => new ClassiaController(),
 ];
 
