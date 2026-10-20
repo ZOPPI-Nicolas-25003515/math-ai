@@ -6,7 +6,7 @@
         <div class="infoCard">
             <h2>cours</h2>
             <p>
-                Cours sur l'analyse de l'ia
+                Cours sur l'analyse de l'IA
             </p>
         </div>
     </a>
@@ -14,7 +14,7 @@
             <div class="infoCard">
                 <h2>exercice</h2>
                 <p>
-                    exercice sur l'analyse de l'ia
+                    Exercice sur l'analyse de l'IA
                 </p>
             </div>
         </a>
