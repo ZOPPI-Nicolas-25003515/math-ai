@@ -6,6 +6,7 @@ require_once $root . '/../core/AutoLoader.php';
 use Core\View;
 use Core\Controller;
 use Core\Db;
+
 use App\Controller\{
     LoginController,
     RegisterController,
