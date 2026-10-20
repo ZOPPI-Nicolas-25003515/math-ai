@@ -4,7 +4,7 @@ namespace Core;
 final class Request {
     public string $method;
     public string $path;
-   public array $get;
+    public array $get;
     public array $post;
     public array $session;
 
@@ -19,19 +19,19 @@ final class Request {
         return new Request($_SERVER['REQUEST_METHOD'],$_SERVER['REQUEST_URI'],$_GET,$_POST,$_SESSION);
     }
 
-    public function post(string $key, string $default = null): mixed {
+    public function post(string $key, string|null $default): mixed {
         return $this->post[$key] ?? $default;
     }
 
-    public function get(string $key, string $default = null): mixed {
+    public function get(string $key, string|null $default): mixed {
         return $this->get[$key] ?? $default;
     }
 
-    public function session(string $key, string $default = null): mixed {
+    public function session(string $key, string|null $default): mixed {
         return $this->session[$key] ?? $default;
     }
 
-    public function setSession(string $key, array $values = null): void {
+    public function setSession(string $key, string|null $values): void {
         $this->session[$key] = $values;
         $_SESSION[$key] = $values;
     }

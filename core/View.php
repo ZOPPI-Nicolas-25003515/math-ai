@@ -21,12 +21,18 @@ final class View
 
     public static function render(string $view,array $data = [], int $status = 200):Response
     {
-        $data += ['LoginUser' => $_SESSION['user'] ?? null];
+        $data += $this->send;
+        $content = $this->catch($view . '.php', $data);
+        $html = $this->catch('Layout.php', $data + ['content' => $content]);
+
+        return new Response($status, $html);
+    }
+
+    private function catch(string $file, array $data): string {
         extract($data, EXTR_SKIP);
         self::openBuffer();
-        require dirname(__DIR__) . '/views/' . $view . '.php';
-        $body =self::getBufferContent();
+        require $this->directory . '/' . $fichier;
 
-        return new Response($status, $body);
+        return self::getBufferContent();
     }
 }

@@ -1,7 +1,7 @@
 <?php
 namespace Core;
 final class Response {
-private string $status;
+private int $status;
 private string $body;
 private array $header = [];
 

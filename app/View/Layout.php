@@ -1,6 +1,3 @@
-<?php
-$body= $body ?? '';
-?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -27,7 +24,9 @@ $body= $body ?? '';
 </header>
 
 <main>
-    <?=$body ?>
+
+    <?= $data['content']?>
+
 </main>
 
 <footer class="footer">

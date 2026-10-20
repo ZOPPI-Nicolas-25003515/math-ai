@@ -1,10 +1,10 @@
 <?php
 namespace App\Controller;
-use Core\{View,Request,Response};
+use Core\{View,Response};
 
 final class HomeController{
     public function homeForm(): Response
     {
-        return View::render('Home', []);
+        return View::render('Home');
     }
 }
