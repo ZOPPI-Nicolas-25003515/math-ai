@@ -289,6 +289,105 @@ button:hover, input[type="submit"]:hover {
     box-shadow: 0 6px 15px rgba(106, 17, 45, 0.3);
 }
 
+#buttons {
+    color: white;
+}
+
+button.secondary {
+    background: #e9ecef;
+    color: #212529;
+    box-shadow: none;
+}
+
+button.secondary:hover {
+    background: #dfe3e8;
+}
+
+.popup_block {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 1000;
+}
+
+.popup_block.is-open {
+    display: flex;
+}
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(8px);
+}
+
+.modal-panel {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 420px);
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+    padding: 1.5rem;
+}
+
+.modal-panel h3 {
+    margin-top: 0;
+}
+
+.modal-panel form {
+    width: 100%;
+    margin: 1rem 0 0;
+    border: none;
+    box-shadow: none;
+}
+
+.modal-panel form ul {
+    padding: 0;
+}
+
+.modal-panel label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.modal-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 1.4rem;
+    line-height: 1;
+    background: #f1f1f1;
+    color: #212529;
+    box-shadow: none;
+}
+
+.modal-close:hover {
+    background: #e2e2e2;
+}
+
+body.modal-open {
+    overflow: hidden;
+}
+
 @media (max-width: 768px) {
     header {
         padding: 1rem;

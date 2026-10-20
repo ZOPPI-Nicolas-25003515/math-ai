@@ -11,6 +11,7 @@ use App\Controller\{HomeController,
     RegisterController,
     ForgottenpasswordController,
     ResetpasswordController,
+    AccountsettingsController,
     ContactController,
     MentionsController,
     SitemapController};
@@ -23,7 +24,7 @@ $controllers = [
     LoginController::class      => fn() => new LoginController($repository),
     RegisterController::class => fn() => new RegisterController($repository),
     ForgottenpasswordController::class => fn() => new ForgottenpasswordController($repository),
-    ResetPasswordController::class => fn() => new ResetpasswordController($repository),
+    ResetPasswordController::class => fn() => new ResetpasswordController($repository),AccountsettingsController::class => fn() => new AccountsettingsController($repository),
     ContactController::class => fn() => new ContactController(),
     MentionsController::class => fn() => new MentionsController(),
     SitemapController::class => fn() => new SitemapController()
