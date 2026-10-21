@@ -1,0 +1,78 @@
+@startuml
+package app.Model {
+  class User << (F,orchid) final >> {
+    +__construct(public readonly int $id,
+      public readonly string $email,
+      public readonly string $passwordHash)
+    +verifyPassword(string $password): bool
+    +getId(): int
+    +getEmail(): string
+  }
+  
+  class UserMail << (F,orchid) final >> {
+    +__construct(private string $email)
+    +sendMail(array $content): bool|string
+    +createResetPasswordMessage(string $email, string $resetLink): array
+  }
+  
+  class UserRepository << (F,orchid) final >> {
+    +$pdo: ?\PDO
+    +__construct((?\PDO $pdo = null)
+    +findByEmail(string $email): ?User
+    +emailExists(string $email): bool
+    +createUser(string $email, string $password): User
+    +deleteUser(string $email, string $password): User
+    +updateUser(string $reset_token, string $password): User
+    +setResetToken(string $email,string $reset_token,string $expiry): bool
+    +findByToken(string $reset_token): ?User
+    +verifyPasswordUsability(string $reset_token,string $password): ?string
+    +verifyToken(string $reset_token): ?string
+  }
+  
+  class UserValidate << (F,orchid) final >> {
+    +__construct(public readonly string $email, 
+      public readonly string $password, 
+      public readonly string $confirmation)
+    +checkEmailValidity(): string
+    +checkPasswordLength(): string
+    +passwordConfirmation(): string
+  }
+}
+
+package app.Controller {
+  class GenericController << (F,orchid) final >>{
+    +__construct(private readonly UserRepository $repository)
+    +geniricForm(): void
+    +genericAction(): void
+  }
+  GenericController <|-- UserRepository : utilise
+}
+
+package "core" {
+  class AutoLoader << (F,orchid) final >> {
+    {static} +findClass(string $class): void
+  }
+  
+  class View << (F,orchid) final >> {
+    {static} +openBuffer(): void
+    {static} +getBufferContent(): string|false
+    {static} +closeBuffer(): bool
+    {static} +show(string $S_location, array $A_array = []):void
+  }
+  
+  class Db << (F,orchid) final >> {
+    {static} -$pdo = null: ?PDO
+    {static} +getPDO(): PDO
+  }
+  
+  class Controller << (F,orchid) final >>{
+   -$_urlSegments = []: array
+   -$_urlParamenters = []: array
+   -$_formData = []: array
+   
+   +__construct(string $S_url,array $A_postParams)
+   +execute(): mixed
+  }
+}
+
+@enduml
