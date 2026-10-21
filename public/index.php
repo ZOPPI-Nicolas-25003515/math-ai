@@ -32,6 +32,8 @@ $controllers = [
     ContactController::class => fn() => new ContactController(),
     MentionsController::class => fn() => new MentionsController(),
     SitemapController::class => fn() => new SitemapController(),
+    AssistantiaController::class => fn() => new AssistantiaController()
+    SitemapController::class => fn() => new SitemapController(),
     AssistantiaController::class => fn() => new AssistantiaController(),
     AnalyseiaController::class => fn() => new AnalyseiaController(),
     ExerciseiaController::class => fn() => new ExerciseiaController(),
