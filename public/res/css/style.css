@@ -19,6 +19,36 @@ body {
     overflow-x: hidden;
 }
 
+.assistantia form {
+    margin: auto;
+    text-align: center;
+}
+
+.assistantia textarea {
+    margin: auto;
+    width: 100%;
+    min-height: 120px;
+    padding: 12px 16px;
+    font-family: "Noto Sans Ethiopic Blk";
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #333333;
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    border-radius: 8px;
+    resize: vertical; /* Permet uniquement d'étirer en hauteur */
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.assistantia p{
+    margin: 1rem 2rem;
+    text-align: center;
+}
+.assistantia button {
+    margin: 2rem 4rem;
+    padding: 1rem 2rem;
+}
 img, video {
     max-width: 100%;
     display: block;
