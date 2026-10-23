@@ -8,7 +8,10 @@ use App\Controller\{HomeController,
     ContactController,
     MentionsController,
     SitemapController,
-    AssistantiaController};
+    AssistantiaController,
+    AnalyseiaController,
+    ExerciseiaController,
+    ClassiaController};
 
 return [
     ['GET', '/', [HomeController::class, 'homeForm']],
@@ -27,4 +30,7 @@ return [
     ['GET', '/mentions', [MentionsController::class, 'mentionsForm']],
     ['GET', '/assistantia', [AssistantiaController::class, 'mathForm']],
     ['POST', '/assistantia', [AssistantiaController::class, 'mathAction']],
+    ['GET', '/analyseia', [AnalyseiaController::class, 'analyseiaForm']],
+    ['GET', '/exerciseia', [ExerciseiaController::class, 'exerciseiaForm']],
+    ['GET', '/classia', [ClassiaController::class, 'classiaForm']],
 ];
