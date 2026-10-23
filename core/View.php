@@ -4,6 +4,9 @@ namespace Core;
 
 final class View
 {
+    public string $directory;
+    public array $share;
+    public function __construct(string $directory, array $share) {}
     public static function openBuffer(): void
     {
         ob_start();
@@ -19,9 +22,9 @@ final class View
         return ob_clean();
     }
 
-    public static function render(string $view,array $data = [], int $status = 200):Response
+    public function render(string $view,array $data = [], int $status = 200):Response
     {
-        $data += $this->send;
+        $data += $this->share;
         $content = $this->catch($view . '.php', $data);
         $html = $this->catch('Layout.php', $data + ['content' => $content]);
 
@@ -31,7 +34,7 @@ final class View
     private function catch(string $file, array $data): string {
         extract($data, EXTR_SKIP);
         self::openBuffer();
-        require $this->directory . '/' . $fichier;
+        require $this->directory . '/' . $file;
 
         return self::getBufferContent();
     }

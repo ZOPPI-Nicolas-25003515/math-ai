@@ -1,11 +1,11 @@
 <?php
 namespace App\Model;
 use Nette\Utils\DateTime;
-use Core\Db;
+use Core\Database;
 final class UserRepository {
     public \PDO $pdo;
     public function __construct(?\PDO $pdo = null) {
-        $this->pdo =$pdo ?? Db::getPdo();
+        $this->pdo =$pdo ?? Database::getPdo();
     }
 
 
