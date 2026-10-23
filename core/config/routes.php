@@ -8,11 +8,7 @@ use App\Controller\{HomeController,
     ContactController,
     MentionsController,
     SitemapController,
-    AssistantiaController,
-    AccountsettingsController,
-    AnalyseiaController,
-    ExerciseiaController,
-    ClassiaController};
+    AiassistantController};
 
 return [
     ['GET', '/', [HomeController::class, 'homeForm']],
@@ -29,6 +25,8 @@ return [
     ['GET', '/sitemap', [SitemapController::class, 'sitemapForm']],
     ['GET', '/contact', [ContactController::class, 'contactForm']],
     ['GET', '/mentions', [MentionsController::class, 'mentionsForm']],
+    ['GET', '/aiassistant', [AiassistantController::class, 'mathForm']],
+    ['POST', '/aiassistant', [AiassistantController::class, 'mathAction']],
     ['GET', '/assistantia', [AssistantiaController::class, 'mathForm']],
     ['POST', '/assistantia', [AssistantiaController::class, 'mathAction']],
     ['GET', '/settings', [AccountsettingsController::class, 'settingsForm']],
