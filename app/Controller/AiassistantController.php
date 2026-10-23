@@ -9,7 +9,7 @@ class AiassistantController
 {
     public function mathForm(): void
     {
-        \Core\View::show('aiassistant', [
+        \Core\View::show('Aiassistant', [
             'answer' => $answer ?? '',
             'error' => $error ?? '',
             'question' => $question ?? ''
@@ -34,7 +34,7 @@ class AiassistantController
             }
         }
 
-        \Core\View::show('aiassistant', [
+        \Core\View::show('Aiassistant', [
             'answer' => $answer,
             'error' => $error,
             'question' => $question ?? ''
