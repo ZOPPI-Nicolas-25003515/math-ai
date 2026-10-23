@@ -4,11 +4,11 @@ namespace App\Controller;
 
 use App\Service\OpenRouterService;
 
-class AssistantiaController
+class AiassistantController
 {
     public function mathForm(): void
     {
-        \Core\View::show('assistantia', [
+        \Core\View::show('aiassistant', [
             'answer' => $answer ?? '',
             'error' => $error ?? '',
             'question' => $question ?? ''
@@ -33,7 +33,7 @@ class AssistantiaController
             }
         }
 
-        \Core\View::show('assistantia', [
+        \Core\View::show('aiassistant', [
             'answer' => $answer,
             'error' => $error,
             'question' => $question ?? ''

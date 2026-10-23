@@ -1,9 +1,9 @@
-<section class="assistantia">
+<section class="aiassistant">
     <h1>MathIA</h1>
 
     <p>Pose ta question à notre Assistant IA </p>
 
-    <form method="POST" action="/assistantia">
+    <form method="POST" action="/aiassistant">
         <label for="question">Version : Chat GPT 4</label>
 
         <textarea
