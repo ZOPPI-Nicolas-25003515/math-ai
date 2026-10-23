@@ -3,14 +3,13 @@
 namespace Core;
 use PDO;
 use PDOException;
-final class Db {
+final class Database {
     private static ?PDO $pdo = null;
-    public static function getPDO(): PDO{
-        require_once __DIR__ . '/Env.php';
-        chargerEnv(__DIR__.'/../.env');
+    public static function connexion(): PDO{
+        Env::load(__DIR__.'/../.env');
         try {
             // Construction du DSN (Data Source Name)
-            $dsn = env('DB_DRIVER') . ':dbname=' . env('DB_NAME') . ';host=' . env('DB_HOST') . ';charset=utf8mb4';
+            $dsn = Env::get('DB_DRIVER') . ':dbname=' . Env::get('DB_NAME') . ';host=' . Env::get('DB_HOST') . ';charset=utf8mb4';
 
             // Options PDO pour plus de sécurité
             $options = [
@@ -20,7 +19,7 @@ final class Db {
             ];
 
             // Création de la connexion PDO
-            self::$pdo = new PDO($dsn,env('DB_USERNAME'),env('DB_PASSWORD'),$options);
+            self::$pdo = new PDO($dsn,Env::get('DB_USERNAME'),Env::get('DB_PASSWORD'),$options);
             // Création de la table users
             self::$pdo->exec('CREATE TABLE IF NOT EXISTS users (
         id INT NOT NULL AUTO_INCREMENT,
@@ -31,11 +30,11 @@ final class Db {
             return self::$pdo;
 
         }catch (PDOException $e){
-            die ("Erreur :". $e->getMessage());
+            die ("Error :". $e->getMessage());
         }
 
     }
 }
 
 
-?>
+

@@ -2,6 +2,12 @@
 namespace Core;
 
 final class Router {
+
+    public array $routes;
+    public array $craft;
+
+    public View $view;
+    public function __construct(array $routes, array $craft = [], View $view) {}
     public function dispatch(Request $request): Response
     {
         foreach ($this->routes as [$routeMethod, $routePath, [$class, $action]]) {

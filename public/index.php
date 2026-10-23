@@ -1,18 +1,7 @@
 <?php
 
-$root = __DIR__;
-require_once $root . '/../vendor/autoload.php'; //AutoLoader de composer
-require_once $root . '/../core/AutoLoader.php';
-use Core\{View,Request,Response};
-use Core\Controller;
-use Core\Db;
-
-
-use App\Controller\{AnalyseiaController,
-    ClassiaController,
-    ExerciseiaController,
-    AiassistantController,
-    HomeController,
+use Core\{View,Env,Database,Router,Request,Response};
+use App\Controller\{HomeController,
     LoginController,
     RegisterController,
     ForgottenpasswordController,
@@ -32,6 +21,13 @@ use App\Controller\{AnalyseiaController,
     AddclassroomController};
 use App\Model\UserRepository;
 
+
+$root = __DIR__ . '/..';
+require_once $root . '/vendor/autoload.php'; //AutoLoader de composer
+require_once $root . '/core/AutoLoader.php';
+
+
+Env::load($root. '/.env');
 session_start();
 $repository = new UserRepository();
 $controllers = [
@@ -71,7 +67,9 @@ foreach ($routes as [$routeMethod, $routePath, [$class, $action]]) {
         break;
     }
 
-    if ($response == null) $response = View::render('404', ['path' => $request->path], 404);
-}
-$response->send();
+$repository = new UserRepository(Database::connexion());
+$view = new View($root . '/Views', ['loggedUser' => $_SESSION['user'] ?? null]);
+$router = new Router(require $root . '/core/config/routes.php', [/* craft */], $view);
+
+$router->dispatch(Request::fromGlobals())->send();
 

@@ -5,7 +5,7 @@ private int $status;
 private string $body;
 private array $header = [];
 
-public function __construct(string $status, string $body,array $header = []) {
+public function __construct(int $status, string $body,array $header = []) {
     $this->status = $status;
     $this->body = $body;
     $this->header = $header;
