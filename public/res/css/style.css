@@ -19,12 +19,12 @@ body {
     overflow-x: hidden;
 }
 
-.assistantia form {
+.aiassistant form {
     margin: auto;
     text-align: center;
 }
 
-.assistantia textarea {
+.aiassistant textarea {
     margin: auto;
     width: 100%;
     min-height: 120px;
@@ -41,11 +41,11 @@ body {
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.assistantia p{
+.aiassistant p{
     margin: 1rem 2rem;
     text-align: center;
 }
-.assistantia button {
+.aiassistant button {
     margin: 2rem 4rem;
     padding: 1rem 2rem;
 }
