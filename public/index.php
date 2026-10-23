@@ -13,6 +13,7 @@ use App\Controller\{HomeController,
     ResetpasswordController,
     ContactController,
     MentionsController,
+    AssistantiaController,
     SitemapController};
 use App\Model\UserRepository;
 
@@ -26,7 +27,8 @@ $controllers = [
     ResetPasswordController::class => fn() => new ResetpasswordController($repository),
     ContactController::class => fn() => new ContactController(),
     MentionsController::class => fn() => new MentionsController(),
-    SitemapController::class => fn() => new SitemapController()
+    SitemapController::class => fn() => new SitemapController(),
+    AssistantiaController::class => fn() => new AssistantiaController()
 ];
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';   // "/login?x=1" -> "/login"

@@ -1,6 +1,8 @@
-
 <?php
 
+namespace App\Service;
+
+use RuntimeException;
 class OpenRouterService
 {
     public function ask(string $question): string
