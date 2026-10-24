@@ -17,6 +17,20 @@ if(!empty($error)){?>
 ?>
 
 <span>
+    <a href="/analyseia">Retour</a>
+    <form action="/addexercise" method="post">
+    <ul>
+        <li>
+            <p>
+                <label for="email">rentré l'enoncer</label>
+                <input type="email" name="email" value="" required>
+            </p>
+        </li>
+        <li>
+            <p>
+                <label for="genre-select">choisiser le genre:</label>
+
+                <select name="genre" id="genre-select">
     <a href="/home">Retour</a>
     <form action="/addexercise" method="POST" enctype="multipart/form-data">
         <ul>
@@ -45,7 +59,7 @@ if(!empty($error)){?>
                     <option value="QCM a choix multiple">QCM a choix multiple</option>
                 </select>
              </li>
-            <li>
+            </p>
             <p>
                 <label for="dificulte-select">choisiser la dificulter:</label>
 

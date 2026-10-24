@@ -9,8 +9,7 @@ final class UserRepository {
     }
 
 
-    public function findByEmail(string $email): ?User
-    {
+    public function findByEmail(string $email): ?Teacher{
         $stmt = $this->pdo->prepare('SELECT id ,user_name ,user_surname ,mail ,hached_password FROM Users WHERE mail = :email');
         $stmt->execute(['email' => $email]);
         $user = $stmt->fetch(\PDO::FETCH_ASSOC);

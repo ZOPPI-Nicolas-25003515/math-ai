@@ -27,6 +27,7 @@ final class UserFile{
         $myfile = basename($fileData['name']);
         $finalpath = $targetfolder . $myfile;
 
+        // 5. Copier le fichier
         if (!move_uploaded_file($fileData['tmp_name'], $finalpath)) {
             $errors = "Erreur : Impossible de déplacer le fichier. Vérifiez les permissions du serveur.";
         }

@@ -43,6 +43,7 @@ class AddclassController
                 if ($this->repository->pathExists($path,$teacherid)) {
                     $errors[] = 'Un de vos cours à deja ce nom';
                 }else{
+
                     $class = $this->repository->createClass($path,$teacherid,$title,$subject);
                     $success = true;
                     header('Location: /');

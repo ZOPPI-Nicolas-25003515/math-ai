@@ -17,13 +17,13 @@ if(!empty($error)){?>
 ?>
 
 <span>
-    <a href="/home">Retour</a>
+    <a href="/analyseia">Retour</a>
     <form action="/addclass" method="POST" enctype="multipart/form-data">
         <ul>
             <li>
                 <p>
                     <label for="pdf_file"><b>Étape 1 : Choisir le cours en PDF :</b></label><br>
-                    <input type="file" name="pdf_file" id="pdf_file" accept=".pdf, application/pdf" required>
+                    <input type="file" name="pdf_file" id="pdf_file" accept="application/pdf" required>
                 </p>
             </li>
             <li>
