@@ -34,7 +34,7 @@ class AssistantiaController
             }
         }
 
-        \Core\View::show('assistantia', [
+        View::show('assistantia', [
             'answer' => $answer,
             'error' => $error,
             'question' => $question ?? ''

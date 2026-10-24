@@ -30,10 +30,10 @@ final class ResetpasswordController
             if (!empty($errorToken)) $errors[] = $errorToken;
 
             if (empty($errors)) {
-                $user = $this->repository->updateUser($reset_token,$password);
+                $user = $this->repository->updateTeacher($reset_token,$password);
                 if (!empty($user)) {
                     $_SESSION['id'] = $user->id;
-                    $_SESSION['email'] = $user->email;
+                    $_SESSION['email'] = $user->mail;
                     header('{Location: /home');
                     $message = 'Votre mot de passe a été modifié.';
                     exit;

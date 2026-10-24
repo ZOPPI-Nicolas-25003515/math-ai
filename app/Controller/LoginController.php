@@ -18,10 +18,11 @@ final class LoginController
             }
 
             if (empty($errors)) {
-                $user = $this->repository->findByEmail($email);
+                $teacher = $this->repository->findByEmail($email);
 
-                if ($user !== null && $user->verifyPassword($password)) {
-                    $_SESSION['email'] = $user->email;
+                if ($teacher !== null && $teacher->verifyPassword($password)) {
+                    $_SESSION['id'] = $teacher->id;
+                    $_SESSION['email'] = $teacher->mail;
                     header('Location: /');
                     exit;
                 } else {

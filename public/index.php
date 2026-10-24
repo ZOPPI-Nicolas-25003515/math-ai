@@ -8,8 +8,8 @@ use Core\Controller;
 use Core\Db;
 use App\Controller\{AnalyseiaController,
     AssistantiaController,
-    CoursiaController,
-    ExerciceiaController,
+    ClassiaController,
+    ExerciseiaController,
     HomeController,
     LoginController,
     RegisterController,
@@ -17,7 +17,9 @@ use App\Controller\{AnalyseiaController,
     ResetpasswordController,
     ContactController,
     MentionsController,
-    SitemapController};
+    SitemapController,
+    AddexerciseController,
+    AddclassController};
 use App\Model\UserRepository;
 
 session_start();
@@ -33,8 +35,10 @@ $controllers = [
     SitemapController::class => fn() => new SitemapController(),
     AssistantiaController::class => fn() => new AssistantiaController(),
     AnalyseiaController::class => fn() => new AnalyseiaController(),
-    ExerciceiaController::class => fn() => new ExerciceiaController(),
-    CoursiaController::class => fn() => new CoursiaController(),
+    ExerciseiaController::class => fn() => new ExerciseiaController(),
+    ClassiaController::class => fn() => new ClassiaController(),
+    AddexerciseController::class => fn() => new AddexerciseController(),
+    AddclassController::class => fn() => new AddclassController($repository),
 ];
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';   // "/login?x=1" -> "/login"

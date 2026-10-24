@@ -6,7 +6,7 @@ use Core\View;
 
 final class AnalyseiaController
 {
-    public function analyseiaForme(): void
+    public function analyseiaForm(): void
     {
         echo View::show('Analyseia');
     }

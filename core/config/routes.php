@@ -10,8 +10,10 @@ use App\Controller\{HomeController,
     SitemapController,
     AssistantiaController,
     AnalyseiaController,
-    ExerciceiaController,
-    CoursiaController};
+    ExerciseiaController,
+    ClassiaController,
+    AddexerciseController,
+    AddclassController};
 
 return [
     ['GET', '/', [HomeController::class, 'homeForm']],
@@ -30,7 +32,10 @@ return [
     ['GET', '/mentions', [MentionsController::class, 'mentionsForm']],
     ['GET', '/assistantia', [AssistantiaController::class, 'mathForm']],
     ['POST', '/assistantia', [AssistantiaController::class, 'mathAction']],
-    ['GET', '/analyseia', [AnalyseiaController::class, 'analyseiaForme']],
-    ['GET', '/exerciceia', [ExerciceiaController::class, 'exerciceiaForme']],
-    ['GET', '/coursia', [CoursiaController::class, 'coursiaForme']],
+    ['GET', '/analyseia', [AnalyseiaController::class, 'analyseiaForm']],
+    ['GET', '/exerciseia', [ExerciseiaController::class, 'exerciseiaForm']],
+    ['GET', '/classia', [ClassiaController::class, 'classiaForm']],
+    ['GET', '/addexercise', [AddexerciseController::class, 'addexerciseForm']],
+    ['GET', '/addclass', [AddclassController::class, 'addclassForm']],
+    ['POST', '/addclass', [AddclassController::class, 'addclassAction']]
 ];
