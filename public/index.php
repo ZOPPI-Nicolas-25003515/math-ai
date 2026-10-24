@@ -8,28 +8,27 @@ use Core\Controller;
 use Core\Db;
 
 
-use App\Controller\{AiassistantController,
-    AnalyseiaController,
+use App\Controller\{AnalyseiaController,
+    ClassiaController,
     ExerciseiaController,
+    AiassistantController,
     HomeController,
     LoginController,
     RegisterController,
     ForgottenpasswordController,
     ResetpasswordController,
     AccountsettingsController,
-    AssistantiaController,
-    ClassiaController,
     LoginteacherController,
     RegisterteacherController,
     ForgottenpasswordteacherController,
     ResetpasswordteacherController,
     ContactController,
     MentionsController,
+    LoginchoiceController,
+    ViewclassController,
     SitemapController,
     AddexerciseController,
-    AddclassController,
-    LoginchoiceController,
-    ViewclassController};
+    AddclassController};
 use App\Model\UserRepository;
 
 session_start();
@@ -40,13 +39,14 @@ $controllers = [
     RegisterteacherController::class => fn() => new RegisterteacherController($repository),
     ForgottenpasswordteacherController::class => fn() => new ForgottenpasswordteacherController($repository),
     ResetpasswordteacherController::class => fn() => new ResetpasswordteacherController($repository),
+    ForgottenpasswordController::class => fn() => new ForgottenpasswordController($repository),
+    ResetPasswordController::class => fn() => new ResetpasswordController($repository),
+    AccountsettingsController::class => fn() => new AccountsettingsController($repository),
     ContactController::class => fn() => new ContactController(),
     MentionsController::class => fn() => new MentionsController(),
     SitemapController::class => fn() => new SitemapController(),
     AiassistantController::class => fn() => new AiassistantController(),
-    AssistantiaController::class => fn() => new AssistantiaController(),
     SitemapController::class => fn() => new SitemapController(),
-    AssistantiaController::class => fn() => new AssistantiaController(),
     AnalyseiaController::class => fn() => new AnalyseiaController(),
     ExerciseiaController::class => fn() => new ExerciseiaController(),
     ClassiaController::class => fn() => new ClassiaController(),
@@ -54,6 +54,7 @@ $controllers = [
     AddclassController::class => fn() => new AddclassController($repository),
     LoginchoiceController::class => fn() => new LoginchoiceController(),
     ViewclassController::class => fn() => new ViewclassController($repository),
+    AiassistantController::class => fn() => new AiassistantController(),
 ];
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';   // "/login?x=1" -> "/login"

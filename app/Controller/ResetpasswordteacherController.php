@@ -16,7 +16,7 @@ final class ResetpasswordteacherController
         if (!empty($_POST)) {
             $password = $_POST['password'] ?? '';
             $confirmation = $_POST['confirmation'] ?? '';
-            $reset_token =$_POST['token'] ?? '';
+            $reset_token = $_GET['token'] ?? $_POST['reset_token'] ?? '';
             $userReset = new UserValidate('', $password, $confirmation);
 
             $errLength = $userReset->checkPasswordLength();

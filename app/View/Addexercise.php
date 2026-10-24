@@ -46,14 +46,18 @@ if(!empty($error)){?>
                 </select>
              </li>
             <li>
-            <select name="difficulty" id="difficulty" required>
-                <option value="">-- Choisissez la dificulter --</option>
+            <p>
+                <label for="dificulte-select">choisiser la dificulter:</label>
+
+                <select name="dificulte" id="dificulte-select" required>
+                    <option value="moyen">moyen</option>
                     <option value="facile">facile</option>
                     <option value="moyen">moyen</option>
                     <option value="dificile">dificile</option>
                 </select>
-             </li>
-        <button type="submit" name="submit_import">Finaliser et Importer</button>
+            </p>
+        </li>
+        <button type="submit">Ajouter</button>
     </ul>
     </form>
 </span>

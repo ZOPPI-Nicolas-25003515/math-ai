@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Model\UserFile;
 use App\Model\UserRepository;
+use App\Model\UserValidate;
 use Core\View;
 
 final class AddexerciseController

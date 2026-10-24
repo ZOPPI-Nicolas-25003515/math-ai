@@ -19,7 +19,6 @@ final class LoginteacherController
 
             if (empty($errors)) {
                 $teacher = $this->repository->findTeacherByEmail($email);
-
                 if ($teacher !== null && $teacher->verifyPassword($password)) {
                     $_SESSION['id'] = $teacher->id;
                     $_SESSION['email'] = $teacher->mail;

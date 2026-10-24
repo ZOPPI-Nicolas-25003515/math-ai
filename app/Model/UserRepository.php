@@ -77,7 +77,7 @@ final class UserRepository {
         else return new Teacher($teacher['id'], $teacher['teacher_name'], $teacher['surname'],$teacher['mail'],$teacher['hached_password'],$teacher['high_school_id']);
     }
 
-    public function verifyTeacherPasswordUsability(string $reset_token,string $password): ?string {
+     public function verifyTeacherPasswordUsability(string $reset_token,string $password): ?string {
         $stmt = $this->pdo->prepare('SELECT password FROM Teacher WHERE reset_token = :reset_token');
         $stmt->execute(['reset_token' => $reset_token]);
         $teacher = $stmt->fetch(\PDO::FETCH_ASSOC);
@@ -98,54 +98,6 @@ final class UserRepository {
             return 'Cette demande n\'est plus valide.';
         }
         else return null;
-    }
-
-    public function takeHighSchool()
-    {
-        $stmt = $this->pdo->prepare('SELECT id, high_school_name FROM High_school ');
-        $stmt->execute();
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
-    }
-
-    public function findByPath(string $path): ?Classes{
-        $stmt = $this->pdo->prepare('SELECT id ,teacher_id ,subject_id ,title ,path_name FROM Class WHERE path_name = :path_name ');
-        $stmt->execute(['path_name' => $path]);
-        $classes = $stmt->fetch(\PDO::FETCH_ASSOC);
-        if (!$classes){return null;}
-        else{return new Classes($classes['id'] ,$classes['teacher_id'] ,$classes['subject_id'] ,$classes['title'] ,$classes['path_name']);}
-    }
-
-    public function pathExists(string $pathname, int $teacherid): bool {
-        $stmt = $this->pdo->prepare('SELECT id FROM Class WHERE path_name = :path_name AND teacher_id = :teacher_id');
-        $stmt->execute(['path_name' => $pathname,'teacher_id' => $teacherid]);
-        return $stmt->fetch() ? true : false;
-    }
-
-    public function createClass(string $pathname, int $teacherid, string $title, int $subjectid): Classes {
-        $stmt = $this->pdo->prepare('INSERT INTO Class (teacher_id ,subject_id ,title ,path_name) VALUES (:teacher_id ,:subject_id ,:title ,:path_name)');
-        $stmt->execute(['teacher_id' => $teacherid,'subject_id' => $subjectid,'title'=> $title,'path_name' => $pathname]);
-        $id = $this->pdo->lastInsertId();
-        $id = (int) $id;
-        return new Classes($id, $teacherid, $subjectid, $title, $pathname);
-    }
-
-    public function deleteClass(string $pathname, int $teacherid): Classes {
-        $class = $this->findByPath($pathname);
-        if ($class === null) {
-            throw new \InvalidArgumentException('Aucun cour trouvé.');
-        }
-
-        $stmt = $this->pdo->prepare('DELETE FROM Class WHERE path_name = :path_name AND teacher_id = :teacherid');
-        $stmt->execute(['path_name' => $pathname,'teacher_id' => $teacherid]);
-
-        return $class;
-    }
-
-    public function takeSubject()
-    {
-        $stmt = $this->pdo->prepare('SELECT id ,subject_name FROM Subjec ');
-        $stmt->execute();
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function classTitleTeacher(int $teacherid, int $subject)
@@ -194,5 +146,53 @@ final class UserRepository {
         $stmt->execute(['path_name' => $pathname,'teacher_id' => $teacherid]);
 
         return $class;
+    }
+
+    public function takeHighSchool()
+    {
+        $stmt = $this->pdo->prepare('SELECT id, high_school_name FROM High_school ');
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function findByPath(string $path): ?Classes{
+        $stmt = $this->pdo->prepare('SELECT id ,teacher_id ,subject_id ,title ,path_name FROM Class WHERE path_name = :path_name ');
+        $stmt->execute(['path_name' => $path]);
+        $classes = $stmt->fetch(\PDO::FETCH_ASSOC);
+        if (!$classes){return null;}
+        else{return new Classes($classes['id'] ,$classes['teacher_id'] ,$classes['subject_id'] ,$classes['title'] ,$classes['path_name']);}
+    }
+
+    public function pathExists(string $pathname, int $teacherid): bool {
+        $stmt = $this->pdo->prepare('SELECT id FROM Class WHERE path_name = :path_name AND teacher_id = :teacher_id');
+        $stmt->execute(['path_name' => $pathname,'teacher_id' => $teacherid]);
+        return $stmt->fetch() ? true : false;
+    }
+
+    public function createClass(string $teacherid, int $subjectid,string $title, string $pathname): Classes {
+        $stmt = $this->pdo->prepare('INSERT INTO Class (teacher_id ,subject_id ,title ,path_name) VALUES (:teacher_id ,:subject_id ,:title ,:path_name)');
+        $stmt->execute(['teacher_id' => $teacherid,'subject_id' => $subjectid,'title'=> $title,'path_name' => $pathname]);
+        $id = $this->pdo->lastInsertId();
+        $id = (int) $id;
+        return new Classes($id, $teacherid, $subjectid, $title, $pathname);
+    }
+
+    public function deleteClass(string $pathname, int $teacherid): Classes {
+        $class = $this->findByPath($pathname);
+        if ($class === null) {
+            throw new \InvalidArgumentException('Aucun cour trouvé.');
+        }
+
+        $stmt = $this->pdo->prepare('DELETE FROM Class WHERE path_name = :path_name AND teacher_id = :teacherid');
+        $stmt->execute(['path_name' => $pathname,'teacher_id' => $teacherid]);
+
+        return $class;
+    }
+
+    public function takeSubject()
+    {
+        $stmt = $this->pdo->prepare('SELECT id ,subject_name FROM Subjec ');
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 }
