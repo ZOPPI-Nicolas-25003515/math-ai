@@ -119,7 +119,7 @@ final class UserRepository {
         return $stmt->fetch() ? true : false;
     }
 
-    public function createClass(string $teacherid, int $subjectid,string $title, string $pathname): Classes {
+    public function createClass(string $pathname, int $teacherid, string $title, int $subjectid): Classes {
         $stmt = $this->pdo->prepare('INSERT INTO Class (teacher_id ,subject_id ,title ,path_name) VALUES (:teacher_id ,:subject_id ,:title ,:path_name)');
         $stmt->execute(['teacher_id' => $teacherid,'subject_id' => $subjectid,'title'=> $title,'path_name' => $pathname]);
         $id = $this->pdo->lastInsertId();

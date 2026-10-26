@@ -33,19 +33,16 @@ class AddclassController
 
             $fileError = $userFile->copyClass($_FILES['pdf_file']);
 
+            if ($teacherid <= 0) {
+                $errors[] = 'Vous devez être connecté en tant que professeur pour ajouter un cours.';
+            }
+
             if (!empty($fileError)) $errors[] = $fileError;
 
             if (empty($errors)) {
                 if ($this->repository->pathExists($path,$teacherid)) {
                     $errors[] = 'Un de vos cours à deja ce nom';
                 }else{
-                    var_dump([
-                        'path' => $path,
-                        'teacher_id' => $teacherid,
-                        'title' => $title,
-                        'subject_id' => $subject,
-                        'POST_brut' => $_POST['subject'] ?? 'non défini'
-                    ]);
                     $class = $this->repository->createClass($path,$teacherid,$title,$subject);
                     $success = true;
                     header('Location: /');
