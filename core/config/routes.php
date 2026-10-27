@@ -13,8 +13,8 @@ use App\Controller\{HomeController,
     ClassiaController,
     AddexerciseController,
     AddclassController,
-    AccountsettingsController,
     LoginchoiceController,
+    AccountsettingsController,
     ViewclassController,
     AiassistantController};
 
@@ -46,6 +46,8 @@ return [
     ['GET', '/addclass', [AddclassController::class, 'addclassForm']],
     ['POST', '/addclass', [AddclassController::class, 'addclassAction']],
     ['GET', '/loginchoice', [LoginchoiceController::class, 'loginteacherForm']],
+    ['GET', '/aiassistant', [AiassistantController::class, 'AiassistantForm']],
+    ['POST', '/aiassistant', [AiassistantController::class, 'AiassistantAction']],
     ['GET', '/viewclass', [ViewclassController::class, 'viewAction']],
     ['GET', '/downloadclass', [ViewclassController::class, 'downloadAction']]
 ];

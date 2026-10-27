@@ -13,22 +13,18 @@ use App\Controller\{AnalyseiaController,
     ExerciseiaController,
     AiassistantController,
     HomeController,
-    LoginController,
-    RegisterController,
-    ForgottenpasswordController,
-    ResetpasswordController,
-    AccountsettingsController,
     LoginteacherController,
     RegisterteacherController,
     ForgottenpasswordteacherController,
     ResetpasswordteacherController,
+    AccountsettingsController,
     ContactController,
     MentionsController,
     LoginchoiceController,
     ViewclassController,
     SitemapController,
     AddexerciseController,
-    AddclassController};
+    AddclassController,};
 use App\Model\UserRepository;
 
 session_start();

@@ -77,7 +77,7 @@ final class UserRepository {
         else return new Teacher($teacher['id'], $teacher['teacher_name'], $teacher['surname'],$teacher['mail'],$teacher['hached_password'],$teacher['high_school_id']);
     }
 
-     public function verifyTeacherPasswordUsability(string $reset_token,string $password): ?string {
+    public function verifyTeacherPasswordUsability(string $reset_token,string $password): ?string {
         $stmt = $this->pdo->prepare('SELECT password FROM Teacher WHERE reset_token = :reset_token');
         $stmt->execute(['reset_token' => $reset_token]);
         $teacher = $stmt->fetch(\PDO::FETCH_ASSOC);
@@ -194,5 +194,13 @@ final class UserRepository {
         $stmt = $this->pdo->prepare('SELECT id ,subject_name FROM Subjec ');
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function classTitleTeacher(int $teacherid)
+    {
+        $stmt = $this->pdo->prepare('SELECT title FROM Class WHERE teacher_id = :teacher_id');
+        $stmt->execute(['teacher_id' => $teacherid]);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
     }
 }

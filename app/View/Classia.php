@@ -7,9 +7,7 @@ $title = $userRepository->classTitleTeacher((int)$_SESSION['teacher_id'],$_SESSI
 ?>
 <h1>Cours sur la réponse de l'IA</h1>
 <a href="/analyseia">Retour</a>
-<?php
-var_dump($_SESSION['teacher_id']);
-?>
+
 <?php
 if($_SESSION['role'] == 'teacher'){?>
     <?php foreach ($title as $titl): ?>
@@ -21,8 +19,5 @@ if($_SESSION['role'] == 'teacher'){?>
                 </p>
             </div>
         </a>
-    <?php endforeach; ?>
-
-    <?php
-}
-?>
+    <?php endforeach;
+}?>

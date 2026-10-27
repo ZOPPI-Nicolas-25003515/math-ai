@@ -4,7 +4,7 @@ if($isLogged) {?>
     <h2> Bonjour, <?=$_SESSION['email']?></h2><?php
 }?>
 <h1>Accueil</h1>
-<p id="homeDescription">Une application web interactive destinée aux lycéens, permettant d’explorer l’utilisation des intelligences artificielles génératives, et notamment des LLM, pour apprendre les mathématiques.</p>
+    <p id="homeDescription">Une application web interactive destinée aux lycéens, permettant d’explorer l’utilisation des intelligences artificielles génératives, et notamment des LLM, pour apprendre les mathématiques.</p>
 <?php
 if($_SESSION['role'] == 'teacher'){?>
     <a class="cardTitle" href="/addclass">
