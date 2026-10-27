@@ -10,8 +10,7 @@ use App\Controller\{HomeController,
     SitemapController,
     AssistantiaController,
     AnalyseiaController,
-    ExerciseiaController,
-    ClassiaController};
+    ExerciseiaController,};
 
 return [
     ['GET', '/', [HomeController::class, 'homeForm']],
@@ -27,10 +26,10 @@ return [
     ['POST', '/resetpassword', [ResetpasswordController::class, 'resetpasswordAction']],
     ['GET', '/sitemap', [SitemapController::class, 'sitemapForm']],
     ['GET', '/contact', [ContactController::class, 'contactForm']],
-    ['GET', '/mentions', [MentionsController::class, 'mentionsForm']],
+    ['GET', '/mentions', [MentionsController::class, 'mentionsForm']],/*
     ['GET', '/assistantia', [AssistantiaController::class, 'mathForm']],
     ['POST', '/assistantia', [AssistantiaController::class, 'mathAction']],
     ['GET', '/analyseia', [AnalyseiaController::class, 'analyseiaForm']],
     ['GET', '/exerciseia', [ExerciseiaController::class, 'exerciseiaForm']],
-    ['GET', '/classia', [ClassiaController::class, 'classiaForm']],
+    ['GET', '/classia', [ClassiaController::class, 'classiaForm']],*/
 ];

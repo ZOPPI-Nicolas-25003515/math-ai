@@ -19,19 +19,19 @@ final class Request {
         return new Request($_SERVER['REQUEST_METHOD'],$_SERVER['REQUEST_URI'],$_GET,$_POST,$_SESSION);
     }
 
-    public function post(string $key, string|null $default): mixed {
+    public function post(string $key, $default = null): mixed {
         return $this->post[$key] ?? $default;
     }
 
-    public function get(string $key, string|null $default): mixed {
+    public function get(string $key, $default = null): mixed {
         return $this->get[$key] ?? $default;
     }
 
-    public function session(string $key, string|null $default): mixed {
+    public function session(string $key, $default = null): mixed {
         return $this->session[$key] ?? $default;
     }
 
-    public function setSession(string $key, string|null $values): void {
+    public function setSession(string $key, $values = null): void {
         $this->session[$key] = $values;
         $_SESSION[$key] = $values;
     }
