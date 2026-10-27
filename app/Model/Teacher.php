@@ -2,8 +2,6 @@
 
 namespace App\Model;
 
-use DateTimeImmutable;
-
 final class Teacher
 {
     public function __construct(

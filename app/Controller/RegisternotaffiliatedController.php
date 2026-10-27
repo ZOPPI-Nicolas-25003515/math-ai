@@ -39,10 +39,15 @@ final class RegisternotaffiliatedController
                 if ($this->repository->emailExists($email)) {
                     $errors[] = 'Un compte existe déjà avec cet email.';
                 }else{
+                    $user = $this->repository->createTeacher($teachername, $surname, $email, $password, $highschoolid);
                     $user = $this->repository->createUser($email, $password);
                     $request->setSession('id', $user->id);
                     $request->setSession('email', $user->email);
+<<<<<<<< HEAD:app/Controller/RegisternotaffiliatedController.php
                     $request->setSession('user', ['id' => $user->id, 'email' => $user->email, 'role' => 'not_affiliated']);
+========
+                    $request->setSession('user', ['id' => $user->id, 'email' => $user->email, 'role' => 'teacher']);
+>>>>>>>> c46d756 (affichage des cours disponible fonctionelle):app/Controller/RegisterteacherController.php
                     return Response::redirect('/');
                 }
             }

@@ -57,6 +57,8 @@ return [
     ['GET', '/addexercise', [AddexerciseController::class, 'addexerciseForm']],
     ['GET', '/addclass', [AddclassController::class, 'addclassForm']],
     ['POST', '/addclass', [AddclassController::class, 'addclassAction']],
+    ['GET', '/loginchoice', [LoginchoiceController::class, 'loginteacherForm']],
+    ['POST', '/addclass', [AddclassController::class, 'addclassAction']],
     ['POST', '/settings', [SettingsController::class, 'deleteAction']],
     ['GET', '/analyseia', [AnalyseiaController::class, 'analyseiaForm']],
     ['GET', '/exerciseia', [ExerciseiaController::class, 'exerciseiaForm']],

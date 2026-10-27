@@ -265,4 +265,12 @@ final class UserRepository {
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
+
+    public function classTitleTeacher(int $teacherid)
+    {
+        $stmt = $this->pdo->prepare('SELECT title FROM Class WHERE teacher_id = :teacher_id');
+        $stmt->execute(['teacher_id' => $teacherid]);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+    }
 }

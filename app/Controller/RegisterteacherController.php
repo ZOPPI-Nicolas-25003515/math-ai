@@ -1,30 +1,37 @@
 <?php
+
 namespace App\Controller;
-use Core\View;
+use App\Core\{View,Request,Response};
 use App\Model\UserRepository;
 use App\Model\UserValidate;
-final class RegisterteacherController {
-    public function __construct(private readonly UserRepository $repository) {}
-    public function registerteacherAction(): void
+
+final class RegisternotaffiliatedController
+{
+    private View $view;
+    public function __construct(private readonly UserRepository $repository,View $view) {
+        $this->view = $view;
+    }
+
+    public function registernotaffiliatedAction(): Response
     {
         $errors = [];
         $success = false;
 
-        if (!empty($_POST)) {
-            $email =filter_var(trim($_POST['email'] ?? ''),FILTER_VALIDATE_EMAIL);
-            $password = $_POST['password'] ?? '';
-            $confirmation = $_POST['confirmation'] ?? '';
-            $teachername = $_POST['teachername'] ?? '';
+        if (!empty($request->post)) {
+            $email =filter_var(trim($request->post('email') ?? ''),FILTER_VALIDATE_EMAIL);
+            $password = $request->post('password') ?? '';
+            $confirmation = $request->post('confirmation') ?? '';
+            $teachername = $_POST['name'] ?? '';
             $surname = $_POST['surname'] ?? '';
             $highschoolid = $_POST['high_school'] ?? '';
             //$s_name = trim($_POST['name'] ?? ''); Nous ajouterons en effet un nom et prénom plus tard.
 
             $userValidate = new UserValidate($email,$password,$confirmation);
-            
+
             $emailError = $userValidate->checkEmailValidity();
             $passwordError = $userValidate->checkPasswordLength();
             $confirmationError = $userValidate->passwordConfirmation();
-            
+
             if (!empty($emailError)) $errors[] = $emailError;
             if (!empty($passwordError)) $errors[] = $passwordError;
             if (!empty($confirmationError)) $errors[] = $confirmationError;
@@ -34,20 +41,18 @@ final class RegisterteacherController {
                 if ($this->repository->emailExists($email)) {
                     $errors[] = 'Un compte existe déjà avec cet email.';
                 }else{
-                    $user = $this->repository->createUser($teachername, $surname, $email, $password);
-                    $teacher = $this->repository->createTeacher($user->id, $highschoolid);
-                    $success = true;
-                    $_SESSION['id'] = $user->id;
-                    $_SESSION['email'] = $user->mail;
-                    $_SESSION['role'] = 'teacher';
-                    header('Location: /');
-                    exit;
+                    $user = $this->repository->createTeacher($teachername, $surname, $email, $password, $highschoolid);
+                    $user = $this->repository->createUser($email, $password);
+                    $request->setSession('id', $user->id);
+                    $request->setSession('email', $user->email);
+                    $request->setSession('user', ['id' => $user->id, 'email' => $user->email, 'role' => 'not_affiliated']);
+                    return Response::redirect('/');
                 }
             }
         }
-        echo View::show('Registerteacher', array( 'errors' => $errors,'success' => $success, 'formData' => $_POST));
+        return $this->view->render('Register', array( 'errors' => $errors, 'formData' => $request->post));
     }
-    public function registerteacherForm(): void {
-        echo View::show('Registerteacher', array( 'errors' => [],'success' => null, 'formData' => []));
+    public function registerForm(): Response {
+        return $this->view->render('Register', array( 'errors' => [], 'formData' => []));
     }
 }

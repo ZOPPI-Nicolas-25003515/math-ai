@@ -14,7 +14,7 @@ final class LoginController
         $password = $request->post('password');
         $user = $this->repository->findByEmail($email);
         if ($user !== null && $user->verifyPassword($password)) {
-            $request->setSession('user', ['id' => $user->id, 'email' => $user->email]);
+            $request->setSession('user', ['id' => $user->id, 'email' => $user->email, 'role' => 'teacher']);
             return Response::redirect('/');
         }
         return $this->view->render('Login', ['errors' => ['Email ou mot de passe incorrect.'], 'email' => $email]);
