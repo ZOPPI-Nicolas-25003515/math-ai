@@ -6,7 +6,10 @@ final class View
 {
     public string $directory;
     public array $share;
-    public function __construct(string $directory, array $share) {}
+    public function __construct(string $directory, array $share) {
+        $this->directory = $directory;
+        $this->share = $share;
+    }
     public static function openBuffer(): void
     {
         ob_start();

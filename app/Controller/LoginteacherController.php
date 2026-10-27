@@ -4,7 +4,10 @@ use Core\{View,Request,Response};
 use App\Model\UserRepository;
 final class LoginController
 {
-    public function __construct(private readonly UserRepository $repository) {}
+    private View $view;
+    public function __construct(private readonly UserRepository $repository, View $view) {
+        $this->view = $view;
+    }
     public function loginAction(Request $request): Response
     {
         $errors = [];
@@ -16,10 +19,10 @@ final class LoginController
             $request->setSession('user', ['id' => $user->id, 'email' => $user->email]);
             return Response::redirect('/');
         }
-        return View::render('Login', ['error' => 'Email ou mot de passe incorrect.', 'email' => $email]);
+        return $this->view->render('Login', ['error' => 'Email ou mot de passe incorrect.', 'email' => $email]);
     }
     public function loginForm(): Response {
-        return View::render('Login', array('errors' => [], 'formData' => []));
+        return $this->view->render('Login', array('errors' => [], 'formData' => []));
     }
     public function logoutAction(Request $request): Response
     {

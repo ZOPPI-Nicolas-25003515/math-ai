@@ -1,8 +1,8 @@
 <?php
 
 use App\Controller\{HomeController,
-    LoginteacherController,
-    RegisterteacherController,
+    LoginController,
+    RegisterController,
     ForgottenpasswordController,
     ResetpasswordController,
     ContactController,

@@ -31,5 +31,5 @@ if(!empty($error)){?>
         </ul>
     </form>
     <p>vous n'avez pas de compte ? Inscrivez-vous <a href="/register">ici</a>.</p>
-    <p><a href="/forgottenpassword">mot de passe oublié</a> ?
+    <p><a href="/forgottenpassword">mot de passe oublié</a> ? </p>
 </span>
