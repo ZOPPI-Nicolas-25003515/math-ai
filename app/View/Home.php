@@ -5,6 +5,16 @@ if($isLogged) {?>
 }?>
 <h1>Accueil</h1>
 <p id="homeDescription">Bienvenue sur Math-Ai, le premier site de cours de mathématique programme lycée entièrement géré par l’intelligence artificielle ! Il va comporter grand nombre de cours et exercices, qui seront entièrement générés par l’intelligence artificielle !</p>
+<?php
+if($_SESSION['role'] == 'teacher'){?>
+    <a class="cardTitle" href="/addclass">
+        <h2>Ajouter cours</h2>
+    </a>
+    <a class="cardTitle" href="/addexercise">
+        <h2>Ajouter exercice</h2>
+    </a><?php
+}
+?>
 <div class="infoCard-grid">
     <a class="cardTitle" href="/analyseia">
         <div class="infoCard">

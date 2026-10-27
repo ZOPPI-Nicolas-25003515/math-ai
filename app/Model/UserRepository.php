@@ -9,7 +9,7 @@ final class UserRepository {
     }
 
 
-    public function findByEmail(string $email): ?Teacher{
+    public function findTeacherByEmail(string $email): ?Teacher{
         $stmt = $this->pdo->prepare('SELECT id,teacher_name,surname,mail,hached_password,high_school_id FROM Teacher WHERE mail = :email');
         $stmt->execute(['email' => $email]);
         $teacher = $stmt->fetch(\PDO::FETCH_ASSOC);
@@ -17,7 +17,7 @@ final class UserRepository {
         else{return new Teacher($teacher['id'], $teacher['teacher_name'], $teacher['surname'],$teacher['mail'],$teacher['hached_password'],$teacher['high_school_id']);}
     }
 
-    public function emailExists(string $email): bool {
+    public function emailTeacherExists(string $email): bool {
         $stmt = $this->pdo->prepare('SELECT id FROM Teacher WHERE mail = :email');
         $stmt->execute(['email' => $email]);
         return $stmt->fetch() ? true : false;
@@ -64,12 +64,12 @@ final class UserRepository {
         return new Teacher ($id, $teachername, $surname, $email, $password, $highschoolid);
     }
 
-    public function setResetToken(string $email,string $reset_token,string $expiry): bool {
+    public function setTeacherResetToken(string $email,string $reset_token,string $expiry): bool {
         $stmt = $this->pdo->prepare('UPDATE Teacher SET reset_token = :token, reset_token_expiry = :expiry WHERE email = :email');
         return $stmt->execute(['token' => $reset_token, 'expiry' => $expiry,'email' => $email]);
     }
 
-    public function findByToken(string $reset_token): ?Teacher {
+    public function findTeacherByToken(string $reset_token): ?Teacher {
         $stmt = $this->pdo->prepare('SELECT * FROM Teacher WHERE reset_token = :token');
         $stmt->execute(['token' => $reset_token]);
         $teacher = $stmt->fetch(\PDO::FETCH_ASSOC);
@@ -77,7 +77,7 @@ final class UserRepository {
         else return new Teacher($teacher['id'], $teacher['teacher_name'], $teacher['surname'],$teacher['mail'],$teacher['hached_password'],$teacher['high_school_id']);
     }
 
-    public function verifyPasswordUsability(string $reset_token,string $password): ?string {
+    public function verifyTeacherPasswordUsability(string $reset_token,string $password): ?string {
         $stmt = $this->pdo->prepare('SELECT password FROM Teacher WHERE reset_token = :reset_token');
         $stmt->execute(['reset_token' => $reset_token]);
         $teacher = $stmt->fetch(\PDO::FETCH_ASSOC);
@@ -86,7 +86,7 @@ final class UserRepository {
         else return null;
     }
 
-    public function verifyToken(string $reset_token): ?string {
+    public function verifyTeacherToken(string $reset_token): ?string {
         if ($reset_token == null) return 'Il n\'existe aucun token.';
         $time_now = new \DateTimeImmutable();
         $stmt = $this->pdo->prepare('SELECT reset_token_expiry FROM Teacher WHERE reset_token = :reset_token');
@@ -144,5 +144,13 @@ final class UserRepository {
         $stmt = $this->pdo->prepare('SELECT id ,subject_name FROM Subjec ');
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function classTitleTeacher(int $teacherid)
+    {
+        $stmt = $this->pdo->prepare('SELECT title FROM Class WHERE teacher_id = :teacher_id');
+        $stmt->execute(['teacher_id' => $teacherid]);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
     }
 }

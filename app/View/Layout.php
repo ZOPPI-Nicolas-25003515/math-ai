@@ -16,7 +16,7 @@ $A_view = $A_view ?? [];
         <a href="/">MathsAI</a>
         <?php $user = $_SESSION['email'] ?? null; ?>
         <?php if ($user === null) { ?>
-            <a href="/login">Connexion</a>
+            <a href="/loginchoice">Connexion</a>
             <a href="/register">Inscription</a>
         <?php } else { ?>
             <a href="/logout">Déconnexion</a>

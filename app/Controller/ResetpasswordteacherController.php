@@ -4,7 +4,7 @@ use Core\View;
 use App\Model\UserRepository;
 use App\Model\UserValidate;
 
-final class ResetpasswordController
+final class ResetpasswordteacherController
 {
     public function __construct(private readonly UserRepository $repository) {}
 
@@ -21,8 +21,8 @@ final class ResetpasswordController
 
             $errLength = $userReset->checkPasswordLength();
             $errConf = $userReset->passwordConfirmation();
-            $errorPassUse = $this->repository -> verifyPasswordUsability($reset_token,$password);
-            $errorToken = $this->repository -> verifyToken($reset_token);
+            $errorPassUse = $this->repository -> verifyTeacherPasswordUsability($reset_token,$password);
+            $errorToken = $this->repository -> verifyTeacherToken($reset_token);
 
             if (!empty($errLength)) $errors[] = $errLength;
             if (!empty($errConf)) $errors[] = $errConf;

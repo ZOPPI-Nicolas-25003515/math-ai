@@ -11,25 +11,26 @@ use App\Controller\{AnalyseiaController,
     ClassiaController,
     ExerciseiaController,
     HomeController,
-    LoginController,
-    RegisterController,
-    ForgottenpasswordController,
-    ResetpasswordController,
+    LoginteacherController,
+    RegisterteacherController,
+    ForgottenpasswordteacherController,
+    ResetpasswordteacherController,
     ContactController,
     MentionsController,
     SitemapController,
     AddexerciseController,
-    AddclassController};
+    AddclassController,
+    LoginchoiceController};
 use App\Model\UserRepository;
 
 session_start();
 $repository = new UserRepository();
 $controllers = [
     HomeController::class     => fn() => new HomeController(),
-    LoginController::class      => fn() => new LoginController($repository),
-    RegisterController::class => fn() => new RegisterController($repository),
-    ForgottenpasswordController::class => fn() => new ForgottenpasswordController($repository),
-    ResetPasswordController::class => fn() => new ResetpasswordController($repository),
+    LoginteacherController::class      => fn() => new LoginteacherController($repository),
+    RegisterteacherController::class => fn() => new RegisterteacherController($repository),
+    ForgottenpasswordteacherController::class => fn() => new ForgottenpasswordteacherController($repository),
+    ResetpasswordteacherController::class => fn() => new ResetpasswordteacherController($repository),
     ContactController::class => fn() => new ContactController(),
     MentionsController::class => fn() => new MentionsController(),
     SitemapController::class => fn() => new SitemapController(),
@@ -39,6 +40,7 @@ $controllers = [
     ClassiaController::class => fn() => new ClassiaController(),
     AddexerciseController::class => fn() => new AddexerciseController(),
     AddclassController::class => fn() => new AddclassController($repository),
+    LoginchoiceController::class => fn() => new LoginchoiceController(),
 ];
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';   // "/login?x=1" -> "/login"

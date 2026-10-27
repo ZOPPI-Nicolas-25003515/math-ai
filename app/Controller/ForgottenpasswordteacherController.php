@@ -3,7 +3,7 @@ namespace App\Controller;
 use Core\View;
 use App\Model\UserRepository;
 use App\Model\UserMail;
-final class ForgottenpasswordController
+final class ForgottenpasswordteacherController
 {
 
     public function __construct(private readonly UserRepository $repository) {}
@@ -13,12 +13,12 @@ final class ForgottenpasswordController
         global $pdo;
         if (!empty($_POST["email"])) {
             $email = filter_var(trim($_POST["email"]), FILTER_VALIDATE_EMAIL);
-            if (!$this->repository->emailExists($email)) {
+            if (!$this->repository->emailTeacherExists($email)) {
                 $message = 'Si votre adresse e-mail est correcte, un email de réinitialisation a été envoyé.';
             } else {
                 $reset_token = bin2hex(random_bytes(32));
                 $expiry = (new \DateTimeImmutable('+15 minutes'))->format('Y-m-d H:i:s');
-                $this->repository->setResetToken($email, $reset_token, $expiry);
+                $this->repository->setTeacherResetToken($email, $reset_token, $expiry);
                 $resetLink = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https://' : 'http://')
                     . ($_SERVER['HTTP_HOST'] ?? 'localhost')
                     . '/resetpassword?reset&token=' . urlencode($reset_token);

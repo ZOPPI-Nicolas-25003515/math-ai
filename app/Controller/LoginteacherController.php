@@ -2,10 +2,10 @@
 namespace App\Controller;
 use Core\View;
 use App\Model\UserRepository;
-final class LoginController
+final class LoginteacherController
 {
     public function __construct(private readonly UserRepository $repository) {}
-    public function loginAction(): void
+    public function loginteacherAction(): void
     {
         $errors = [];
 
@@ -18,11 +18,12 @@ final class LoginController
             }
 
             if (empty($errors)) {
-                $teacher = $this->repository->findByEmail($email);
+                $teacher = $this->repository->findTeacherByEmail($email);
 
                 if ($teacher !== null && $teacher->verifyPassword($password)) {
-                    $_SESSION['id'] = $teacher->id;
+                    $_SESSION['teacher_id'] = $teacher->id;
                     $_SESSION['email'] = $teacher->mail;
+                    $_SESSION['role'] = 'teacher';
                     header('Location: /');
                     exit;
                 } else {
@@ -33,7 +34,7 @@ final class LoginController
         echo View::show('Login', array('errors' => $errors, 'formData' => $_POST));
     }
 
-    public function loginForm(): void {
+    public function loginteacherForm(): void {
         echo View::show('Login', array('errors' => [], 'formData' => []));
     }
     public function logoutAction(): void

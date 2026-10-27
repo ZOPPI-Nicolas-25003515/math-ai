@@ -3,7 +3,7 @@ namespace App\Controller;
 use Core\View;
 use App\Model\UserRepository;
 use App\Model\UserValidate;
-final class RegisterController {
+final class RegisterteacherController {
     public function __construct(private readonly UserRepository $repository) {}
     public function registerAction(): void
     {
@@ -31,13 +31,14 @@ final class RegisterController {
 
 
             if (empty($errors)) {
-                if ($this->repository->emailExists($email)) {
+                if ($this->repository->emailTeacherExists($email)) {
                     $errors[] = 'Un compte existe déjà avec cet email.';
                 }else{
                     $user = $this->repository->createTeacher($teachername, $surname, $email, $password, $highschoolid);
                     $success = true;
-                    $_SESSION['id'] = $user->id;
+                    $_SESSION['teacher_id'] = $user->id;
                     $_SESSION['email'] = $user->mail;
+                    $_SESSION['role'] = 'teacher';
                     header('Location: /');
                     exit;
                 }
