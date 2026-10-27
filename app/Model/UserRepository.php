@@ -266,4 +266,5 @@ final class UserRepository {
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
+
 }
