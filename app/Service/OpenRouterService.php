@@ -1,6 +1,5 @@
-
 <?php
-
+namespace App\Service;
 class OpenRouterService
 {
     public function ask(string $question): string
