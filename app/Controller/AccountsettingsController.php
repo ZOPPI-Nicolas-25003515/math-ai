@@ -27,7 +27,7 @@ final class AccountsettingsController {
             exit;
         }
 
-        echo View::show('AccountSettings', [
+        echo View::show('Accountsettings', [
             'email' => $user->getEmail(),
             'errors' => [],
         ]);
@@ -44,7 +44,7 @@ final class AccountsettingsController {
         }
 
         if (trim((string) $password) === '') {
-            echo View::show('AccountSettings', [
+            echo View::show('Accountsettings', [
                 'email' => $email,
                 'errors' => ['Le mot de passe est requis pour supprimer le compte.'],
             ]);
@@ -54,7 +54,7 @@ final class AccountsettingsController {
         try {
             $this->repository->deleteUser($email, (string) $password);
         } catch (\InvalidArgumentException $e) {
-            echo View::show('AccountSettings', [
+            echo View::show('Accountsettings', [
                 'email' => $email,
                 'errors' => [$e->getMessage()],
             ]);
