@@ -14,8 +14,8 @@ use App\Controller\{HomeController,
     AddexerciseController,
     AddclassController,
     LoginchoiceController,
-    AccountsettingsController,
     ViewclassController,
+    AccountsettingsController,
     AiassistantController};
 
 return [
