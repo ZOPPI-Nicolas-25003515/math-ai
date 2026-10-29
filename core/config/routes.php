@@ -14,7 +14,8 @@ use App\Controller\{HomeController,
     ClassiaController,
     AddexerciseController,
     AddclassController,
-    LoginchoiceController};
+    LoginchoiceController,
+    ViewclassController,};
 
 return [
     ['GET', '/', [HomeController::class, 'homeForm']],
@@ -40,4 +41,6 @@ return [
     ['GET', '/addclass', [AddclassController::class, 'addclassForm']],
     ['POST', '/addclass', [AddclassController::class, 'addclassAction']],
     ['GET', '/loginchoice', [LoginchoiceController::class, 'loginteacherForm']],
+    ['GET', '/viewclass', [ViewclassController::class, 'viewAction']],
+    ['GET', '/downloadclass', [ViewclassController::class, 'downloadAction']]
 ];

@@ -1,5 +1,9 @@
 <?php
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 $root = __DIR__;
 require_once $root . '/../vendor/autoload.php'; //AutoLoader de composer
 require_once $root . '/../core/AutoLoader.php';
@@ -20,7 +24,8 @@ use App\Controller\{AnalyseiaController,
     SitemapController,
     AddexerciseController,
     AddclassController,
-    LoginchoiceController};
+    LoginchoiceController,
+    ViewclassController};
 use App\Model\UserRepository;
 
 session_start();
@@ -41,6 +46,7 @@ $controllers = [
     AddexerciseController::class => fn() => new AddexerciseController(),
     AddclassController::class => fn() => new AddclassController($repository),
     LoginchoiceController::class => fn() => new LoginchoiceController(),
+    ViewclassController::class => fn() => new ViewclassController($repository),
 ];
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';   // "/login?x=1" -> "/login"
