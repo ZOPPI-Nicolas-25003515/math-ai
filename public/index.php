@@ -50,7 +50,6 @@ $controllers = [
     AddclassController::class => fn() => new AddclassController($repository),
     LoginchoiceController::class => fn() => new LoginchoiceController(),
     ViewclassController::class => fn() => new ViewclassController($repository),
-    AiassistantController::class => fn() => new AiassistantController(),
 ];
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';   // "/login?x=1" -> "/login"

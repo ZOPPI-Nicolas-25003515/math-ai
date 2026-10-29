@@ -14,8 +14,8 @@ use App\Controller\{HomeController,
     AddexerciseController,
     AddclassController,
     LoginchoiceController,
-    AccountsettingsController,
     ViewclassController,
+    AccountsettingsController,
     AiassistantController};
 
 return [
@@ -36,8 +36,6 @@ return [
     ['GET', '/analyseia', [AnalyseiaController::class, 'analyseiaForm']],
     ['GET', '/exerciseia', [ExerciseiaController::class, 'exerciseiaForm']],
     ['GET', '/classia', [ClassiaController::class, 'classiaForm']],
-    ['GET', '/aiassistant', [AiassistantController::class, 'AiassistantForm']],
-    ['POST', '/aiassistant', [AiassistantController::class, 'AiassistantAction']],
     ['GET', '/analyseia', [AnalyseiaController::class, 'analyseiaForm']],
     ['GET', '/settings', [AccountsettingsController::class, 'settingsForm']],
     ['POST', '/settings', [AccountsettingsController::class, 'deleteAction']],
