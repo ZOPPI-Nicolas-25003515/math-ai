@@ -28,7 +28,7 @@ use App\Controller\{AnalyseiaController,
     AddanswerexerciseController,
     RegisterchoiceController,
     RegisternotaffiliatedController,
-    AddclassroomController};
+    AddclassroomController,};
 use App\Model\UserRepository;
 
 
@@ -60,14 +60,9 @@ $craft = [
     ClassiaController::class => fn() => new ClassiaController($view),
     AddexerciseController::class => fn() => new AddexerciseController($view),
     AddclassController::class => fn() => new AddclassController($repository,$view),
-    AiassistantController::class => fn() => new AiassistantController($view),
-    AiassistantController::class => fn() => new AiassistantController($repository, $view),
-    RegisterController::class => fn() => new RegisterController($repository),
-    ForgottenpasswordController::class => fn() => new ForgottenpasswordController($repository),
-    ResetPasswordController::class => fn() => new ResetpasswordController($repository),
-    ContactController::class => fn() => new ContactController(),
-    MentionsController::class => fn() => new MentionsController(),
-    SitemapController::class => fn() => new SitemapController(),
+    LoginchoiceController::class => fn() => new LoginchoiceController(),
+    ViewclassController::class => fn() => new ViewclassController($repository),
+
 ];
 
 $router = new Router(require $root . '/app/Core/config/routes.php', $view, $craft);
