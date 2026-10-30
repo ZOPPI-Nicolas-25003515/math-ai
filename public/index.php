@@ -6,9 +6,8 @@ require_once $root . '/../core/AutoLoader.php';
 use Core\View;
 use Core\Controller;
 use Core\Db;
-use App\Controller\{AnalyseiaController,
-    AssistantiaController,
-    ClassiaController,
+use App\Controller\{AiassistantController,
+    AnalyseiaController,
     ExerciseiaController,
     HomeController,
     LoginController,
@@ -32,10 +31,7 @@ $controllers = [
     ContactController::class => fn() => new ContactController(),
     MentionsController::class => fn() => new MentionsController(),
     SitemapController::class => fn() => new SitemapController(),
-    AssistantiaController::class => fn() => new AssistantiaController(),
-    AnalyseiaController::class => fn() => new AnalyseiaController(),
-    ExerciseiaController::class => fn() => new ExerciseiaController(),
-    ClassiaController::class => fn() => new ClassiaController(),
+    AiassistantController::class => fn() => new AiassistantController()
 ];
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';   // "/login?x=1" -> "/login"
@@ -49,7 +45,7 @@ foreach ($routes as [$routeMethod, $routePath, [$class, $action]]) {
         $controller = $controllers[$class]();
         $controller->$action();
         $ViewContent = View::getBufferContent();
-        echo View::show('Layout',array('body' => $ViewContent));
+        View::show('Layout',array('body' => $ViewContent));
         exit;
     }
 

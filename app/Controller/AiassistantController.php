@@ -5,18 +5,18 @@ namespace App\Controller;
 use App\Service\OpenRouterService;
 use Core\View;
 
-class AssistantiaController
+class AiassistantController
 {
-    public function mathForm(): void
+    public function AiassistantForm(): void
     {
-        \Core\View::show('assistantia', [
+        \Core\View::show('Aiassistant', [
             'answer' => $answer ?? '',
             'error' => $error ?? '',
             'question' => $question ?? ''
         ]);
     }
 
-    public function mathAction(): void
+    public function AiassistantAction(): void
     {
         $question = trim($_POST['question'] ?? '');
         $answer = null;
@@ -34,7 +34,7 @@ class AssistantiaController
             }
         }
 
-        \Core\View::show('assistantia', [
+        \Core\View::show('Aiassistant', [
             'answer' => $answer,
             'error' => $error,
             'question' => $question ?? ''
