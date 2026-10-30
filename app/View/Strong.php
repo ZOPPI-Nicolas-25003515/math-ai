@@ -1,5 +1,6 @@
 <?php
-namespace View;
+namespace App\View;
+
 final class Strong extends Component
 {
     public function __construct(

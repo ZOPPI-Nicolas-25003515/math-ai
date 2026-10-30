@@ -1,6 +1,6 @@
 <?php
 namespace App\Controller;
-use Core\{View,Response};
+use App\Core\{View,Response};
 
 final class HomeController{
     private View $view;

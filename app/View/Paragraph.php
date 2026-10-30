@@ -1,5 +1,6 @@
 <?php
-namespace View;
+namespace App\View;
+
 final class Paragraph extends Component
 {
     /** @param array<string> $texts */

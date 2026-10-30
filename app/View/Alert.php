@@ -1,5 +1,6 @@
 <?php
-namespace View;
+namespace App\View;
+
 final class Alert extends Component
 {
     /** @param array<string> $alerts */

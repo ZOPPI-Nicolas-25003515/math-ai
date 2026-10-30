@@ -1,10 +1,12 @@
 <?php
 
-namespace Core;
+namespace App\Core;
 
 final class View
 {
     public string $directory;
+
+
     public array $share;
     public function __construct(string $directory, array $share) {
         $this->directory = $directory;
