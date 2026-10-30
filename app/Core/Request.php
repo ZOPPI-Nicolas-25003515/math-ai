@@ -1,6 +1,6 @@
 <?php
 
-namespace Core;
+namespace App\Core;
 final class Request {
     public string $method;
     public string $path;

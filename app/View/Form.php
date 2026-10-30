@@ -1,5 +1,5 @@
 <?php
-namespace View;
+namespace App\View;
 
 final class Form extends Component
 {

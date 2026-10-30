@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use Core\View;
+use App\Core\{View,Response};
 
 final class AnalyseiaController
 {

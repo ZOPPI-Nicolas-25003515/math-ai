@@ -1,5 +1,5 @@
 <?php
-namespace Core;
+namespace App\Core;
 final class Response {
 private int $status;
 private string $body;

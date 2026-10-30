@@ -1,12 +1,11 @@
 <?php
 
-namespace Core;
+namespace App\Core;
 use PDO;
 use PDOException;
 final class Database {
     private static ?PDO $pdo = null;
-    public static function connexion(): PDO{
-        Env::load(__DIR__.'/../.env');
+    public static function connexion(string $root): PDO{
         try {
             // Construction du DSN (Data Source Name)
             $dsn = Env::get('DB_DRIVER') . ':dbname=' . Env::get('DB_NAME') . ';host=' . Env::get('DB_HOST') . ';charset=utf8mb4';

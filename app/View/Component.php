@@ -1,5 +1,5 @@
 <?php
-namespace View;
+namespace App\View;
 abstract class Component
 {
     abstract public function render(): string;
