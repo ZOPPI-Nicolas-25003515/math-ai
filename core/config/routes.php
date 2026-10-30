@@ -25,13 +25,6 @@ return [
     ['GET', '/sitemap', [SitemapController::class, 'sitemapForm']],
     ['GET', '/contact', [ContactController::class, 'contactForm']],
     ['GET', '/mentions', [MentionsController::class, 'mentionsForm']],
-    ['GET', '/aiassistant', [AiassistantController::class, 'mathForm']],
-    ['POST', '/aiassistant', [AiassistantController::class, 'mathAction']],
-    ['GET', '/assistantia', [AssistantiaController::class, 'mathForm']],
-    ['POST', '/assistantia', [AssistantiaController::class, 'mathAction']],
-    ['GET', '/settings', [AccountsettingsController::class, 'settingsForm']],
-    ['POST', '/settings', [AccountsettingsController::class, 'deleteAction']],
-    ['GET', '/analyseia', [AnalyseiaController::class, 'analyseiaForm']],
-    ['GET', '/exerciseia', [ExerciseiaController::class, 'exerciseiaForm']],
-    ['GET', '/classia', [ClassiaController::class, 'classiaForm']]
+    ['GET', '/aiassistant', [AiassistantController::class, 'AiassistantForm']],
+    ['POST', '/aiassistant', [AiassistantController::class, 'AiassistantAction']]
 ];
