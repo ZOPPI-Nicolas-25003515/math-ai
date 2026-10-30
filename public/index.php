@@ -8,17 +8,17 @@ use Core\Controller;
 use Core\Db;
 
 
-use App\Controller\{
+use App\Controller\{AiassistantController,
+    AnalyseiaController,
+    ExerciseiaController,
+    HomeController,
     LoginController,
     RegisterController,
     ForgottenpasswordController,
     ResetpasswordController,
     AccountsettingsController,
-    AnalyseiaController,
     AssistantiaController,
     ClassiaController,
-    ExerciseiaController,
-    HomeController,
     LoginteacherController,
     RegisterteacherController,
     ForgottenpasswordteacherController,
@@ -43,7 +43,8 @@ $controllers = [
     ContactController::class => fn() => new ContactController(),
     MentionsController::class => fn() => new MentionsController(),
     SitemapController::class => fn() => new SitemapController(),
-    AssistantiaController::class => fn() => new AssistantiaController()
+    AiassistantController::class => fn() => new AiassistantController(),
+    AssistantiaController::class => fn() => new AssistantiaController(),
     SitemapController::class => fn() => new SitemapController(),
     AssistantiaController::class => fn() => new AssistantiaController(),
     AnalyseiaController::class => fn() => new AnalyseiaController(),
@@ -66,7 +67,7 @@ foreach ($routes as [$routeMethod, $routePath, [$class, $action]]) {
         $controller = $controllers[$class]();
         $controller->$action();
         $ViewContent = View::getBufferContent();
-        echo View::show('Layout',array('body' => $ViewContent));
+        View::show('Layout',array('body' => $ViewContent));
         exit;
     }
 

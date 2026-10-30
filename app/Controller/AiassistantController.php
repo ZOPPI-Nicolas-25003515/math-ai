@@ -7,7 +7,7 @@ use Core\View;
 
 class AiassistantController
 {
-    public function mathForm(): void
+    public function AiassistantForm(): void
     {
         \Core\View::show('Aiassistant', [
             'answer' => $answer ?? '',
@@ -16,7 +16,7 @@ class AiassistantController
         ]);
     }
 
-    public function mathAction(): void
+    public function AiassistantAction(): void
     {
         $question = trim($_POST['question'] ?? '');
         $answer = null;

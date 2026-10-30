@@ -31,4 +31,4 @@ final class View
         require $S_file;
     }
 }
-?>
+
