@@ -9,6 +9,7 @@ use App\Controller\{HomeController,
     MentionsController,
     SitemapController,
     AssistantiaController,
+    AccountsettingsController,
     AnalyseiaController,
     ExerciseiaController,
     ClassiaController};
@@ -30,7 +31,9 @@ return [
     ['GET', '/mentions', [MentionsController::class, 'mentionsForm']],
     ['GET', '/assistantia', [AssistantiaController::class, 'mathForm']],
     ['POST', '/assistantia', [AssistantiaController::class, 'mathAction']],
+    ['GET', '/settings', [AccountsettingsController::class, 'settingsForm']],
+    ['POST', '/settings', [AccountsettingsController::class, 'deleteAction']],
     ['GET', '/analyseia', [AnalyseiaController::class, 'analyseiaForm']],
     ['GET', '/exerciseia', [ExerciseiaController::class, 'exerciseiaForm']],
-    ['GET', '/classia', [ClassiaController::class, 'classiaForm']],
+    ['GET', '/classia', [ClassiaController::class, 'classiaForm']]
 ];
