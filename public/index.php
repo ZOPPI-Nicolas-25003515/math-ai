@@ -43,7 +43,7 @@ $controllers = [
     AnalyseiaController::class => fn() => new AnalyseiaController(),
     ExerciseiaController::class => fn() => new ExerciseiaController(),
     ClassiaController::class => fn() => new ClassiaController(),
-    AddexerciseController::class => fn() => new AddexerciseController(),
+    AddexerciseController::class => fn() => new AddexerciseController($repository),
     AddclassController::class => fn() => new AddclassController($repository),
     LoginchoiceController::class => fn() => new LoginchoiceController(),
     ViewclassController::class => fn() => new ViewclassController($repository),

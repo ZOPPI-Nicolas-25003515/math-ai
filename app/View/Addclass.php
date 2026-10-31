@@ -3,7 +3,7 @@
 use App\Model\UserRepository;
 
 $A_view = $A_view ?? [];
-$error = $A_view['errors'];
+$error = $A_view['errors'] ?? [];
 $userRepository = new UserRepository();
 $subject = $userRepository->takeSubject();
 ?>
@@ -17,7 +17,7 @@ if(!empty($error)){?>
 ?>
 
 <span>
-    <a href="/analyseia">Retour</a>
+    <a href="/home">Retour</a>
     <form action="/addclass" method="POST" enctype="multipart/form-data">
         <ul>
             <li>
