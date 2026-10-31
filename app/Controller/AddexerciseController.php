@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Model\UserFile;
 use App\Model\UserRepository;
-use App\Model\UserValidate;
 use Core\View;
 
 final class AddexerciseController
@@ -54,6 +53,7 @@ final class AddexerciseController
         }
         echo View::show('Addclass', array( 'errors' => $errors,'success' => $success, 'formData' => $_POST));
     }
+
     public function addexerciseForm(): void
     {
         echo View::show('Addexercise');

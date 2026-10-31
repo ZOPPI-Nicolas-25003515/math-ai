@@ -38,6 +38,7 @@ return [
     ['GET', '/exerciseia', [ExerciseiaController::class, 'exerciseiaForm']],
     ['GET', '/classia', [ClassiaController::class, 'classiaForm']],
     ['GET', '/addexercise', [AddexerciseController::class, 'addexerciseForm']],
+    ['POST', '/addexercise', [AddexerciseController::class, 'addexerciseAction']],
     ['GET', '/addclass', [AddclassController::class, 'addclassForm']],
     ['POST', '/addclass', [AddclassController::class, 'addclassAction']],
     ['GET', '/loginchoice', [LoginchoiceController::class, 'loginteacherForm']],

@@ -17,20 +17,6 @@ if(!empty($error)){?>
 ?>
 
 <span>
-    <a href="/analyseia">Retour</a>
-    <form action="/addexercise" method="post">
-    <ul>
-        <li>
-            <p>
-                <label for="email">rentré l'enoncer</label>
-                <input type="email" name="email" value="" required>
-            </p>
-        </li>
-        <li>
-            <p>
-                <label for="genre-select">choisiser le genre:</label>
-
-                <select name="genre" id="genre-select">
     <a href="/home">Retour</a>
     <form action="/addexercise" method="POST" enctype="multipart/form-data">
         <ul>
@@ -59,19 +45,15 @@ if(!empty($error)){?>
                     <option value="QCM a choix multiple">QCM a choix multiple</option>
                 </select>
              </li>
-            </p>
-            <p>
-                <label for="dificulte-select">choisiser la dificulter:</label>
-
-                <select name="dificulte" id="dificulte-select" required>
-                    <option value="moyen">moyen</option>
+            <li>
+            <select name="difficulty" id="difficulty" required>
+                <option value="">-- Choisissez la dificulter --</option>
                     <option value="facile">facile</option>
                     <option value="moyen">moyen</option>
                     <option value="dificile">dificile</option>
                 </select>
-            </p>
-        </li>
-        <button type="submit">Ajouter</button>
+             </li>
+        <button type="submit" name="submit_import">Finaliser et Importer</button>
     </ul>
     </form>
 </span>

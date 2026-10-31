@@ -17,7 +17,7 @@ if(!empty($error)){?>
 ?>
 
 <span>
-    <a href="/analyseia">Retour</a>
+    <a href="/home">Retour</a>
     <form action="/addclass" method="POST" enctype="multipart/form-data">
         <ul>
             <li>
