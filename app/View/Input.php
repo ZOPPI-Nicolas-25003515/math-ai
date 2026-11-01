@@ -8,6 +8,7 @@ final class Input extends Component
         private readonly string $label,
         private readonly string $type = 'text',
         private readonly string $value = '',
+        private readonly string $class = ''
     ) {
     }
 
@@ -17,13 +18,17 @@ final class Input extends Component
         $label = $this->e($this->label);
         $type = $this->e($this->type);
         $value = $this->e($this->value);
+        $class = $this->e($this->class);
 
-        return <<<HTML
-            <p>
+        return ($class == '') ?
+            <<<HTML
                 <label for="{$name}">{$label}</label><br>
                 <input type="{$type}" id="{$name}" name="{$name}" value="{$value}" required>
-            </p>
-
+            HTML
+            :
+            <<<HTML
+                <label for="{$name}"  class = "{$class}">{$label}</label><br>
+                <input type="{$type}" id="{$name}" name="{$name}" value="{$value}" required>
             HTML;
     }
 }

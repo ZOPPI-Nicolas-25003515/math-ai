@@ -6,7 +6,6 @@
     <title><?= htmlspecialchars($title ?? 'MathIA') ?></title>
     <link rel="stylesheet" href= "/res/css/style.css">
 </head>
-
 <body>
 <header>
     <nav>

@@ -29,11 +29,7 @@ final class View
 
     public function render(string $view,array $data = [], int $status = 200):Response
     {
-        $data += $this->share;
-        $content = $this->catch($view . '.php', $data);
-        $html = $this->catch('Layout.php', $data + ['content' => $content]);
-
-        return new Response($status, $html);
+        return new Response($status, $this->catch($view . '.php', $data + $this->share));
     }
 
     private function catch(string $file, array $data): string {

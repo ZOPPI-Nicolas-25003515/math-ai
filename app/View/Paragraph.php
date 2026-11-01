@@ -3,25 +3,31 @@ namespace App\View;
 
 final class Paragraph extends Component
 {
-    /** @param array<string> $texts */
+    /**
+     * @param array $children
+     * @param string $class
+     */
     public function __construct(
-        private readonly array $texts
-    ) {
+        private readonly array  $children,
+        private readonly string $class = '') {
     }
 
     public function render(): string
     {
-        $par = '';
-        foreach ($this->texts as $text) {
-            $par .= $text instanceof Component ? $text->render() : $text;
-            $par .= ' ';
-        }
+        $class = $this->e($this->class);
+        $par = $this->renderAll($this->children);
 
-        return <<<HTML
+        return ($class == '') ?
+            <<<HTML
             <p>
                 {$par}
             </p>
-
+            HTML
+            :
+            <<<HTML
+            <p class="{$class}">
+                {$par}
+            </p>
             HTML;
     }
 }
