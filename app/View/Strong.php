@@ -5,6 +5,7 @@ final class Strong extends Component
 {
     public function __construct(
         private readonly string $text,
+        private readonly string $class = ''
     ) {
     }
 
@@ -12,9 +13,16 @@ final class Strong extends Component
     {
 
         $text = $this->e($this->text);
+        $class = $this->e($this->class);
 
-        return <<<HTML
+        return ($class == '') ?
+            <<<HTML
                 <strong>{$text}</strong>
-            HTML;
+            HTML
+            :
+            <<<HTML
+                <strong class ="{$class}">{$text}</strong>
+            HTML
+            ;
     }
 }

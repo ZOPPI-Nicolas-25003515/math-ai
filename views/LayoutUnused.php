@@ -7,7 +7,6 @@
     <link rel="stylesheet" href= "/res/css/style.css">
     <script src="/res/js/main.js" defer></script>
 </head>
-
 <body>
 <header>
     <nav>

@@ -1,14 +1,16 @@
 <?php
 namespace App\View;
+use App\View\Input;
 
 final class Form extends Component
 {
 
-    /** @param array<Input> $inputs */
+    /** @param array<> $content */
     public function __construct(
         private readonly string $action,
         private readonly string $method = 'post',
-        private readonly array $inputs = []
+        private readonly array $content = [],
+        private readonly string $class = ''
     ) {
     }
 
@@ -16,17 +18,22 @@ final class Form extends Component
     {
         $action = $this->e($this->action);
         $method = $this->e($this->method);
+        $class = $this->e($this->class);
 
-        $renderInput = '';
-        foreach ($this->inputs as $input) {
-            $renderInput .= '<li>'.$input->render().'</li>';
-        }
-        return <<<HTML
-            <span>
-                <Form action="{$action}" method="{$method}">
-                    <ul>{$renderInput}</ul>
-            </span>
+        $par = $this->renderAll($this->content);
+        return ($class == '') ?
+            <<<HTML
+                <form action="{$action}" method="{$method}">
+                    {$par}
+                </form>
 
-            HTML;
+            HTML
+            :
+            <<<HTML
+                <form action="{$action}" method="{$method}" class = {$class}>
+                    {$par}
+                </form>
+            HTML
+            ;
     }
 }
