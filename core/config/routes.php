@@ -26,8 +26,8 @@ return [
     ['GET', '/sitemap', [SitemapController::class, 'sitemapForm']],
     ['GET', '/contact', [ContactController::class, 'contactForm']],
     ['GET', '/mentions', [MentionsController::class, 'mentionsForm']],
-    ['GET', '/assistantia', [AssistantiaController::class, 'mathForm']],
-    ['POST', '/assistantia', [AssistantiaController::class, 'mathAction']],
+    ['GET', '/aiassistant', [AssistantiaController::class, 'mathForm']],
+    ['POST', '/aiassistant', [AssistantiaController::class, 'mathAction']],
     ['GET', '/settings', [SettingsController::class, 'settingsForm']],
     ['POST', '/settings', [SettingsController::class, 'deleteAction']]
 ];
