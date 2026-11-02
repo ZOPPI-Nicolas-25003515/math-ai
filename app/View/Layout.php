@@ -15,7 +15,7 @@ $A_view = $A_view ?? [];
 <header>
     <nav>
         <a href="/">MathsAI</a>
-        <a href="/assistantia"> Assistant IA</a>
+        <a href="/aiassistant"> Assistant IA</a>
         <?php $user = $_SESSION['email'] ?? null; ?>
         <?php if ($user === null) { ?>
             <a href="/loginchoice">Connexion</a>
