@@ -1,0 +1,45 @@
+<?php
+
+use Libs\Parsedown;
+
+?>
+
+<section class="aiassistant">
+    <h1>MathIA</h1>
+
+    <p>Pose ta question à notre Assistant IA </p>
+
+    <form method="POST" action="/aiassistant">
+        <label for="question">Version : Chat GPT 4</label>
+
+        <textarea
+                id="question"
+                name="question"
+                rows="5"
+                maxlength="2000"
+                required
+                placeholder="Exemple : Résous 2x + 5 = 15"
+        ><?= htmlspecialchars($question ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
+
+        <button type="submit">Envoyer</button>
+    </form>
+
+    <?php $parsedown = new Parsedown();
+    $parsedown->setSafeMode(true);
+    $htmlOutput = $parsedown->text($answer ?? ''); ?>
+
+    <?php if (!empty($answer)): ?>
+        <section class="answer">
+            <h2>Réponses de MathIA</h2>
+
+            <div class="answer-content">
+                <?= $htmlOutput ?>
+            </div>
+
+        </section>
+    <?php endif; ?>
+
+    <?php if (!empty($error)): ?>
+        <p class="error"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></p>
+    <?php endif; ?>
+</section>

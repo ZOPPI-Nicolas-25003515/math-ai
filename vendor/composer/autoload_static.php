@@ -56,7 +56,11 @@ class ComposerStaticInitd470c1ca77d71cc3cb75fbe724632eb3
     );
 
     public static $classMap = array (
+        'App\\Controller\\AccountsettingsController' => __DIR__ . '/../..' . '/app/Controller/AccountsettingsController.php',
+        'App\\Controller\\AiassistantController' => __DIR__ . '/../..' . '/app/Controller/AiassistantController.php',
+        'App\\Controller\\AnalyseiaController' => __DIR__ . '/../..' . '/app/Controller/AnalyseiaController.php',
         'App\\Controller\\ContactController' => __DIR__ . '/../..' . '/app/Controller/ContactController.php',
+        'App\\Controller\\ExerciseiaController' => __DIR__ . '/../..' . '/app/Controller/ExerciseiaController.php',
         'App\\Controller\\ForgottenpasswordController' => __DIR__ . '/../..' . '/app/Controller/ForgottenpasswordController.php',
         'App\\Controller\\HomeController' => __DIR__ . '/../..' . '/app/Controller/HomeController.php',
         'App\\Controller\\LoginController' => __DIR__ . '/../..' . '/app/Controller/LoginController.php',
@@ -68,6 +72,7 @@ class ComposerStaticInitd470c1ca77d71cc3cb75fbe724632eb3
         'App\\Model\\UserMail' => __DIR__ . '/../..' . '/app/Model/UserMail.php',
         'App\\Model\\UserRepository' => __DIR__ . '/../..' . '/app/Model/UserRepository.php',
         'App\\Model\\UserValidate' => __DIR__ . '/../..' . '/app/Model/UserValidate.php',
+        'App\\Service\\OpenRouterService' => __DIR__ . '/../..' . '/app/Service/OpenRouterService.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'Core\\AutoLoader' => __DIR__ . '/../..' . '/core/AutoLoader.php',
         'Core\\Constants' => __DIR__ . '/../..' . '/core/Constants.php',
@@ -101,6 +106,7 @@ class ComposerStaticInitd470c1ca77d71cc3cb75fbe724632eb3
         'DeepCopy\\TypeFilter\\Spl\\SplDoublyLinkedListFilter' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/TypeFilter/Spl/SplDoublyLinkedListFilter.php',
         'DeepCopy\\TypeFilter\\TypeFilter' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/TypeFilter/TypeFilter.php',
         'DeepCopy\\TypeMatcher\\TypeMatcher' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/TypeMatcher/TypeMatcher.php',
+        'Libs\\Parsedown' => __DIR__ . '/../..' . '/Libs/Parsedown.php',
         'PHPMailer\\PHPMailer\\DSNConfigurator' => __DIR__ . '/..' . '/phpmailer/phpmailer/src/DSNConfigurator.php',
         'PHPMailer\\PHPMailer\\Exception' => __DIR__ . '/..' . '/phpmailer/phpmailer/src/Exception.php',
         'PHPMailer\\PHPMailer\\OAuth' => __DIR__ . '/..' . '/phpmailer/phpmailer/src/OAuth.php',
