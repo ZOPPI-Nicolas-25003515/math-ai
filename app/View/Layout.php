@@ -21,7 +21,7 @@ $A_view = $A_view ?? [];
             <a href="/login">Connexion</a>
             <a href="/register">Inscription</a>
         <?php } else { ?>
-            <a href="/settings">Profile</a>
+            <a href="/settings">Profil</a>
         <?php } ?>
     </nav>
 </header>

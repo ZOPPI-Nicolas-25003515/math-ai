@@ -4,7 +4,7 @@ namespace App\Controller;
 use Core\View;
 use App\Model\UserRepository;
 
-final class AccountsettingsController {
+final class SettingsController {
     public function __construct(private readonly ?UserRepository $repository = null)
     {
         $this->repository ??= new UserRepository();
@@ -27,10 +27,11 @@ final class AccountsettingsController {
             exit;
         }
 
-        echo View::show('Accountsettings', [
+        View::show('Settings', [
             'email' => $user->getEmail(),
             'errors' => [],
         ]);
+        return;
     }
 
     public function deleteAction(): void
@@ -44,7 +45,7 @@ final class AccountsettingsController {
         }
 
         if (trim((string) $password) === '') {
-            echo View::show('Accountsettings', [
+            View::show('Settings', [
                 'email' => $email,
                 'errors' => ['Le mot de passe est requis pour supprimer le compte.'],
             ]);
@@ -54,7 +55,7 @@ final class AccountsettingsController {
         try {
             $this->repository->deleteUser($email, (string) $password);
         } catch (\InvalidArgumentException $e) {
-            echo View::show('Accountsettings', [
+            View::show('Settings', [
                 'email' => $email,
                 'errors' => [$e->getMessage()],
             ]);
