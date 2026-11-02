@@ -3,7 +3,7 @@ namespace App\Controller;
 use Core\View;
 use App\Model\UserRepository;
 use App\Model\UserValidate;
-final class RegisterController {
+final class RegisterteacherController {
     public function __construct(private readonly UserRepository $repository) {}
     public function registerAction(): void
     {
@@ -14,6 +14,9 @@ final class RegisterController {
             $email =filter_var(trim($_POST['email'] ?? ''),FILTER_VALIDATE_EMAIL);
             $password = $_POST['password'] ?? '';
             $confirmation = $_POST['confirmation'] ?? '';
+            $teachername = $_POST['teachername'] ?? '';
+            $surname = $_POST['surname'] ?? '';
+            $highschoolid = $_POST['high_school'] ?? '';
             //$s_name = trim($_POST['name'] ?? ''); Nous ajouterons en effet un nom et prénom plus tard.
 
             $userValidate = new UserValidate($email,$password,$confirmation);
@@ -28,13 +31,14 @@ final class RegisterController {
 
 
             if (empty($errors)) {
-                if ($this->repository->emailExists($email)) {
+                if ($this->repository->emailTeacherExists($email)) {
                     $errors[] = 'Un compte existe déjà avec cet email.';
                 }else{
-                    $user = $this->repository->createUser($email, $password);
+                    $user = $this->repository->createTeacher($teachername, $surname, $email, $password, $highschoolid);
                     $success = true;
                     $_SESSION['id'] = $user->id;
-                    $_SESSION['email'] = $user->email;
+                    $_SESSION['email'] = $user->mail;
+                    $_SESSION['role'] = 'teacher';
                     header('Location: /');
                     exit;
                 }

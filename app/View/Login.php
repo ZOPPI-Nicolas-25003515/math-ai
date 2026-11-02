@@ -13,7 +13,7 @@ if(!empty($error)){?>
 ?>
 
 <span>
-    <form action="/login" method="post">
+    <form action="/loginteacher" method="post">
     <ul>
         <li>
             <p>

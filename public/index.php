@@ -6,33 +6,51 @@ require_once $root . '/../core/AutoLoader.php';
 use Core\View;
 use Core\Controller;
 use Core\Db;
-use App\Controller\{AiassistantController,
-    AnalyseiaController,
+
+
+use App\Controller\{AnalyseiaController,
+    ClassiaController,
     ExerciseiaController,
+    AiassistantController,
     HomeController,
-    LoginController,
-    RegisterController,
-    ForgottenpasswordController,
-    ResetpasswordController,
+    LoginteacherController,
+    RegisterteacherController,
+    ForgottenpasswordteacherController,
+    ResetpasswordteacherController,
+    AccountsettingsController,
     SettingsController,
     ContactController,
     MentionsController,
-    SitemapController};
+    LoginchoiceController,
+    ViewclassController,
+    SitemapController,
+    AddexerciseController,
+    AddanswerexerciseController,
+    AddclassController,};
 use App\Model\UserRepository;
 
 session_start();
 $repository = new UserRepository();
 $controllers = [
     HomeController::class     => fn() => new HomeController(),
-    LoginController::class      => fn() => new LoginController($repository),
-    RegisterController::class => fn() => new RegisterController($repository),
-    ForgottenpasswordController::class => fn() => new ForgottenpasswordController($repository),
-    ResetPasswordController::class => fn() => new ResetpasswordController($repository),
+    LoginteacherController::class      => fn() => new LoginteacherController($repository),
+    RegisterteacherController::class => fn() => new RegisterteacherController($repository),
+    ForgottenpasswordteacherController::class => fn() => new ForgottenpasswordteacherController($repository),
+    ResetpasswordteacherController::class => fn() => new ResetpasswordteacherController($repository),
+    AccountsettingsController::class => fn() => new AccountsettingsController($repository),
     SettingsController::class => fn() => new SettingsController($repository),
     ContactController::class => fn() => new ContactController(),
     MentionsController::class => fn() => new MentionsController(),
     SitemapController::class => fn() => new SitemapController(),
-    AiassistantController::class => fn() => new AiassistantController()
+    AiassistantController::class => fn() => new AiassistantController(),
+    AnalyseiaController::class => fn() => new AnalyseiaController(),
+    ExerciseiaController::class => fn() => new ExerciseiaController(),
+    ClassiaController::class => fn() => new ClassiaController(),
+    AddexerciseController::class => fn() => new AddexerciseController($repository),
+    AddclassController::class => fn() => new AddclassController($repository),
+    LoginchoiceController::class => fn() => new LoginchoiceController(),
+    ViewclassController::class => fn() => new ViewclassController($repository),
+    AddanswerexerciseController::class => fn() => new AddanswerexerciseController()
 ];
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';   // "/login?x=1" -> "/login"

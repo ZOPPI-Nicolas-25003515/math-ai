@@ -7,6 +7,6 @@ final class ExerciseiaController
 {
     public function exerciseiaForm(): void
     {
-        echo View::show('Exerciceia');
+        echo View::show('Exerciseia');
     }
 }

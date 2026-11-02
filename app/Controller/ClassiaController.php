@@ -3,10 +3,10 @@ namespace App\Controller;
 
 use Core\View;
 
-final class ClasssiaController
+final class ClassiaController
 {
     public function classiaForm(): void
     {
-        echo View::show('Coursia');
+        echo View::show('Classia');
     }
 }
