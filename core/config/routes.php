@@ -9,7 +9,7 @@ use App\Controller\{HomeController,
     MentionsController,
     SitemapController,
     AssistantiaController,
-    AccountsettingsController};
+    SettingsController};
 
 return [
     ['GET', '/', [HomeController::class, 'homeForm']],
@@ -28,6 +28,6 @@ return [
     ['GET', '/mentions', [MentionsController::class, 'mentionsForm']],
     ['GET', '/assistantia', [AssistantiaController::class, 'mathForm']],
     ['POST', '/assistantia', [AssistantiaController::class, 'mathAction']],
-    ['GET', '/settings', [AccountsettingsController::class, 'settingsForm']],
-    ['POST', '/settings', [AccountsettingsController::class, 'deleteAction']]
+    ['GET', '/settings', [SettingsController::class, 'settingsForm']],
+    ['POST', '/settings', [SettingsController::class, 'deleteAction']]
 ];

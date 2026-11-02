@@ -11,7 +11,7 @@ use App\Controller\{HomeController,
     RegisterController,
     ForgottenpasswordController,
     ResetpasswordController,
-    AccountsettingsController,
+    SettingsController,
     ContactController,
     MentionsController,
     SitemapController};
@@ -24,7 +24,8 @@ $controllers = [
     LoginController::class      => fn() => new LoginController($repository),
     RegisterController::class => fn() => new RegisterController($repository),
     ForgottenpasswordController::class => fn() => new ForgottenpasswordController($repository),
-    ResetPasswordController::class => fn() => new ResetpasswordController($repository),AccountsettingsController::class => fn() => new AccountsettingsController($repository),
+    ResetPasswordController::class => fn() => new ResetpasswordController($repository),
+    SettingsController::class => fn() => new SettingsController($repository),
     ContactController::class => fn() => new ContactController(),
     MentionsController::class => fn() => new MentionsController(),
     SitemapController::class => fn() => new SitemapController()
@@ -41,7 +42,7 @@ foreach ($routes as [$routeMethod, $routePath, [$class, $action]]) {
         $controller = $controllers[$class]();
         $controller->$action();
         $ViewContent = View::getBufferContent();
-        echo View::show('Layout',array('body' => $ViewContent));
+        View::show('Layout',array('body' => $ViewContent));
         exit;
     }
 

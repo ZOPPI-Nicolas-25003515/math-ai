@@ -4,7 +4,7 @@ $error = $A_view['errors'] ?? [];
 $showModal = !empty($error);
 ?>
 
-<h1>Profile</h1>
+<h1>Profil</h1>
 
 <?php if (!empty($error)) { ?>
     <p style="color: red;"><?= htmlspecialchars($error[0]) ?></p>
