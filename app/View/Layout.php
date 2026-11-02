@@ -8,14 +8,18 @@ $A_view = $A_view ?? [];
     <link rel="icon" type="image/x-icon" href="/res/image/logoMathAi.ico">
     <title><?= htmlspecialchars($title ?? 'MathIA') ?></title>
     <link rel="stylesheet" href= "/res/css/style.css">
-    <script src="/res/js/main.js" defer></script>
+    <script src="/res/js/mathjax-config.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script defer src="/res/js/main.js"></script>
+    <script defer src="/res/js/mathjax.js"></script>
+
 </head>
 
 <body>
 <header>
     <nav>
         <a href="/">MathsAI</a>
-        <a href="/assistantia"> Assistant IA</a>
+        <a href="/aiassistant"> Assistant IA</a>
         <?php $user = $_SESSION['email'] ?? null; ?>
         <?php if ($user === null) { ?>
             <a href="/login">Connexion</a>

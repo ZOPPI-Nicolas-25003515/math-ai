@@ -1,3 +1,9 @@
+<?php
+
+use Libs\Parsedown;
+
+?>
+
 <section class="aiassistant">
     <h1>MathIA</h1>
 
@@ -18,10 +24,18 @@
         <button type="submit">Envoyer</button>
     </form>
 
+    <?php $parsedown = new Parsedown();
+    $parsedown->setSafeMode(true);
+    $htmlOutput = $parsedown->text($answer ?? ''); ?>
+
     <?php if (!empty($answer)): ?>
         <section class="answer">
             <h2>Réponses de MathIA</h2>
-            <p><?= nl2br(htmlspecialchars($answer, ENT_QUOTES, 'UTF-8')) ?></p>
+
+            <div class="answer-content">
+                <?= $htmlOutput ?>
+            </div>
+
         </section>
     <?php endif; ?>
 
