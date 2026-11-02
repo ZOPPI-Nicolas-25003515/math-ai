@@ -23,7 +23,7 @@ if(!empty($error)){?>
             <li>
                 <p>
                     <label for="pdf_file"><b>Étape 1 : Choisir le cours en PDF :</b></label><br>
-                    <input type="file" name="pdf_file" id="pdf_file" accept="application/pdf" required>
+                    <input type="file" name="pdf_file" id="pdf_file" accept=".pdf, application/pdf" required>
                 </p>
             </li>
             <li>

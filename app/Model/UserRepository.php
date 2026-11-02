@@ -128,7 +128,16 @@ final class UserRepository {
         return $stmt->fetch() ? true : false;
     }
 
-    public function createExercise(int $teacherid, int $subjectid, string $pathname, string $type, string $difficulty,): Exercise {
+    public function findIdExercise(string $pathname, int $teacherid)
+    {
+        $stmt = $this->pdo->prepare('SELECT id FROM Exercise WHERE exercise_path = :exercise_path AND teacher_id = :teacher_id');
+        $stmt->execute(['exercise_path' => $pathname,'teacher_id' => $teacherid]);
+        $exercise = $stmt->fetch(\PDO::FETCH_ASSOC);
+        if (!$exercise){return null;}
+        else{return new Exercise($exercise['id']);}
+    }
+
+    public function createExercise(int $teacherid, int $subjectid, string $pathname, string $type, string $difficulty): Exercise {
         $stmt = $this->pdo->prepare('INSERT INTO Exercise (teacher_id ,subject_id ,exercise_path ,type_name ,difficulty_name) VALUES (:teacher_id ,:subject_id ,:exercise_path ,:type_name, :difficulty_name)');
         $stmt->execute(['teacher_id' => $teacherid,'subject_id' => $subjectid,'exercise_path'=> $pathname,'type_name' => $type,'difficulty_name' => $difficulty]);
         $id = $this->pdo->lastInsertId();

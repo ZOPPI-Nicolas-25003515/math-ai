@@ -47,7 +47,7 @@ final class AddexerciseController
                 }else{
                     $exercise = $this->repository->createExercise($teacherid,$subject,$path,$type,$difficulty);
                     $success = true;
-                    header('Location: /');
+                    header('/answerexercise');
                     exit;
                 }
             }

@@ -3,7 +3,7 @@
 use App\Model\UserRepository;
 
 $userRepository = new UserRepository();
-$title = $userRepository->classTitleTeacher((int)$_SESSION['teacher_id'],$_SESSION['subject']);
+$title = $userRepository->classTitleTeacher((int)$_SESSION['id'],$_SESSION['subject']);
 ?>
 <h1>Cours sur la réponse de l'IA</h1>
 <a href="/analyseia">Retour</a>

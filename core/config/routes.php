@@ -15,6 +15,7 @@ use App\Controller\{HomeController,
     AddclassController,
     LoginchoiceController,
     ViewclassController,
+    AddanswerexerciseController,
     AccountsettingsController,
     AiassistantController};
 
@@ -47,5 +48,9 @@ return [
     ['GET', '/aiassistant', [AiassistantController::class, 'AiassistantForm']],
     ['POST', '/aiassistant', [AiassistantController::class, 'AiassistantAction']],
     ['GET', '/viewclass', [ViewclassController::class, 'viewAction']],
-    ['GET', '/downloadclass', [ViewclassController::class, 'downloadAction']]
+    ['GET', '/downloadclass', [ViewclassController::class, 'downloadAction']],
+    ['GET', '/aiassistant', [AiassistantController::class, 'AiassistantForm']],
+    ['POST', '/aiassistant', [AiassistantController::class, 'AiassistantAction']],
+    ['GET','/answerexercise',[AddanswerexerciseController::class, 'addanswerexerciseForm']],
+    ['POST','/answerexercise',[AddanswerexerciseController::class, 'addanswerexerciseAction']],
 ];
