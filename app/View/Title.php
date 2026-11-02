@@ -6,30 +6,24 @@ final class Title extends Component
     /**
      * @param int $size
      * @param array $children
-     * @param string $class
+     * @param string $optional
      */
     public function __construct(
         private int $size,
         private readonly array $children,
-        private readonly string $class = '') {
+        private readonly string $optional = '') {
         if (0 >= $size || $size > 6) $this->size = 6;
     }
 
     public function render(): string
     {
-        $class = $this->e($this->class);
+        $optional = $this->e($this->optional);
         $size = $this->size;
         $par = $this->renderAll($this->children);
 
-        return ($class == '') ?
+        return
             <<<HTML
-            <h{$size}>
-                {$par}
-            </h{$size}>
-            HTML
-            :
-            <<<HTML
-            <h{$size} class="{$class}">
+            <h{$size} {$optional}>
                 {$par}
             </h{$size}>
             HTML;

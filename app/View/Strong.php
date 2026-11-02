@@ -5,7 +5,7 @@ final class Strong extends Component
 {
     public function __construct(
         private readonly string $text,
-        private readonly string $class = ''
+        private readonly string $optional = ''
     ) {
     }
 
@@ -13,15 +13,11 @@ final class Strong extends Component
     {
 
         $text = $this->e($this->text);
-        $class = $this->e($this->class);
+        $optional = $this->e($this->optional);
 
-        return ($class == '') ?
+        return
             <<<HTML
-                <strong>{$text}</strong>
-            HTML
-            :
-            <<<HTML
-                <strong class ="{$class}">{$text}</strong>
+                <strong {$optional}>{$text}</strong>
             HTML
             ;
     }

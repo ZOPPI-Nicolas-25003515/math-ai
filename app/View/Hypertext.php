@@ -4,14 +4,14 @@ namespace App\View;
 /**
  * @param string $href
  * @param array $content
- * @param string $class
+ * @param string $optional
  */
 final class Hypertext extends Component
 {
     public function __construct(
         private readonly string $href,
         private readonly array $content,
-        private readonly string $class = ''
+        private readonly string $optional = ''
     ) {
     }
 
@@ -19,15 +19,11 @@ final class Hypertext extends Component
     {
         $href = $this->e($this->href);
         $par = $this->renderAll($this->content);
-        $class = $this->e($this->class);
+        $optional = $this->e($this->optional);
 
-        return ($class == '') ?
+        return
             <<<HTML
-                <a href="{$href}">{$par}</a>
-            HTML
-            :
-            <<<HTML
-                <a href="{$href}" class="{$class}">{$par}</a>
+                <a href="{$href}" {$optional}>{$par}</a>
             HTML
             ;
     }

@@ -9,30 +9,24 @@ final class Textarea extends Component
         private readonly int $rows,
         private readonly int $maxlength, //required
         private readonly string $placeholder,
-        private readonly string $class = ''
+        private readonly string $optional = '',
     ) {
     }
 
     public function render(): string
     {
         $id = $this->e($this->id);
-        $class = $this->e($this->class);
+        $optional = $this->e($this->optional);
         $maxlength = $this->maxlength;
         $rows = $this->rows;
         $placeholder = $this->e($this->placeholder);
         $name = $this->e($this->name);
 
-        return ($class == '') ?
+        return
             <<<HTML
                 <textarea id={$id}
             name="{$name}"
-            rows="{$rows}" maxlength="{$maxlength}" required placeholder="{$placeholder}"></textarea>
-            HTML
-            :
-            <<<HTML
-                <textarea id={$id}
-            name="{$name}"
-            rows="{$rows}" maxlength="{$maxlength}" required placeholder="{$placeholder}" class = "{$class}"></textarea>
+            rows="{$rows}" maxlength="{$maxlength}" required placeholder="{$placeholder}" {$optional}></textarea>
             HTML;
     }
 }

@@ -5,27 +5,21 @@ final class Paragraph extends Component
 {
     /**
      * @param array $children
-     * @param string $class
+     * @param string $optional
      */
     public function __construct(
         private readonly array  $children,
-        private readonly string $class = '') {
+        private readonly string $optional = '') {
     }
 
     public function render(): string
     {
-        $class = $this->e($this->class);
+        $optional = $this->e($this->optional);
         $par = $this->renderAll($this->children);
 
-        return ($class == '') ?
+        return
             <<<HTML
-            <p>
-                {$par}
-            </p>
-            HTML
-            :
-            <<<HTML
-            <p class="{$class}">
+            <p {$optional}>
                 {$par}
             </p>
             HTML;
