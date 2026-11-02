@@ -5,7 +5,6 @@ use Core\View;
 use App\Model\UserRepository;
 
 final class AccountsettingsController {
-
     public function __construct(private readonly ?UserRepository $repository){}
 
     public function settingsForm(): void
