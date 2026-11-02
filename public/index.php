@@ -24,6 +24,7 @@ use App\Controller\{AnalyseiaController,
     ViewclassController,
     SitemapController,
     AddexerciseController,
+    AddanswerexerciseContoller,
     AddclassController,
     AddanswerexerciseController,
     RegisterchoiceController,
@@ -62,6 +63,8 @@ $craft = [
     AddclassController::class => fn() => new AddclassController($repository,$view),
     LoginchoiceController::class => fn() => new LoginchoiceController(),
     ViewclassController::class => fn() => new ViewclassController($repository),
+    AddanswerexerciseContoller::class => fn() => new AddanswerexerciseContoller()
+];
 
 ];
 
