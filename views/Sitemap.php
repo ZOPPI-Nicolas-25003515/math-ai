@@ -1,15 +1,42 @@
 <?php
 
-?>
-<section class="sitemap">
-    <h1>Plan du site</h1>
-    <ul>
-        <li><h3><a href="/">Accueil</a></h3></li>
-        <li><h3><a href="/register">Inscription</a></h3></li>
-        <li><h3><a href="/login">Connexion</a></h3></li>
-        <li><h3><a href="/forgottenpassword">Reinitialisation du mot de passe</a></h3></li>
-        <li><h3><a href="/mentions">Mentions légales</a></h3></li>
-        <li><h3><a href="/sitemap">Plan de notre site</a></h3></li>
-        <li><h3><a href="/contact">Contact</a></h3></li>
-    </ul>
-</section>
+use App\View\{Alert,Button,Form,Input,Layout,Link,Hypertext,Paragraph,Title,Container};
+
+echo new Layout('Site map',isset($loggedUser),[new Container('section',[
+        new Title (1,['Plan du site']),
+    new Container('ul',[
+            new Container('li',[
+                    new Title (3,[
+                            new Hypertext('/',['Accueil'])])
+            ]) ,
+            new Container('li',[
+                    new Title (3,[
+                            new Hypertext('/register',['Inscription'])])
+            ]),
+            new Container('li',[
+                    new Title (3,[
+                            new Hypertext('/login',['Connexion'])])
+            ]),
+            new Container('li',[
+                    new Title (3,[
+                            new Hypertext('/forgottenpassword',['Réinitialisation du mot de passe'])])
+            ]),
+            new Container('li',[
+                    new Title (3,[
+                            new Hypertext('/mentions',['Mentions légales'])])
+            ]),
+            new Container('li',[
+                    new Title (3,[
+                            new Hypertext('/sitemap',['Plan du site'])])
+            ]),
+            new Container('li',[
+                    new Title (3,[
+                            new Hypertext('/contact',['Contact'])])
+            ]),
+            new Container('li',[
+                    new Title (3,[
+                            new Hypertext('/aiassistant',['Assistant IA'])])
+            ]),
+    ])
+],'class=sitemap')]);
+

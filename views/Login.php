@@ -1,6 +1,5 @@
 <?php
 use App\View\{Alert,Button,Form,Input,Layout,Link,Hypertext,Paragraph,Title,Container};
-use App\Core\User;
 
 echo new Layout ('Login',isset($loggedUser),
         [
@@ -23,10 +22,8 @@ echo new Layout ('Login',isset($loggedUser),
                 ,new Paragraph(['Vous n\'avez pas de compte ? Inscrivez-vous ',
                             new Hypertext('/register',['ici']), '.'])
                 ,new Paragraph([new Hypertext('/register',['Mot de passe oublié ?'])])
-            ])
+            ]);
 
-                ]
-);
 
 
 

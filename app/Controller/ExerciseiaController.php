@@ -1,12 +1,15 @@
 <?php
 namespace App\Controller;
-
-use Core\View;
+use App\Core\{View,Request,Response};
 
 final class ExerciseiaController
 {
-    public function exerciseiaForm(): void
+    private View $view;
+    public function __construct(View $view) {
+        $this->view = $view;
+    }
+    public function exerciseiaForm(): Response
     {
-        echo View::show('Exerciceia');
+        return $this->view->render('Exerciceia');
     }
 }
