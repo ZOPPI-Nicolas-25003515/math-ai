@@ -1,23 +1,23 @@
 <?php
 use App\View\{Alert,Button,Form,Input,Layout,Link,Hypertext,Paragraph,Title,Container};
+use App\Model\User;
 
-echo new Layout('MathAi',$loggedUser,[
-$loggedUser === null ? null : new Title(
-        2,['Bonjour, ' . $loggedUser]),
+echo isset($loggedUser);
+echo (new Layout('MathAi',isset($loggedUser),[
+isset($loggedUser) ? new Title(
+        2,['Bonjour, ' . $loggedUser->getEmail()]) : '',
     new Title(
             1,['Accueil']),
-    new Paragraph(['Une application web interactive destinée aux lycéens, permettant d’explorer l’utilisation des intelligences artificielles génératives, et notamment des LLM, pour apprendre les mathématiques.','homeDescription']),
+    new Paragraph(['Une application web interactive destinée aux lycéens, permettant d’explorer l’utilisation des intelligences artificielles génératives, et notamment des LLM, pour apprendre les mathématiques.'],'id=homeDescription'),
     new Container('div',[
-            new Hypertext('/analysisia',[
+            new Hypertext('/analyseia',[
                     new Container('div',[
-                            new Title(2,['Analyse la réponse d\une LLM']),
-                        new Paragraph(['Paragraph'])
-                    ])
-            ],'cardTitle')
-    ],'infoCard-grid')
-
-]);
-
+                            new Title(2,['Analyse la réponse d\'une LLM']),
+                        new Paragraph(['Paragraphe'])
+                    ], 'class=infoCard')
+            ],'class=cardTitle')
+    ],'class=infoCard-grid')
+]))->render();
 
 
 
@@ -31,10 +31,11 @@ $loggedUser === null ? null : new Title(
 
 
 
+/*
 $isLogged = isset($_SESSION['email']);
-if($isLogged) {?>
-    <h2> Bonjour, <?=$_SESSION['email']?></h2><?php
-}?>
+if($isLogged) {
+    <h2> Bonjour, $_SESSION['email']</h2>
+}
 <h1>Accueil</h1>
     <p id="homeDescription">Une application web interactive destinée aux lycéens, permettant d’explorer l’utilisation des intelligences artificielles génératives, et notamment des LLM, pour apprendre les mathématiques.</p>
 <?php
@@ -58,19 +59,17 @@ if($_SESSION['role'] == 'teacher'){?>
                 Paragraphe
             </p>
         </div>
-    </a><?php
-for ($i = 1; $i <= 11; $i++) {?>
-    <a class="cardTitle" href="/login.php?url=<?='title' .  $i?>">
+    </a>
+for ($i = 1; $i <= 11; $i++) {
+    <a class="cardTitle" href="/login.php?url='title' .  $i">
     <div class="infoCard">
-    <h2>Title<?=$i?></h2>
+    <h2>Title$i</h2>
     <p>
     Paragraphe
     </p>
     </div>
     </a>
-    <?php
-}
-?>
-</div>
-<?php
 
+}
+</div>
+*/
