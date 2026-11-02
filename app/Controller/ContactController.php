@@ -1,6 +1,6 @@
 <?php
 namespace App\Controller;
-use Core\{View,Request,Response};
+use App\Core\{View,Request,Response};
 final class ContactController{
 
     public function contactForm(): Response

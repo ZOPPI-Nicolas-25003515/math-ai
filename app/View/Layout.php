@@ -41,7 +41,6 @@ final class Layout extends Component
                 </head>
                 <body>
                 <header>
-                {$this->isLogged}
                 <nav>
                     {$nav}
                 </nav>
