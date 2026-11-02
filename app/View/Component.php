@@ -1,5 +1,6 @@
 <?php
 namespace App\View;
+use App\Model\User;
 abstract class Component
 {
     abstract public function render(): string;
@@ -14,6 +15,10 @@ abstract class Component
         return htmlspecialchars($text, ENT_QUOTES);
     }
 
+    /**
+    * @param string $renderAll
+     * @string
+     */
     protected function renderAll(array $childs): string
     {
         $html = '';
@@ -22,5 +27,9 @@ abstract class Component
         }
 
         return $html;
+    }
+
+    public function bismillah(): string {
+        return 'lumière';
     }
 }

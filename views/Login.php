@@ -1,7 +1,8 @@
 <?php
 use App\View\{Alert,Button,Form,Input,Layout,Link,Hypertext,Paragraph,Title,Container};
+use App\Core\User;
 
-echo new Layout ('Login',$loggedUser,
+echo new Layout ('Login',isset($loggedUser),
         [
                 new Title (1,['Connexion']),
                 new Paragraph(
@@ -15,14 +16,13 @@ echo new Layout ('Login',$loggedUser,
                             new Container('li',[
                                     new Input('password','Mot de passe','password')
                             ]),
-                            new Container('li',[
-                                    new Button('submit','Se connecter')
+                            new Button('submit','','Se connecter')
                             ])
                     ])
             ])
                 ,new Paragraph(['Vous n\'avez pas de compte ? Inscrivez-vous ',
-                            new Hypertext('/register','ici'), '.'])
-                ,new Paragraph([new Hypertext('/register','Mot de passe oublié ?')])
+                            new Hypertext('/register',['ici']), '.'])
+                ,new Paragraph([new Hypertext('/register',['Mot de passe oublié ?'])])
             ])
 
                 ]

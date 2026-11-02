@@ -129,6 +129,7 @@ a {
 
 .infoCard {
     border: 1px solid #cacaca;
+    text-align: center;
     padding: 1.5rem;
     border-radius: 25px;
     background: white;
