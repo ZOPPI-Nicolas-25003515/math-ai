@@ -5,10 +5,7 @@ use Core\View;
 use App\Model\UserRepository;
 
 final class AccountsettingsController {
-    public function __construct(private readonly ?UserRepository $repository = null)
-    {
-        $this->repository ??= new UserRepository();
-    }
+    public function __construct(private readonly ?UserRepository $repository){}
 
     public function settingsForm(): void
     {
@@ -19,7 +16,7 @@ final class AccountsettingsController {
             exit;
         }
 
-        $user = $this->repository->findByEmail($email);
+        $user = $this->repository->findTeacherByEmail($email);
 
         if ($user === null) {
             unset($_SESSION['email'], $_SESSION['id']);
@@ -52,7 +49,7 @@ final class AccountsettingsController {
         }
 
         try {
-            $this->repository->deleteUser($email, (string) $password);
+            $this->repository->deleteTeacher($email, (string) $password);
         } catch (\InvalidArgumentException $e) {
             echo View::show('Accountsettings', [
                 'email' => $email,

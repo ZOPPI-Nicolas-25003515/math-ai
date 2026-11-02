@@ -36,7 +36,7 @@ final class RegisterteacherController {
                 }else{
                     $user = $this->repository->createTeacher($teachername, $surname, $email, $password, $highschoolid);
                     $success = true;
-                    $_SESSION['teacher_id'] = $user->id;
+                    $_SESSION['id'] = $user->id;
                     $_SESSION['email'] = $user->mail;
                     $_SESSION['role'] = 'teacher';
                     header('Location: /');

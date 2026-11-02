@@ -34,7 +34,7 @@ final class Teacher
     }
 
     public function getEmail(): string {
-        return $this->email;
+        return $this->mail;
     }
 
     public function getHighSchoolId(): int

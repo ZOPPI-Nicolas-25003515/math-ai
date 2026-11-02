@@ -204,20 +204,4 @@ final class UserRepository {
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
-
-    public function classTitleTeacher(int $teacherid, int $subject)
-    {
-        $stmt = $this->pdo->prepare('SELECT id,title FROM Class WHERE teacher_id = :teacher_id AND subject_id = :subject_id');
-        $stmt->execute(['teacher_id' => $teacherid,'subject_id' => $subject]);
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-    }
-
-
-    public function findClassById(int $id)
-    {
-        $stmt = $this->pdo->prepare('SELECT id,title,path_name FROM Class WHERE id = :id');
-        $stmt->execute(['id' => $id]);
-        return $stmt->fetch(\PDO::FETCH_ASSOC);
-    }
 }
