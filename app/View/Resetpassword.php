@@ -1,6 +1,7 @@
 <?php
 $A_view = $A_view ?? [];
 $errors = $A_view['errors'];
+$token = $A_view['token'];
 ?>
 
 <h1>Réinitialiser le mot de passe</h1>
@@ -14,6 +15,14 @@ if(!empty($errors)){?>
 <span>
    <form action="/resetpassword" method="post">
      <ul>
+         <li>
+             <li>
+                 <label id = "label" for = "token" >Reset_token</label>
+             </li>
+             <li>
+                <input class="textInput" type="token" name="token" value="<?=htmlspecialchars($token)?>" required>
+            </li>
+         </li>
          <li>
              <li>
                  <label id = "label" for = "password" >Mot de passe</label>

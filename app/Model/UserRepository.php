@@ -85,10 +85,12 @@ final class UserRepository {
 
     public function verifyToken(string $reset_token): ?string {
         if ($reset_token == null) return 'Il n\'existe aucun token.';
-        $time_now = new \DateTimeImmutable();
+        $timezoneParis = new \DateTimeZone('Europe/Paris');
+        $time_now = new \DateTimeImmutable('now',$timezoneParis );
         $stmt = $this->pdo->prepare('SELECT reset_token_expiry FROM users WHERE reset_token = :reset_token');
         $stmt->execute(['reset_token' => $reset_token]);
-        $expiry_date = $stmt->fetch(\PDO::FETCH_ASSOC)['reset_token_expiry'];
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $expiry_date = new \DateTimeImmutable($result['reset_token_expiry'], $timezoneParis);
         if ($time_now > $expiry_date) {
             return 'Cette demande n\'est plus valide.';
         }

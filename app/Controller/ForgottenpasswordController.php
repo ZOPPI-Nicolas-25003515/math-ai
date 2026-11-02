@@ -17,7 +17,8 @@ final class ForgottenpasswordController
                 $message = 'Si votre adresse e-mail est correcte, un email de réinitialisation a été envoyé.';
             } else {
                 $reset_token = bin2hex(random_bytes(32));
-                $expiry = (new \DateTimeImmutable('+15 minutes'))->format('Y-m-d H:i:s');
+                $timezoneFrance = new \DateTimeZone('Europe/Paris');
+                $expiry = (new \DateTimeImmutable('+15 minutes', $timezoneFrance))->format('Y-m-d H:i:s');
                 $this->repository->setResetToken($email, $reset_token, $expiry);
                 $resetLink = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https://' : 'http://')
                     . ($_SERVER['HTTP_HOST'] ?? 'localhost')
@@ -29,15 +30,9 @@ final class ForgottenpasswordController
                 } else $message = 'Une erreur est survenue lors de l\'envoi de l\'email.';
             }
         }
-        echo View::show('Forgottenpassword', [
-            'message' => $message,
-            'formData' => $_POST
-        ]);
+        echo View::show('Forgottenpassword', ['message' => $message, 'formData' => $_POST]);
     }
     public function forgottenpasswordForm():void {
-        echo View::show('Forgottenpassword', [
-            'message' => '',
-            'formData' => []
-        ]);
+        echo View::show('Forgottenpassword', ['message' => '', 'formData' => []]);
     }
 }
