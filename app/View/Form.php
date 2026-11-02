@@ -10,7 +10,7 @@ final class Form extends Component
         private readonly string $action,
         private readonly string $method = 'post',
         private readonly array $content = [],
-        private readonly string $class = ''
+        private readonly string $optional = ''
     ) {
     }
 
@@ -18,19 +18,12 @@ final class Form extends Component
     {
         $action = $this->e($this->action);
         $method = $this->e($this->method);
-        $class = $this->e($this->class);
+        $optional = $this->e($this->optional);
 
         $par = $this->renderAll($this->content);
-        return ($class == '') ?
+        return
             <<<HTML
-                <form action="{$action}" method="{$method}">
-                    {$par}
-                </form>
-
-            HTML
-            :
-            <<<HTML
-                <form action="{$action}" method="{$method}" class = {$class}>
+                <form action="{$action}" method="{$method}" {$optional}>
                     {$par}
                 </form>
             HTML

@@ -6,16 +6,16 @@ final class Alert extends Component
     /** @param array<string> $alerts */
     public function __construct(
         private readonly array $alerts,
-        private readonly string $class = ''
+        private readonly string $optional = ''
     ) {
     }
 
     public function render(): string
     {
-        $class = $this->e($this->class);
+        $optional = $this->e($this->optional);
         $par = '';
         foreach ($this->alerts as $alert) {
-            $par .= ($class == '') ? '<p>' . $alert . '</p>' . PHP_EOL : '<p class=\"'. $class . '">' . $alert . '</p>';
+            $par .= '<p '. $optional . '>' . $alert . '</p>';
         }
 
         return <<<HTML
