@@ -8,9 +8,8 @@ use App\Controller\{HomeController,
     ContactController,
     MentionsController,
     SitemapController,
-    AssistantiaController,
-    AnalyseiaController,
-    ExerciseiaController,};
+    AiassistantController,
+    SettingsController};
 
 return [
     ['GET', '/', [HomeController::class, 'homeForm']],
@@ -26,10 +25,9 @@ return [
     ['POST', '/resetpassword', [ResetpasswordController::class, 'resetpasswordAction']],
     ['GET', '/sitemap', [SitemapController::class, 'sitemapForm']],
     ['GET', '/contact', [ContactController::class, 'contactForm']],
-    ['GET', '/mentions', [MentionsController::class, 'mentionsForm']],/*
-    ['GET', '/assistantia', [AssistantiaController::class, 'mathForm']],
-    ['POST', '/assistantia', [AssistantiaController::class, 'mathAction']],
-    ['GET', '/analyseia', [AnalyseiaController::class, 'analyseiaForm']],
-    ['GET', '/exerciseia', [ExerciseiaController::class, 'exerciseiaForm']],
-    ['GET', '/classia', [ClassiaController::class, 'classiaForm']],*/
+    ['GET', '/mentions', [MentionsController::class, 'mentionsForm']],
+    ['GET', '/aiassistant', [AiassistantController::class, 'aiassistantForm']],
+    ['POST', '/aiassistant', [AiassistantController::class, 'aiassistantAction']],
+    ['GET', '/settings', [SettingsController::class, 'settingsForm']],
+    ['POST', '/settings', [SettingsController::class, 'deleteAction']]
 ];

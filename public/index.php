@@ -10,6 +10,7 @@ use App\Controller\{HomeController,
     RegisterController,
     ForgottenpasswordController,
     ResetpasswordController,
+    SettingsController,
     ContactController,
     MentionsController,
     SitemapController};
@@ -34,9 +35,11 @@ $craft = [
     RegisterController::class => fn() => new RegisterController($repository),
     ForgottenpasswordController::class => fn() => new ForgottenpasswordController($repository),
     ResetPasswordController::class => fn() => new ResetpasswordController($repository),
+    SettingsController::class => fn() => new SettingsController($repository),
     ContactController::class => fn() => new ContactController(),
     MentionsController::class => fn() => new MentionsController(),
     SitemapController::class => fn() => new SitemapController(),
+    AiassistantController::class => fn() => new AiassistantController()
 ];
 
 $router = new Router(require $root . '/app/Core/config/routes.php', $view, $craft);
