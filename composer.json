@@ -15,7 +15,10 @@
         "psr-4": {
             "App\\": "app/",
             "Core\\": "core/"
-        }
+        },
+        "classmap": [
+            "Libs/"
+        ]
     },
     "scripts": {
         "test": "phpunit",

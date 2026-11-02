@@ -1,3 +1,9 @@
+<?php
+
+use Libs\Parsedown;
+
+?>
+
 <section class="aiassistant">
     <h1>MathIA</h1>
 
@@ -18,10 +24,41 @@
         <button type="submit">Envoyer</button>
     </form>
 
+    <?php
+
+    function markdownAvecMath(string $texte): string
+    {
+        $formules = [];
+
+        // Extraire \[ ... \] et \( ... \)
+        $texte = preg_replace_callback(
+                '~\\\\\[.*?\\\\\]|\\\\\(.*?\\\\\)~s',
+                function ($m) use (&$formules) {
+                    $cle = 'MATHPLACEHOLDER' . count($formules) . 'END';
+                    // On échappe le HTML (<, >, &) pour rester en mode sûr
+                    $formules[$cle] = htmlspecialchars($m[0], ENT_NOQUOTES, 'UTF-8');
+                    return $cle;
+                },
+                $texte
+        );
+
+        $parsedown = new Parsedown();
+        $parsedown->setSafeMode(true);
+        $html = $parsedown->text($texte);
+
+        // Remettre les formules
+        return strtr($html, $formules);
+    }
+
+    $htmlOutput = markdownAvecMath($answer ?? '');
+    ?>
     <?php if (!empty($answer)): ?>
         <section class="answer">
             <h2>Réponses de MathIA</h2>
-            <p><?= nl2br(htmlspecialchars($answer, ENT_QUOTES, 'UTF-8')) ?></p>
+
+            <div class="answer-content">
+                <?= $htmlOutput ?>
+            </div>
         </section>
     <?php endif; ?>
 

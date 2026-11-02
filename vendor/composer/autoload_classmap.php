@@ -6,7 +6,11 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'App\\Controller\\AccountsettingsController' => $baseDir . '/app/Controller/AccountsettingsController.php',
+    'App\\Controller\\AiassistantController' => $baseDir . '/app/Controller/AiassistantController.php',
+    'App\\Controller\\AnalyseiaController' => $baseDir . '/app/Controller/AnalyseiaController.php',
     'App\\Controller\\ContactController' => $baseDir . '/app/Controller/ContactController.php',
+    'App\\Controller\\ExerciseiaController' => $baseDir . '/app/Controller/ExerciseiaController.php',
     'App\\Controller\\ForgottenpasswordController' => $baseDir . '/app/Controller/ForgottenpasswordController.php',
     'App\\Controller\\HomeController' => $baseDir . '/app/Controller/HomeController.php',
     'App\\Controller\\LoginController' => $baseDir . '/app/Controller/LoginController.php',
@@ -18,6 +22,7 @@ return array(
     'App\\Model\\UserMail' => $baseDir . '/app/Model/UserMail.php',
     'App\\Model\\UserRepository' => $baseDir . '/app/Model/UserRepository.php',
     'App\\Model\\UserValidate' => $baseDir . '/app/Model/UserValidate.php',
+    'App\\Service\\OpenRouterService' => $baseDir . '/app/Service/OpenRouterService.php',
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
     'Core\\AutoLoader' => $baseDir . '/core/AutoLoader.php',
     'Core\\Constants' => $baseDir . '/core/Constants.php',
@@ -51,6 +56,7 @@ return array(
     'DeepCopy\\TypeFilter\\Spl\\SplDoublyLinkedListFilter' => $vendorDir . '/myclabs/deep-copy/src/DeepCopy/TypeFilter/Spl/SplDoublyLinkedListFilter.php',
     'DeepCopy\\TypeFilter\\TypeFilter' => $vendorDir . '/myclabs/deep-copy/src/DeepCopy/TypeFilter/TypeFilter.php',
     'DeepCopy\\TypeMatcher\\TypeMatcher' => $vendorDir . '/myclabs/deep-copy/src/DeepCopy/TypeMatcher/TypeMatcher.php',
+    'Libs\\Parsedown' => $baseDir . '/Libs/Parsedown.php',
     'PHPMailer\\PHPMailer\\DSNConfigurator' => $vendorDir . '/phpmailer/phpmailer/src/DSNConfigurator.php',
     'PHPMailer\\PHPMailer\\Exception' => $vendorDir . '/phpmailer/phpmailer/src/Exception.php',
     'PHPMailer\\PHPMailer\\OAuth' => $vendorDir . '/phpmailer/phpmailer/src/OAuth.php',
