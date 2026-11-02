@@ -27,7 +27,7 @@ return [
     ['GET', '/contact', [ContactController::class, 'contactForm']],
     ['GET', '/mentions', [MentionsController::class, 'mentionsForm']],
     ['GET', '/aiassistant', [AiassistantController::class, 'aiassistantForm']],
-    ['POST', '/aiassistant', [AiassistantController::class, 'aiassitantAction']],
+    ['POST', '/aiassistant', [AiassistantController::class, 'aiassistantAction']],
     ['GET', '/settings', [SettingsController::class, 'settingsForm']],
     ['POST', '/settings', [SettingsController::class, 'deleteAction']]
 ];
