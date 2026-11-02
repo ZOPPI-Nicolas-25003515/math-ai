@@ -10,29 +10,34 @@ class OpenRouterService
 
     private function corrigerLatex(string $texte): string
     {
-        // Commandes LaTeX reconnues
-        $commandes = 'frac|sqrt|times|div|approx|pi|alpha|beta|theta|'
-            . 'sum|int|infty|mathbb|log|sin|cos|tan';
-
-        // Expressions entre parenthèses simples
+        // 1. Protéger les formules déjà correctement délimitées
+        $protegees = [];
         $texte = preg_replace_callback(
-            '~(?<!\\\\)\(\s*((?:\\\\(?:' . $commandes . ')\b)[^()]*)\s*\)~',
-            function ($m) {
-                return '\\(' . trim($m[1]) . '\\)';
+            '~(\\\\\[.*?\\\\\]|\\\\\(.*?\\\\\)|\$\$.*?\$\$)~s',
+            function ($m) use (&$protegees) {
+                $cle = '@@MATH' . count($protegees) . '@@';
+                $protegees[$cle] = $m[0];
+                return $cle;
             },
             $texte
         );
 
-        // Expressions entre crochets simples
+        // 2. Blocs [ ... ] contenant une commande LaTeX (ligne seule)
         $texte = preg_replace_callback(
-            '~(?<!\\\\)\[\s*((?:\\\\(?:' . $commandes . ')\b)[^\[\]]*)\s*\]~',
-            function ($m) {
-                return '\\[' . trim($m[1]) . '\\]';
-            },
+            '~^\s*\[\s*(.*?\\\\[a-zA-Z]+.*?)\s*\]\s*$~ms',
+            fn ($m) => '\\[' . trim($m[1]) . '\\]',
             $texte
         );
 
-        return $texte;
+        // 3. Parenthèses contenant une commande LaTeX (gère 1 niveau d'imbrication)
+        $texte = preg_replace_callback(
+            '~\(\s*((?:[^()]|\([^()]*\))*?\\\\[a-zA-Z]+(?:[^()]|\([^()]*\))*?)\s*\)~',
+            fn ($m) => '\\(' . trim($m[1]) . '\\)',
+            $texte
+        );
+
+        // 4. Restaurer les formules protégées
+        return strtr($texte, $protegees);
     }
 
     public function ask(string $question): string
@@ -54,7 +59,7 @@ class OpenRouterService
                 [
                     'role' => 'system',
                     'content' => <<<'PROMPT'
-Tu es MathIA, un professeur de mathématiques.
+Tu es MathIA, une IA qui aide les lyceens
 
 FORMAT OBLIGATOIRE :
 
@@ -64,11 +69,14 @@ FORMAT OBLIGATOIRE :
 - Fractions : \( \frac{a}{b} \).
 - Racines : \( \sqrt{x} \).
 - Puissances : \( x^{2} \).
+- Utilise de manière pertinente les balises Markdown
 
 INTERDICTIONS ABSOLUES :
 
 - Ne jamais écrire ( \frac{a}{b} ).
 - Ne jamais écrire [ \frac{a}{b} ].
+- Ne jamais au grand jamais mettre ::mark car c'est moche.
+
 - Ne jamais écrire une formule mathématique sans délimiteurs.
 - Ne jamais utiliser de blocs de code pour les formules.
 

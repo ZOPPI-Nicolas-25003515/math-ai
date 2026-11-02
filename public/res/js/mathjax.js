@@ -1,10 +1,10 @@
 async function afficherReponse(texte) {
     const element = document.getElementById("reponse");
 
-    await MathJax.typesetClear([element]);
+    // Insérer d'abord le contenu
+    element.textContent = texte;
 
-    element.innerHTML = reponse;
-
+    // Puis demander à MathJax de le traiter
     await MathJax.typesetPromise([element]);
 }
 
