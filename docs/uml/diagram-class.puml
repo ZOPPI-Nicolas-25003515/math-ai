@@ -45,7 +45,29 @@ package app.Controller {
     +geniricForm(): void
     +genericAction(): void
   }
-  GenericController <|-- UserRepository : utilise
+  GenericController --> UserRepository : utilise
+}
+
+package app.Assets {
+  abstract class Component {
+    +{abstract} render(): string
+    #e(string $text): string
+    #renderAll(array $childs): string
+  }
+  
+  class Balises << (F,orchid) final >> {
+    +__construct()
+    +render(): string
+  }
+  
+    Component <|--- Balises : <<extends>>
+}
+
+package app.Services {
+  class OpenRouterService{
+    +ask(string $question): string
+  }
+  GenericController --> OpenRouterService : utilise
 }
 
 package "core" {
@@ -54,15 +76,22 @@ package "core" {
   }
   
   class View << (F,orchid) final >> {
+    +__construct(string $directory, array $share)
     {static} +openBuffer(): void
     {static} +getBufferContent(): string|false
     {static} +closeBuffer(): bool
-    {static} +show(string $S_location, array $A_array = []):void
+    +render(string $view,array $data = [], int $status = 200): Response
+    -catch(string $file, array $data): string
   }
   
-  class Db << (F,orchid) final >> {
+  class Database << (F,orchid) final >> {
     {static} -$pdo = null: ?PDO
-    {static} +getPDO(): PDO
+    {static} +connexion(string $root): PDO
+  }
+  
+  class Env << (F,orchid) final >> {
+    {static} +load(string $path): void
+    {static} +get(string $key, string $default = null): ?string
   }
   
   class Controller << (F,orchid) final >>{
@@ -72,6 +101,40 @@ package "core" {
    
    +__construct(string $S_url,array $A_postParams)
    +execute(): mixed
+  }
+  
+  class Response << (F,orchid) final >>{
+   -$status : int
+   -$body: string
+   -$header = []: array
+   
+   +__construct(int $status, string $body,array $header = [])
+   {static} +redirect(string $path): Response
+   +send(): void
+  }
+  
+  class Router << (F,orchid) final >>{
+   -$routes: array
+   -$craft: array
+   -$view: View
+   
+   +__construct(array $routes, View $view,array $craft = [])
+   +dispatch(Request $request): Response
+  }
+  
+  class Request  << (F,orchid) final >>{
+    +$method: string 
+    +$path: string
+    +$get: array 
+    +$post: array 
+    +$session: array 
+   
+   +__construct(string $method, string $path,array $get, array $post, array $session)
+   {static} +fromGlobals(): self
+   +post(string $key, $default = null): mixed
+   +get(string $key, $default = null): mixed
+   +session(string $key, $default = null): mixed
+   +getSession(string $key, $default = null): void
   }
 }
 
