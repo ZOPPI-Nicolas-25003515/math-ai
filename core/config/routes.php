@@ -19,16 +19,18 @@ use App\Controller\{HomeController,
     AccountsettingsController,
     AiassistantController,
     SettingsController,
-    RegisterchoiceController};
+    RegisterchoiceController,
+    RegisternotaffiliatedController,
+    LoginnotaffiliatedController};
 
 return [
     ['GET', '/', [HomeController::class, 'homeForm']],
     ['GET', '/home', [HomeController::class, 'homeForm']],
-    ['GET', '/loginteacher', [LoginteacherController::class, 'loginteacherForm']],
+    ['GET', '/login', [LoginteacherController::class, 'loginteacherForm']],
     ['POST', '/loginteacher', [LoginteacherController::class, 'loginteacherAction']],
     ['GET', '/registerchoice', [RegisterchoiceController::class, 'registerchoiceForm']],
-    ['GET', '/registerteacher', [RegisterteacherController::class, 'registerForm']],
-    ['POST', '/registerteacher', [RegisterteacherController::class, 'registerAction']],
+    ['GET', '/registerteacher', [RegisterteacherController::class, 'registerteacherForm']],
+    ['POST', '/registerteacher', [RegisterteacherController::class, 'registerteacherAction']],
     ['GET', '/logout', [LoginteacherController::class, 'logoutAction']],
     ['GET', '/forgottenpassword', [ForgottenpasswordteacherController::class, 'forgottenpasswordForm']],
     ['POST', '/forgottenpassword', [ForgottenpasswordteacherController::class, 'forgottenpasswordAction']],
@@ -58,4 +60,8 @@ return [
     ['GET', '/downloadclass', [ViewclassController::class, 'downloadAction']],
     ['GET','/answerexercise',[AddanswerexerciseController::class, 'addanswerexerciseForm']],
     ['POST','/answerexercise',[AddanswerexerciseController::class, 'addanswerexerciseAction']],
+    ['GET','/registernotaffiliated',[RegisternotaffiliatedController::class, 'registernotaffiliatedForm']],
+    ['POST','/registernotaffiliated',[RegisternotaffiliatedController::class, 'registernotaffiliatedAction']],
+    ['GET','/loginnotaffiliated',[LoginnotaffiliatedController::class, 'loginnotaffiliatedForm']],
+    ['POST','/loginnotaffiliated',[LoginnotaffiliatedController::class, 'loginnotaffiliatedAction']],
 ];

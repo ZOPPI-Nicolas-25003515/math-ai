@@ -2,8 +2,8 @@
 ?>
 <span>
     <ul>
-        <a href="/loginteacher">Professeur</a>
+        <a href="/login">Professeur</a>
         <a href="/loginstudent">Eleve</a>
-        <a href="/loginnotaffiliated">Non affilier</a>
+        <a href="/login">Non affilier</a>
     </ul>
 </span>

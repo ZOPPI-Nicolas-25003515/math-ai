@@ -9,7 +9,7 @@ use Core\View;
 class RegisternotaffiliatedController
 {
     public function __construct(private readonly UserRepository $repository) {}
-    public function registerAction(): void
+    public function registernotaffiliatedAction(): void
     {
         $errors = [];
         $success = false;
@@ -18,9 +18,8 @@ class RegisternotaffiliatedController
             $email =filter_var(trim($_POST['email'] ?? ''),FILTER_VALIDATE_EMAIL);
             $password = $_POST['password'] ?? '';
             $confirmation = $_POST['confirmation'] ?? '';
-            $teachername = $_POST['teachername'] ?? '';
+            $teachername = $_POST['name'] ?? '';
             $surname = $_POST['surname'] ?? '';
-            $highschoolid = $_POST['high_school'] ?? '';
             //$s_name = trim($_POST['name'] ?? ''); Nous ajouterons en effet un nom et prénom plus tard.
 
             $userValidate = new UserValidate($email,$password,$confirmation);
@@ -39,11 +38,11 @@ class RegisternotaffiliatedController
                     $errors[] = 'Un compte existe déjà avec cet email.';
                 }else{
                     $user = $this->repository->createUser($teachername, $surname, $email, $password);
-                    $teacher = $this->repository->createNotAffiliated($user->id, $highschoolid);
+                    $teacher = $this->repository->createNotAffiliated($user->id);
                     $success = true;
                     $_SESSION['id'] = $user->id;
                     $_SESSION['email'] = $user->mail;
-                    $_SESSION['role'] = 'teacher';
+                    $_SESSION['role'] = 'notaffiliated';
                     header('Location: /');
                     exit;
                 }
@@ -51,7 +50,7 @@ class RegisternotaffiliatedController
         }
         echo View::show('Registernotaffiliated', array( 'errors' => $errors,'success' => $success, 'formData' => $_POST));
     }
-    public function registerForm(): void {
+    public function registernotaffiliatedForm(): void {
         echo View::show('Registernotaffiliated', array( 'errors' => [],'success' => null, 'formData' => []));
     }
 }

@@ -5,7 +5,7 @@ use App\Model\UserRepository;
 use App\Model\UserValidate;
 final class RegisterteacherController {
     public function __construct(private readonly UserRepository $repository) {}
-    public function registerAction(): void
+    public function registerteacherAction(): void
     {
         $errors = [];
         $success = false;
@@ -47,7 +47,7 @@ final class RegisterteacherController {
         }
         echo View::show('Registerteacher', array( 'errors' => $errors,'success' => $success, 'formData' => $_POST));
     }
-    public function registerForm(): void {
+    public function registerteacherForm(): void {
         echo View::show('Registerteacher', array( 'errors' => [],'success' => null, 'formData' => []));
     }
 }
