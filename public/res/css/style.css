@@ -295,7 +295,7 @@ form input {
     transition: all 0.3s ease-in-out;
 }
 
-input[type="password"], input[type="email"], input[type="text"] {
+input[type="password"], input[type="email"],input[type="confirmation"], input[type="text"] {
     background-color: #f0f0f0;
     border-radius: 25px;
     border: none;

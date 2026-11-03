@@ -6,9 +6,13 @@ use App\Service\OpenRouterService;
 
 class AiassistantController
 {
+    private View $view;
+    public function __construct(View $view) {
+        $this->view = $view;
+    }
     public function aiassistantForm(): void
     {
-        \Core\View::show('Aiassistant', [
+        $this->view->render('Aiassistant', [
             'answer' => $answer ?? '',
             'error' => $error ?? '',
             'question' => $question ?? ''
@@ -33,10 +37,10 @@ class AiassistantController
             }
         }
 
-        View::show('assistantia', [
+        $this->view->render('Aiassistant', [
             'answer' => $answer,
             'error' => $error,
-            'question' => $question ?? ''
+            'question' => $question
         ]);
     }
 }

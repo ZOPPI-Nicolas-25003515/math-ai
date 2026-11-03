@@ -1,16 +1,15 @@
 <?php
 namespace App\Controller;
 
-use Core\View;
+use App\Core\{View,Request,Response};
 use App\Model\UserRepository;
 
 final class SettingsController {
-    public function __construct(private readonly ?UserRepository $repository = null)
-    {
-        $this->repository ??= new UserRepository();
+    private View $view;
+    public function __construct(private readonly UserRepository $repository,View $view) {
+        $this->view = $view;
     }
-
-    public function settingsForm(): void
+    public function settingsForm(): Response
     {
         $email = $_SESSION['email'] ?? null;
 
@@ -27,14 +26,13 @@ final class SettingsController {
             exit;
         }
 
-        View::show('Settings', [
+        return $this->view->render('Settings', [
             'email' => $user->getEmail(),
             'errors' => [],
         ]);
-        return;
     }
 
-    public function deleteAction(): void
+    public function deleteAction(): Response
     {
         $email = $_SESSION['email'] ?? null;
         $password = $_POST['password'] ?? '';
@@ -45,21 +43,19 @@ final class SettingsController {
         }
 
         if (trim((string) $password) === '') {
-            View::show('Settings', [
+            return $this->view->render('Settings', [
                 'email' => $email,
                 'errors' => ['Le mot de passe est requis pour supprimer le compte.'],
             ]);
-            return;
         }
 
         try {
             $this->repository->deleteUser($email, (string) $password);
         } catch (\InvalidArgumentException $e) {
-            View::show('Settings', [
+            return $this->view->render('Settings', [
                 'email' => $email,
                 'errors' => [$e->getMessage()],
             ]);
-            return;
         }
 
         session_unset();

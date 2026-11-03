@@ -1,8 +1,8 @@
 <?php
-
+namespace App\Controller;
 final class LogoutController
 {
-    public function logoutAction(array $parameters, array $postParams): bool
+    public static function logoutAction(): void
     {
         session_start();
         $_SESSION = [];
@@ -14,6 +14,5 @@ final class LogoutController
 
         session_destroy();
         header('Location: /');
-        exit;
     }
 }

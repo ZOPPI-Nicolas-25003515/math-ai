@@ -1,58 +1,32 @@
 <?php
+use App\View\{Alert,Button,Form,Input,Label,Layout,Link,Hypertext,Paragraph,Title,Container};
 
-$A_view = $A_view ?? [];
-$error = $A_view['errors'];
-?>
+echo new Layout ('Register',isset($loggedUser),[
+        new Title (1,['Inscription']),
+    new Paragraph([new Alert ($errors)]),
+    new Container ('span',[
+            new Form('/register','post',[
+                    new Container('ul',[
+                            new Container ('li',[
+                                    new Label('email','email',['E-mail']),
+                                            new Input('email','email','email','required')
+                                    ]
+                            ),
+                            new Container ('li',[
+                                            new Label('password','password',['Mot de passe']),
+                                            new Input('password','password','password','required')
+                                    ]
+                            ),
+                            new Container ('li',[
+                                            new Label('confirmation','confirmation',['Confirmation du mot de passe']),
+                                            new Input('confirmation','confirmation','confirmation','required')
+                                    ]
+                            ),
+                            new Button('submit','','S\'inscrire')
+                    ]),
 
-<h1>Inscription</h1>
 
-<?php
-if(!empty($error)){?>
-    <p style="color: red;"><?=htmlspecialchars($error[0])?></p><?php
-}
-?>
-
-<span>
-   <form action="/registernotaffiliated" method="post">
-     <ul>
-         <li>
-            <p>
-                <label for="name">Nom</label>
-                <input type="text" name="name" value="" required>
-            </p>
-        </li>
-        <li>
-            <p>
-                <label for="surname">Prenom</label>
-                <input type="text" name="surname" value="" required>
-            </p>
-        </li>
-           <li>
-              <li>
-                <label id = "label" for = "email">E-mail</label>
-              </li>
-             <li>
-                 <input class="textInput" type="email" name="email" required>
-             </li>
-         </li>
-         <li>
-             <li>
-                 <label id = "label" for = "password" >Mot de passe</label>
-             </li>
-             <li>
-                <input class="textInput" type="password" name="password" value="" required>
-            </li>
-         </li>
-         <li>
-            <li>
-                <label id = "label" for = "confirmation">Confirmation du mot de passe</label>
-            </li>
-            <li>
-                <input class="textInput" type="password" name="confirmation" value="" required>
-            </li>
-         </li>
-        <button type="submit">S'inscrire</button>
-       </ul>
-   </form>
-   <p>vous avez déjà un compte ? Connectez vous <a href="/login">ici</a></p>
-</span>
+            ]),
+            new Paragraph(['Vous avez déjà un compte ? Connectez-vous ', new Hypertext('/login',['ici']),'.'])
+    ]),
+]);

@@ -5,10 +5,13 @@ use App\Core\{View,Request,Response};
 use App\Model\UserRepository;
 use App\Model\UserValidate;
 
-class RegisternotaffiliatedController
+final class RegisternotaffiliatedController
 {
-    public function __construct(private readonly UserRepository $repository) {}
-    public function registernotaffiliatedAction(): void
+    private View $view;
+    public function __construct(private readonly UserRepository $repository,View $view) {
+        $this->view = $view;
+    }
+    public function registernotaffiliatedAction(): Response
     {
         $errors = [];
         $success = false;
@@ -47,9 +50,9 @@ class RegisternotaffiliatedController
                 }
             }
         }
-        echo View::show('Registernotaffiliated', array( 'errors' => $errors,'success' => $success, 'formData' => $_POST));
+        return $this->view->render('Register', array( 'errors' => $errors, 'formData' => $_POST));
     }
-    public function registernotaffiliatedForm(): void {
-        echo View::show('Registernotaffiliated', array( 'errors' => [],'success' => null, 'formData' => []));
+    public function registerForm(): Response {
+        return $this->view->render('Register', array( 'errors' => [], 'formData' => []));
     }
 }

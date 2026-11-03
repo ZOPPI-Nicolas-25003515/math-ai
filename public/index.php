@@ -33,43 +33,6 @@ require_once $root . '/app/Core/AutoLoader.php';
 $env_path = $root. '/.env';
 Env::load($env_path);
 session_start();
-$repository = new UserRepository();
-$controllers = [
-    HomeController::class     => fn() => new HomeController(),
-    LoginController::class      => fn() => new LoginController($repository),
-    RegisterController::class => fn() => new RegisterController($repository),
-    ForgottenpasswordController::class => fn() => new ForgottenpasswordController($repository),
-    ResetpasswordController::class => fn() => new ResetpasswordController($repository),
-    AccountsettingsController::class => fn() => new AccountsettingsController($repository),
-    SettingsController::class => fn() => new SettingsController($repository),
-    ContactController::class => fn() => new ContactController(),
-    MentionsController::class => fn() => new MentionsController(),
-    SitemapController::class => fn() => new SitemapController(),
-    AiassistantController::class => fn() => new AiassistantController(),
-    AnalyseiaController::class => fn() => new AnalyseiaController(),
-    ExerciseiaController::class => fn() => new ExerciseiaController(),
-    ClassiaController::class => fn() => new ClassiaController(),
-    AddexerciseController::class => fn() => new AddexerciseController($repository),
-    AddclassController::class => fn() => new AddclassController($repository),
-    LoginchoiceController::class => fn() => new LoginchoiceController(),
-    ViewclassController::class => fn() => new ViewclassController($repository),
-    AddanswerexerciseController::class => fn() => new AddanswerexerciseController(),
-    RegisterchoiceController::class => fn() => new RegisterchoiceController(),
-    RegisternotaffiliatedController::class => fn() => new RegisternotaffiliatedController($repository),
-    AddclassroomController::class => fn() => new AddclassroomController($repository),
-];
-$request = Request::fromGlobals();
-$path = $request->path;
-$method = $request->method;
-$response = null;
-$routes = require $root . '/../core/config/routes.php';
-View::openBuffer();
-foreach ($routes as [$routeMethod, $routePath, [$class, $action]]) {
-    if ($routeMethod === $method && $path === $routePath) {
-        $controller = $controllers[$class]();
-        $response = $controller->$action();
-        break;
-    }
 
 $repository = new UserRepository(Database::connexion($root));
 
@@ -78,6 +41,14 @@ $view = new View($root . '/views', ['loggedUser' => $_SESSION['user'] ?? null]);
 $craft = [
     HomeController::class     => fn() => new HomeController($view),
     LoginController::class      => fn() => new LoginController($repository, $view),
+    RegisterController::class => fn() => new RegisterController($repository, $view),
+    ForgottenpasswordController::class => fn() => new ForgottenpasswordController($repository,$view),
+    ResetPasswordController::class => fn() => new ResetpasswordController($repository,$view),
+    SettingsController::class => fn() => new SettingsController($repository, $view),
+    ContactController::class => fn() => new ContactController($view),
+    MentionsController::class => fn() => new MentionsController($view),
+    SitemapController::class => fn() => new SitemapController($view),
+    AiassistantController::class => fn() => new AiassistantController($repository, $view),
     RegisterController::class => fn() => new RegisterController($repository),
     ForgottenpasswordController::class => fn() => new ForgottenpasswordController($repository),
     ResetPasswordController::class => fn() => new ResetpasswordController($repository),

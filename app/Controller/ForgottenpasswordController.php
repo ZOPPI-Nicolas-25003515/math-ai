@@ -5,9 +5,11 @@ use App\Model\UserRepository;
 use App\Model\UserMail;
 final class ForgottenpasswordController
 {
-
-    public function __construct(private readonly UserRepository $repository) {}
-    public function forgottenpasswordAction(): void
+    private View $view;
+    public function __construct(private readonly UserRepository $repository, View $view) {
+        $this->view = $view;
+    }
+    public function forgottenpasswordAction(): Response
     {
         $message = '';
         global $pdo;
@@ -30,9 +32,10 @@ final class ForgottenpasswordController
                 } else $message = 'Une erreur est survenue lors de l\'envoi de l\'email.';
             }
         }
-        echo View::show('Forgottenpassword', ['message' => $message, 'formData' => $_POST]);
+        return $this->view->render('Forgottenpassword', ['message' => $message, 'formData' => $_POST]);
     }
-    public function forgottenpasswordForm():void {
-        echo View::show('Forgottenpassword', ['message' => '', 'formData' => []]);
+    public function forgottenpasswordForm(): Response
+    {
+        return $this->view->render('Forgottenpassword', ['message' => '', 'formData' => []]);
     }
 }

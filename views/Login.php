@@ -1,5 +1,9 @@
 <?php
-use App\View\{Alert,Button,Form,Input,Layout,Link,Hypertext,Paragraph,Title,Container};
+use App\View\{Alert,Button,Form,Input,Layout,Label,Link,Hypertext,Paragraph,Title,Container};
+
+/**
+ * @param array $errors
+ */
 
 echo new Layout ('Login',isset($loggedUser),
         [
@@ -10,10 +14,12 @@ echo new Layout ('Login',isset($loggedUser),
                     new Form('/login','post',[
                     new Container('ul',[
                             new Container('li',[
-                                    new Input('email','E-mail','email')
+                                new Label('email','email',['E-mail']),
+                                    new Input('email','email','email','required')
                             ]),
                             new Container('li',[
-                                    new Input('password','Mot de passe','password')
+                                new Label('password','password',['Password']),
+                                    new Input('password','password','email','required')
                             ]),
                             new Button('submit','','Se connecter')
                             ])
@@ -21,7 +27,7 @@ echo new Layout ('Login',isset($loggedUser),
             ])
                 ,new Paragraph(['Vous n\'avez pas de compte ? Inscrivez-vous ',
                             new Hypertext('/register',['ici']), '.'])
-                ,new Paragraph([new Hypertext('/register',['Mot de passe oublié ?'])])
+                ,new Paragraph([new Hypertext('/forgottenpassword',['Mot de passe oublié ?'])])
             ]);
 
 
