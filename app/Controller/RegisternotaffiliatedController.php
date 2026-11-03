@@ -24,7 +24,6 @@ final class RegisternotaffiliatedController
             $confirmation = $request->post('confirmation') ?? '';
             $teachername = $_POST['name'] ?? '';
             $surname = $_POST['surname'] ?? '';
-            $highschoolid = $_POST['high_school'] ?? '';
             //$s_name = trim($_POST['name'] ?? ''); Nous ajouterons en effet un nom et prénom plus tard.
 
             $userValidate = new UserValidate($email, $password, $confirmation);
