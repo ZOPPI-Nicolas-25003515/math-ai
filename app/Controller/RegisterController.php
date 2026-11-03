@@ -4,8 +4,11 @@ use App\Core\{View,Request,Response};
 use App\Model\UserRepository;
 use App\Model\UserValidate;
 final class RegisterController {
-    public function __construct(private readonly UserRepository $repository) {}
-    public function registerAction(): void
+    private View $view;
+    public function __construct(private readonly UserRepository $repository,View $view) {
+        $this->view = $view;
+    }
+    public function registerAction(): Response
     {
         $errors = [];
         $success = false;
@@ -40,9 +43,9 @@ final class RegisterController {
                 }
             }
         }
-        echo View::show('Register', array( 'errors' => $errors,'success' => $success, 'formData' => $_POST));
+        return $this->view->render('Register', array( 'errors' => $errors, 'formData' => $_POST));
     }
-    public function registerForm(): void {
-        echo View::show('Register', array( 'errors' => [],'success' => null, 'formData' => []));
+    public function registerForm(): Response {
+        return $this->view->render('Register', array( 'errors' => [], 'formData' => []));
     }
 }

@@ -6,9 +6,12 @@ use App\Model\UserValidate;
 
 final class ResetpasswordController
 {
-    public function __construct(private readonly UserRepository $repository) {}
+    private View $view;
+    public function __construct(private readonly UserRepository $repository,View $view) {
+        $this->view = $view;
+    }
 
-    public function resetpasswordAction(): void
+    public function resetpasswordAction(): Response
     {
         $errors = [];
         $message = '';
@@ -43,11 +46,12 @@ final class ResetpasswordController
                 }
             }
         }
-        echo View::render('Resetpassword', array('errors' => $errors, 'formData' => $_POST, 'token' => $reset_token));
+        return $this->view->render('Resetpassword', array('errors' => $errors, 'formData' => $_POST, 'token' => $reset_token));
     }
 
-    public function resetpasswordForm(): void{
-        echo View::render('Resetpassword', array('errors' => [], 'formData' => [], 'token' => $_GET['token'] ?? ''));
+    public function resetpasswordForm(): Response
+    {
+        return $this->view->render('Resetpassword', array('errors' => [], 'formData' => [], 'token' => $_GET['token'] ?? ''));
     }
 
 }

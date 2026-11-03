@@ -4,10 +4,9 @@ namespace App\View;
 final class Input extends Component
 {
     public function __construct(
+        private readonly string $type,
+        private readonly string $id,
         private readonly string $name,
-        private readonly string $label,
-        private readonly string $type = 'text',
-        private readonly string $value = '',
         private readonly string $optional = ''
     ) {
     }
@@ -15,15 +14,13 @@ final class Input extends Component
     public function render(): string
     {
         $name = $this->e($this->name);
-        $label = $this->e($this->label);
+        $id = $this->e($this->id);
         $type = $this->e($this->type);
-        $value = $this->e($this->value);
         $optional = $this->e($this->optional);
 
         return
             <<<HTML
-                <label for="{$name}"  {$optional}>{$label}</label><br>
-                <input type="{$type}" id="{$name}" name="{$name}" value="{$value}" required>
+                <input type="{$type}" id="{$name}" name="{$name}" {$optional}" required>
             HTML;
     }
 }
