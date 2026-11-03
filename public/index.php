@@ -24,7 +24,6 @@ use App\Controller\{AnalyseiaController,
     ViewclassController,
     SitemapController,
     AddexerciseController,
-    AddanswerexerciseContoller,
     AddclassController,
     AddanswerexerciseController,
     RegisterchoiceController,
@@ -61,12 +60,12 @@ $craft = [
     ClassiaController::class => fn() => new ClassiaController($view),
     AddexerciseController::class => fn() => new AddexerciseController($view),
     AddclassController::class => fn() => new AddclassController($repository,$view),
-    LoginchoiceController::class => fn() => new LoginchoiceController(),
-    ViewclassController::class => fn() => new ViewclassController($repository),
-    AddanswerexerciseContoller::class => fn() => new AddanswerexerciseContoller()
+    LoginchoiceController::class => fn() => new LoginchoiceController($view),
+    ViewclassController::class => fn() => new ViewclassController($repository,$view),
+    AddanswerexerciseController::class => fn() => new AddanswerexerciseController($view),
+    RegisterchoiceController::class => fn() => new RegisterchoiceController($view),
 ];
 
-];
 
 $router = new Router(require $root . '/app/Core/config/routes.php', $view, $craft);
 

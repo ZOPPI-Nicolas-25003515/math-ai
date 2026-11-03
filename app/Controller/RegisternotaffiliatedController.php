@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Controller;
+
 use App\Core\{View,Request,Response};
 use App\Model\UserRepository;
 use App\Model\UserValidate;
@@ -15,6 +16,7 @@ final class RegisternotaffiliatedController
     public function registernotaffiliatedAction(): Response
     {
         $errors = [];
+        $success = false;
 
         if (!empty($request->post)) {
             $email =filter_var(trim($request->post('email') ?? ''),FILTER_VALIDATE_EMAIL);
@@ -22,6 +24,7 @@ final class RegisternotaffiliatedController
             $confirmation = $request->post('confirmation') ?? '';
             $teachername = $_POST['name'] ?? '';
             $surname = $_POST['surname'] ?? '';
+            $highschoolid = $_POST['high_school'] ?? '';
             //$s_name = trim($_POST['name'] ?? ''); Nous ajouterons en effet un nom et prénom plus tard.
 
             $userValidate = new UserValidate($email,$password,$confirmation);
@@ -39,22 +42,20 @@ final class RegisternotaffiliatedController
                 if ($this->repository->emailExists($email)) {
                     $errors[] = 'Un compte existe déjà avec cet email.';
                 }else{
-                    $user = $this->repository->createTeacher($teachername, $surname, $email, $password, $highschoolid);
-                    $user = $this->repository->createUser($email, $password);
+                    $user = $this->repository->createUser($teachername, $surname, $email, $password);
+                    $teacher = $this->repository->createNotAffiliated($user->id, $highschoolid);
                     $request->setSession('id', $user->id);
                     $request->setSession('email', $user->email);
-<<<<<<<< HEAD:app/Controller/RegisternotaffiliatedController.php
                     $request->setSession('user', ['id' => $user->id, 'email' => $user->email, 'role' => 'not_affiliated']);
-========
-                    $request->setSession('user', ['id' => $user->id, 'email' => $user->email, 'role' => 'teacher']);
->>>>>>>> c46d756 (affichage des cours disponible fonctionelle):app/Controller/RegisterteacherController.php
                     return Response::redirect('/');
                 }
             }
         }
         return $this->view->render('Register', array( 'errors' => $errors, 'formData' => $request->post));
     }
-    public function registerForm(): Response {
+
+
+   public function registerForm(): Response {
         return $this->view->render('Register', array( 'errors' => [], 'formData' => []));
     }
 }

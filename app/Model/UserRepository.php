@@ -8,8 +8,8 @@ final class UserRepository {
         $this->pdo =$pdo ?? Database::getPdo();
     }
 
-
-    public function findByEmail(string $email): ?Teacher{
+    public function findByEmail(string $email): ?User
+    {
         $stmt = $this->pdo->prepare('SELECT id ,user_name ,user_surname ,mail ,hached_password FROM Users WHERE mail = :email');
         $stmt->execute(['email' => $email]);
         $user = $stmt->fetch(\PDO::FETCH_ASSOC);

@@ -11,14 +11,11 @@ final class Teacher
     )
     {
     }
-
-    public function verifyPassword(string $password): bool {
-        return password_verify($password, $this->passwordHash);
-    }
     public function getId(): int
     {
         return $this->id;
     }
+
    public function getTeacherid(): int{
         return $this->teacherid;
    }
