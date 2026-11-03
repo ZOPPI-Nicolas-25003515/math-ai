@@ -17,7 +17,7 @@ if(!empty($error)){?>
 ?>
 
 <span>
-   <form action="/register" method="post">
+   <form action="/registerteacher" method="post">
      <ul>
          <li>
             <p>

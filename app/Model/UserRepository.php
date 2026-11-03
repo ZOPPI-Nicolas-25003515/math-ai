@@ -9,88 +9,90 @@ final class UserRepository {
     }
 
 
-    public function findTeacherByEmail(string $email): ?Teacher{
-        $stmt = $this->pdo->prepare('SELECT id,teacher_name,surname,mail,hached_password,high_school_id FROM Teacher WHERE mail = :email');
+    public function findByEmail(string $email): ?User
+    {
+        $stmt = $this->pdo->prepare('SELECT id ,user_name ,user_surname ,mail ,hached_password FROM Users WHERE mail = :email');
         $stmt->execute(['email' => $email]);
-        $teacher = $stmt->fetch(\PDO::FETCH_ASSOC);
-        if (!$teacher){return null;}
-        else{return new Teacher($teacher['id'], $teacher['teacher_name'], $teacher['surname'],$teacher['mail'],$teacher['hached_password'],$teacher['high_school_id']);}
+        $user = $stmt->fetch(\PDO::FETCH_ASSOC);
+        if (!$user) {
+            return null;
+        } else {
+            return new User($user['id'], $user['user_name'], $user['user_surname'], $user['mail'], $user['hached_password']);
+        }
     }
-
-    public function emailTeacherExists(string $email): bool {
-        $stmt = $this->pdo->prepare('SELECT id FROM Teacher WHERE mail = :email');
+    public function emailExists(string $email): bool {
+        $stmt = $this->pdo->prepare('SELECT id FROM Users WHERE mail = :email');
         $stmt->execute(['email' => $email]);
         return $stmt->fetch() ? true : false;
     }
 
-    public function createTeacher(string $teachername, string $surname,string $email, string $password, int $highschoolid): Teacher {
+    public function createUser(string $username, string $usersurname,string $email, string $password): ?User {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $this->pdo->prepare('INSERT INTO Teacher (teacher_name,surname,mail,hached_password,high_school_id) VALUES (:teacher_name, :surname, :mail, :hached_password, :high_school_id)');
-        $stmt->execute(['teacher_name' => $teachername,'surname' => $surname,'mail'=> $email,'hached_password' => $hashed_password,'high_school_id' => $highschoolid]);
+        $stmt = $this->pdo->prepare('INSERT INTO Users (user_name ,user_surname ,mail ,hached_password ) VALUES (:user_name ,:user_surname ,:mail ,:hached_password)');
+        $stmt->execute(['user_name' => $username,'user_surname' => $usersurname,'mail'=> $email,'hached_password' => $hashed_password ]);
         $id = $this->pdo->lastInsertId();
         $id = (int) $id;
-        return new Teacher($id, $teachername, $surname, $email, $hashed_password, $highschoolid);
+        return new User($id, $username, $usersurname, $email, $hashed_password);
     }
 
-    public function deleteTeacher(string $email, string $password): Teacher {
-        $teacher = $this->findByEmail($email);
-        if ($teacher === null) {
+    public function deleteUser(string $email, string $password): User {
+        $user = $this->findByEmail($email);
+        if ($user === null) {
             throw new \InvalidArgumentException('Aucun utilisateur trouvé pour cet email.');
         }
 
-        if (!$teacher->verifyPassword($password)) {
+        if (!$user->verifyPassword($password)) {
             throw new \InvalidArgumentException('Le mot de passe est incorrect.');
         }
 
-        $stmt = $this->pdo->prepare('DELETE FROM Teacher WHERE email = :email');
+        $stmt = $this->pdo->prepare('DELETE FROM Users WHERE email = :email');
         $stmt->execute(['email' => $email]);
 
-        return $teacher;
+        return $user;
     }
 
-    public function updateTeacher(string $reset_token, string $password): Teacher {
-        $teacher = $this->findByToken($reset_token);
-        if ($teacher === null) {
+    public function updateUser(string $reset_token, string $password): User {
+        $user = $this->findByToken($reset_token);
+        if ($user === null) {
             throw new \InvalidArgumentException('Aucun utilisateur trouvé pour ce token.');
         }
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $this->pdo->prepare('UPDATE Teacher SET hached_password = :password, reset_token = NULL, reset_token_expiry = NULL WHERE reset_token = :reset_token');
+        $stmt = $this->pdo->prepare('UPDATE Users SET hached_password = :password, reset_token = NULL, reset_token_expiry = NULL WHERE reset_token = :reset_token');
         $stmt->execute(['password' => $hashed_password,'reset_token' => $reset_token]);
-        $id = $teacher->getId();
-        $teachername = $teacher->getTeacherName();
-        $surname = $teacher->getSurname();
-        $email = $teacher->getEmail();
-        $highschoolid = $teacher->getHighSchoolId();
-        return new Teacher ($id, $teachername, $surname, $email, $password, $highschoolid);
+        $id = $user->getId();
+        $username = $user->getUsername();
+        $usersurname = $user->getUsersurname();
+        $email = $user->getEmail();
+        return new Teacher ($id, $username, $usersurname, $email, $password);
     }
 
-    public function setTeacherResetToken(string $email,string $reset_token,string $expiry): bool {
-        $stmt = $this->pdo->prepare('UPDATE Teacher SET reset_token = :token, reset_token_expiry = :expiry WHERE email = :email');
-        return $stmt->execute(['token' => $reset_token, 'expiry' => $expiry,'email' => $email]);
+    public function setResetToken(string $email,string $reset_token,string $expiry): bool {
+        $stmt = $this->pdo->prepare('UPDATE Users SET reset_token = :token, reset_token_expiry = :expiry WHERE mail = :email');
+        return $stmt->execute(['token' => $reset_token, 'expiry' => $expiry,'mail' => $email]);
     }
 
-    public function findTeacherByToken(string $reset_token): ?Teacher {
-        $stmt = $this->pdo->prepare('SELECT * FROM Teacher WHERE reset_token = :token');
+    public function findByToken(string $reset_token): ?User {
+        $stmt = $this->pdo->prepare('SELECT * FROM Users WHERE reset_token = :token');
         $stmt->execute(['token' => $reset_token]);
-        $teacher = $stmt->fetch(\PDO::FETCH_ASSOC);
-        if (!$teacher) return null;
-        else return new Teacher($teacher['id'], $teacher['teacher_name'], $teacher['surname'],$teacher['mail'],$teacher['hached_password'],$teacher['high_school_id']);
+        $user = $stmt->fetch(\PDO::FETCH_ASSOC);
+        if (!$user) return null;
+        else return new User($user['id'], $user['user_name'], $user['user_surname'], $user['mail'],$user['hached_password']);
     }
 
-    public function verifyTeacherPasswordUsability(string $reset_token,string $password): ?string {
-        $stmt = $this->pdo->prepare('SELECT password FROM Teacher WHERE reset_token = :reset_token');
+    public function verifyPasswordUsability(string $reset_token,string $password): ?string {
+        $stmt = $this->pdo->prepare('SELECT hached_password FROM Users WHERE reset_token = :reset_token');
         $stmt->execute(['reset_token' => $reset_token]);
-        $teacher = $stmt->fetch(\PDO::FETCH_ASSOC);
-        if (password_verify($password, $teacher['password']))
+        $user = $stmt->fetch(\PDO::FETCH_ASSOC);
+        if (password_verify($password, $user['hached_password']))
             return 'Veuillez entrer un mot de passe différent du précédent.';
         else return null;
     }
 
-    public function verifyTeacherToken(string $reset_token): ?string {
+    public function verifyToken(string $reset_token): ?string {
         if ($reset_token == null) return 'Il n\'existe aucun token.';
         $timezoneParis = new \DateTimeZone('Europe/Paris');
         $time_now = new \DateTimeImmutable('now',$timezoneParis );
-        $stmt = $this->pdo->prepare('SELECT reset_token_expiry FROM Teacher WHERE reset_token = :reset_token');
+        $stmt = $this->pdo->prepare('SELECT reset_token_expiry FROM Users WHERE reset_token = :reset_token');
         $stmt->execute(['reset_token' => $reset_token]);
         $result = $stmt->fetch(\PDO::FETCH_ASSOC);
         $expiry_date = new \DateTimeImmutable($result['reset_token_expiry'], $timezoneParis);
@@ -100,14 +102,32 @@ final class UserRepository {
         else return null;
     }
 
+    public function createTeacher(int $teacherid, int $highschoolid): Teacher
+    {
+        $stmt = $this->pdo->prepare('INSERT INTO Teacher (teacher_id ,high_school_id) VALUES (:teacher_id ,:high_school_id)');
+        $stmt->execute(['teacher_id' => $teacherid, 'high_school_id' => $highschoolid]);
+        $id = $this->pdo->lastInsertId();
+        $id = (int) $id;
+        return new Teacher($id, $teacherid, $highschoolid);
+    }
+
+    public function createNotAffiliated(int $notaffiliatedid, int $titleid = 1): NotAffiliated
+    {
+        $stmt = $this->pdo->prepare('INSERT INTO Not_affiliated (not_affiliated_id ,title_id) VALUES (:not_affiliated_id, :title_id )');
+        $stmt->execute(['not_affiliated_id' => $notaffiliatedid, 'title_id' => $titleid]);
+        $id = $this->pdo->lastInsertId();
+        $id = (int) $id;
+        return new NotAffiliated($id, $notaffiliatedid , $titleid);
+    }
+
     public function classTitleTeacher(int $teacherid, int $subject)
     {
         $stmt = $this->pdo->prepare('SELECT id,title FROM Class WHERE teacher_id = :teacher_id AND subject_id = :subject_id');
         $stmt->execute(['teacher_id' => $teacherid,'subject_id' => $subject]);
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
     }
-        public function findClassById(int $id)
+
+    public function findClassById(int $id)
     {
         $stmt = $this->pdo->prepare('SELECT id,title,path_name FROM Class WHERE id = :id');
         $stmt->execute(['id' => $id]);

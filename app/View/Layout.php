@@ -19,7 +19,7 @@ $A_view = $A_view ?? [];
         <?php $user = $_SESSION['email'] ?? null; ?>
         <?php if ($user === null) { ?>
             <a href="/loginchoice">Connexion</a>
-            <a href="/register">Inscription</a>
+            <a href="/registerchoice">Inscription</a>
         <?php } else { ?>
             <a href="/settings">Profile</a>
         <?php } ?>

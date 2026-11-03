@@ -31,10 +31,11 @@ final class RegisterteacherController {
 
 
             if (empty($errors)) {
-                if ($this->repository->emailTeacherExists($email)) {
+                if ($this->repository->emailExists($email)) {
                     $errors[] = 'Un compte existe déjà avec cet email.';
                 }else{
-                    $user = $this->repository->createTeacher($teachername, $surname, $email, $password, $highschoolid);
+                    $user = $this->repository->createUser($teachername, $surname, $email, $password);
+                    $teacher = $this->repository->createTeacher($user->id, $highschoolid);
                     $success = true;
                     $_SESSION['id'] = $user->id;
                     $_SESSION['email'] = $user->mail;
@@ -44,9 +45,9 @@ final class RegisterteacherController {
                 }
             }
         }
-        echo View::show('Register', array( 'errors' => $errors,'success' => $success, 'formData' => $_POST));
+        echo View::show('Registerteacher', array( 'errors' => $errors,'success' => $success, 'formData' => $_POST));
     }
     public function registerForm(): void {
-        echo View::show('Register', array( 'errors' => [],'success' => null, 'formData' => []));
+        echo View::show('Registerteacher', array( 'errors' => [],'success' => null, 'formData' => []));
     }
 }

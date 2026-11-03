@@ -26,7 +26,8 @@ use App\Controller\{AnalyseiaController,
     SitemapController,
     AddexerciseController,
     AddanswerexerciseController,
-    AddclassController,};
+    AddclassController,
+    RegisterchoiceController};
 use App\Model\UserRepository;
 
 session_start();
@@ -50,7 +51,8 @@ $controllers = [
     AddclassController::class => fn() => new AddclassController($repository),
     LoginchoiceController::class => fn() => new LoginchoiceController(),
     ViewclassController::class => fn() => new ViewclassController($repository),
-    AddanswerexerciseController::class => fn() => new AddanswerexerciseController()
+    AddanswerexerciseController::class => fn() => new AddanswerexerciseController(),
+    RegisterchoiceController::class => fn() => new RegisterchoiceController(),
 ];
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';   // "/login?x=1" -> "/login"
