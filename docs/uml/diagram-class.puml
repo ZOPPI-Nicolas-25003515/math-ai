@@ -1,0 +1,141 @@
+@startuml
+package app.Model {
+  class User << (F,orchid) final >> {
+    +__construct(public readonly int $id,
+      public readonly string $email,
+      public readonly string $passwordHash)
+    +verifyPassword(string $password): bool
+    +getId(): int
+    +getEmail(): string
+  }
+  
+  class UserMail << (F,orchid) final >> {
+    +__construct(private string $email)
+    +sendMail(array $content): bool|string
+    +createResetPasswordMessage(string $email, string $resetLink): array
+  }
+  
+  class UserRepository << (F,orchid) final >> {
+    +$pdo: ?\PDO
+    +__construct((?\PDO $pdo = null)
+    +findByEmail(string $email): ?User
+    +emailExists(string $email): bool
+    +createUser(string $email, string $password): User
+    +deleteUser(string $email, string $password): User
+    +updateUser(string $reset_token, string $password): User
+    +setResetToken(string $email,string $reset_token,string $expiry): bool
+    +findByToken(string $reset_token): ?User
+    +verifyPasswordUsability(string $reset_token,string $password): ?string
+    +verifyToken(string $reset_token): ?string
+  }
+  
+  class UserValidate << (F,orchid) final >> {
+    +__construct(public readonly string $email, 
+      public readonly string $password, 
+      public readonly string $confirmation)
+    +checkEmailValidity(): string
+    +checkPasswordLength(): string
+    +passwordConfirmation(): string
+  }
+}
+
+package app.Controller {
+  class GenericController << (F,orchid) final >>{
+    +__construct(private readonly UserRepository $repository)
+    +geniricForm(): void
+    +genericAction(): void
+  }
+  GenericController --> UserRepository : utilise
+}
+
+package app.Assets {
+  abstract class Component {
+    +{abstract} render(): string
+    #e(string $text): string
+    #renderAll(array $childs): string
+  }
+  
+  class Balises << (F,orchid) final >> {
+    +__construct()
+    +render(): string
+  }
+  
+    Component <|--- Balises : <<extends>>
+}
+
+package app.Services {
+  class OpenRouterService{
+    +ask(string $question): string
+  }
+  GenericController --> OpenRouterService : utilise
+}
+
+package "core" {
+  class AutoLoader << (F,orchid) final >> {
+    {static} +findClass(string $class): void
+  }
+  
+  class View << (F,orchid) final >> {
+    +__construct(string $directory, array $share)
+    {static} +openBuffer(): void
+    {static} +getBufferContent(): string|false
+    {static} +closeBuffer(): bool
+    +render(string $view,array $data = [], int $status = 200): Response
+    -catch(string $file, array $data): string
+  }
+  
+  class Database << (F,orchid) final >> {
+    {static} -$pdo = null: ?PDO
+    {static} +connexion(string $root): PDO
+  }
+  
+  class Env << (F,orchid) final >> {
+    {static} +load(string $path): void
+    {static} +get(string $key, string $default = null): ?string
+  }
+  
+  class Controller << (F,orchid) final >>{
+   -$_urlSegments = []: array
+   -$_urlParamenters = []: array
+   -$_formData = []: array
+   
+   +__construct(string $S_url,array $A_postParams)
+   +execute(): mixed
+  }
+  
+  class Response << (F,orchid) final >>{
+   -$status : int
+   -$body: string
+   -$header = []: array
+   
+   +__construct(int $status, string $body,array $header = [])
+   {static} +redirect(string $path): Response
+   +send(): void
+  }
+  
+  class Router << (F,orchid) final >>{
+   -$routes: array
+   -$craft: array
+   -$view: View
+   
+   +__construct(array $routes, View $view,array $craft = [])
+   +dispatch(Request $request): Response
+  }
+  
+  class Request  << (F,orchid) final >>{
+    +$method: string 
+    +$path: string
+    +$get: array 
+    +$post: array 
+    +$session: array 
+   
+   +__construct(string $method, string $path,array $get, array $post, array $session)
+   {static} +fromGlobals(): self
+   +post(string $key, $default = null): mixed
+   +get(string $key, $default = null): mixed
+   +session(string $key, $default = null): mixed
+   +getSession(string $key, $default = null): void
+  }
+}
+
+@enduml

@@ -28,12 +28,6 @@ final class Layout extends Component
                 'footer')]);
         $links = $this->renderAll([new Link ('icon', '/res/image/logoMathAi.ico','type="image/x-icon"'),new Link ('stylesheet', '/res/css/style.css')]);
         $par = $this->renderAll($this->content);
-/*
- * A ajouter :
- * <script src="/res/js/mathjax-config.js"></script>
- * <script defer src="/res/js/mathjax.js"></script>
- */
-
         return
                 <<<HTML
                 <!DOCTYPE html>
@@ -41,9 +35,10 @@ final class Layout extends Component
                 <head>
                     <meta charset="UTF-8">
                     {$links}
-                    
+                    <script src="/res/js/mathjax-config.js"></script>
                     <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
                     <script defer src="/res/js/main.js"></script>
+                    <script defer src="/res/js/mathjax.js"></script>
                     <title>{$this->e($title)}</title>
 
                 </head>
