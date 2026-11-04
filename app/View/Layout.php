@@ -1,46 +1,63 @@
 <?php
-$A_view = $A_view ?? [];
-?>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <link rel="icon" type="image/x-icon" href="/res/image/logoMathAi.ico">
-    <title><?= htmlspecialchars($title ?? 'MathIA') ?></title>
-    <link rel="stylesheet" href= "/res/css/style.css">
-    <script src="/res/js/mathjax-config.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script defer src="/res/js/main.js"></script>
-    <script defer src="/res/js/mathjax.js"></script>
+namespace App\View;
+use App\Model\User;
+final class Layout extends Component
+{
+    /**
+     * @param string $title
+     * @param bool $isLogged
+     * @param array $content
+     * */
 
-</head>
+    public function __construct(
+            private readonly string $title, private readonly bool $isLogged, private readonly array $content) {
+    }
 
-<body>
-<header>
-    <nav>
-        <a href="/">MathsAI</a>
-        <a href="/aiassistant"> Assistant IA</a>
-        <?php $user = $_SESSION['email'] ?? null; ?>
-        <?php if ($user === null) { ?>
-            <a href="/login">Connexion</a>
-            <a href="/register">Inscription</a>
-        <?php } else { ?>
-            <a href="/settings">Profil</a>
-        <?php } ?>
-    </nav>
-</header>
+    public function render(): string
+    {
+        $title = $this->e($this->title);
+        $nav = $this->renderAll(!$this->isLogged
+                ? [new Hypertext('/', ['MathAI']),new Hypertext('/aiassistant', ['Assistant IA']), new Hypertext('/login', ['Connexion']), new Hypertext('/register', ['Inscription'])]
+                : [new Hypertext('/', ['MathAI']),new Hypertext('/aiassistant', ['Assistant IA']), new Hypertext('/settings', ['Paramètres'])]);
+        $footer = $this->renderAll([new Container('footer',
+                [new Container('ul',[
+                        new Container('li',[new Hypertext('/',['Accueil'])]),
+                        new Container('li',[new Hypertext('/sitemap',['Plan du site'])]),
+                        new Container('li',[new Hypertext('/contact',['Nous contacter'])]),
+                        new Container('li',[new Hypertext('/mentions',['Mentions légales'])])])],
+                'footer')]);
+        $links = $this->renderAll([new Link ('icon', '/res/image/logoMathAi.ico','type="image/x-icon"'),new Link ('stylesheet', '/res/css/style.css')]);
+        $par = $this->renderAll($this->content);
+        return
+                <<<HTML
+                <!DOCTYPE html>
+                <html lang="fr">
+                <head>
+                    <meta charset="UTF-8">
+                    {$links}
+                    <script src="/res/js/mathjax-config.js"></script>
+                    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+                    <script defer src="/res/js/main.js"></script>
+                    <script defer src="/res/js/mathjax.js"></script>
+                    <title>{$this->e($title)}</title>
 
-<main>
-    <?= $A_view['body'] ?>
-</main>
+                </head>
+                <body>
+                <header>
+                <nav>
+                    {$nav}
+                </nav>
+                </header>
 
-<footer class="footer">
-    <ul>
-        <li> <a href="/">Accueil</a></li>
-        <li> <a href="/sitemap"> Plan du site</a></li>
-        <li> <a href="/contact"> Nous contacter</a> </li>
-        <li> <a href="/mentions"> Mentions légales </a></li>
-    </ul>
-</footer>
-</body>
-</html>
+                <main>
+                    {$par}
+                </main>
+
+                {$footer}
+                </body>
+                </html>
+                HTML;
+    }
+}
+
+

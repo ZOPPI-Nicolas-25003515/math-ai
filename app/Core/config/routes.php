@@ -9,7 +9,8 @@ use App\Controller\{HomeController,
     MentionsController,
     SitemapController,
     AiassistantController,
-    SettingsController};
+    SettingsController,
+    LogoutController};
 
 return [
     ['GET', '/', [HomeController::class, 'homeForm']],
@@ -18,7 +19,7 @@ return [
     ['POST', '/login', [LoginController::class, 'loginAction']],
     ['GET', '/register', [RegisterController::class, 'registerForm']],
     ['POST', '/register', [RegisterController::class, 'registerAction']],
-    ['GET', '/logout', [LoginController::class, 'logoutAction']],
+    ['GET', '/logout', [LogoutController::class, 'logoutAction']],
     ['GET', '/forgottenpassword', [ForgottenpasswordController::class, 'forgottenpasswordForm']],
     ['POST', '/forgottenpassword', [ForgottenpasswordController::class, 'forgottenpasswordAction']],
     ['GET', '/resetpassword', [ResetpasswordController::class, 'resetpasswordForm']],

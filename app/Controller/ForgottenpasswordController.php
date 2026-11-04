@@ -1,18 +1,20 @@
 <?php
 namespace App\Controller;
-use Core\View;
+use App\Core\{View,Request,Response};
 use App\Model\UserRepository;
 use App\Model\UserMail;
 final class ForgottenpasswordController
 {
-
-    public function __construct(private readonly UserRepository $repository) {}
-    public function forgottenpasswordAction(): void
+    private View $view;
+    public function __construct(private readonly UserRepository $repository, View $view) {
+        $this->view = $view;
+    }
+    public function forgottenpasswordAction(Request $request): Response
     {
         $message = '';
         global $pdo;
-        if (!empty($_POST["email"])) {
-            $email = filter_var(trim($_POST["email"]), FILTER_VALIDATE_EMAIL);
+        if (!empty($request->post('email'))) {
+            $email = filter_var(trim($request->post('email')), FILTER_VALIDATE_EMAIL);
             if (!$this->repository->emailExists($email)) {
                 $message = 'Si votre adresse e-mail est correcte, un email de réinitialisation a été envoyé.';
             } else {
@@ -30,9 +32,10 @@ final class ForgottenpasswordController
                 } else $message = 'Une erreur est survenue lors de l\'envoi de l\'email.';
             }
         }
-        echo View::show('Forgottenpassword', ['message' => $message, 'formData' => $_POST]);
+        return $this->view->render('Forgottenpassword', ['message' => $message, 'formData' => $request->post]);
     }
-    public function forgottenpasswordForm():void {
-        echo View::show('Forgottenpassword', ['message' => '', 'formData' => []]);
+    public function forgottenpasswordForm(): Response
+    {
+        return $this->view->render('Forgottenpassword', ['message' => '', 'formData' => []]);
     }
 }

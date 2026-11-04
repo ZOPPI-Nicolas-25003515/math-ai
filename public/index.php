@@ -1,15 +1,11 @@
 <?php
 
-$root = __DIR__;
-require_once $root . '/../vendor/autoload.php'; //AutoLoader de composer
-require_once $root . '/../core/AutoLoader.php';
-use Core\View;
-use Core\Controller;
-use Core\Db;
-use App\Controller\{AiassistantController,
-    AnalyseiaController,
-    ExerciseiaController,
-    HomeController,
+use App\Core\{View,
+    Env,
+    Database,
+    Router,
+    Request};
+use App\Controller\{HomeController,
     LoginController,
     RegisterController,
     ForgottenpasswordController,
@@ -17,41 +13,38 @@ use App\Controller\{AiassistantController,
     SettingsController,
     ContactController,
     MentionsController,
-    SitemapController};
+    SitemapController,
+    AiassistantController,
+};
 use App\Model\UserRepository;
 
+
+$root = __DIR__ . '/..';
+require_once $root . '/vendor/autoload.php'; //AutoLoader de composer
+require_once $root . '/app/Core/AutoLoader.php';
+
+$env_path = $root. '/.env';
+Env::load($env_path);
 session_start();
-$repository = new UserRepository();
-$controllers = [
-    HomeController::class     => fn() => new HomeController(),
-    LoginController::class      => fn() => new LoginController($repository),
-    RegisterController::class => fn() => new RegisterController($repository),
-    ForgottenpasswordController::class => fn() => new ForgottenpasswordController($repository),
-    ResetPasswordController::class => fn() => new ResetpasswordController($repository),
-    SettingsController::class => fn() => new SettingsController($repository),
-    ContactController::class => fn() => new ContactController(),
-    MentionsController::class => fn() => new MentionsController(),
-    SitemapController::class => fn() => new SitemapController(),
-    AiassistantController::class => fn() => new AiassistantController()
+
+$repository = new UserRepository(Database::connexion($root));
+
+$view = new View($root . '/views', ['loggedUser' => $_SESSION['user'] ?? null]);
+
+$craft = [
+    HomeController::class     => fn() => new HomeController($view),
+    LoginController::class      => fn() => new LoginController($repository, $view),
+    RegisterController::class => fn() => new RegisterController($repository, $view),
+    ForgottenpasswordController::class => fn() => new ForgottenpasswordController($repository,$view),
+    ResetPasswordController::class => fn() => new ResetpasswordController($repository,$view),
+    SettingsController::class => fn() => new SettingsController($repository, $view),
+    ContactController::class => fn() => new ContactController($view),
+    MentionsController::class => fn() => new MentionsController($view),
+    SitemapController::class => fn() => new SitemapController($view),
+    AiassistantController::class => fn() => new AiassistantController($view)
 ];
 
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';   // "/login?x=1" -> "/login"
-$path = rtrim($path, '/') ?: '/';
+$router = new Router(require $root . '/app/Core/config/routes.php', $view, $craft);
 
-$routes = require $root . '/../core/config/routes.php';
-$method = $_SERVER['REQUEST_METHOD'];
-View::openBuffer();
-foreach ($routes as [$routeMethod, $routePath, [$class, $action]]) {
-    if ($routeMethod === $method && $path === $routePath) {
-        $controller = $controllers[$class]();
-        $controller->$action();
-        $ViewContent = View::getBufferContent();
-        View::show('Layout',array('body' => $ViewContent));
-        exit;
-    }
-
-}
-View::closeBuffer();
-http_response_code(404);
-View::show('404', ['path' => $path]);
+$router->dispatch(Request::fromGlobals())->send();
 

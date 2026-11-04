@@ -1,10 +1,14 @@
 <?php
 namespace App\Controller;
-use Core\View;
+use App\Core\{View,Request,Response};
 final class SitemapController
 {
-    public function sitemapForm(): void
+    private View $view;
+    public function __construct(View $view) {
+        $this->view = $view;
+    }
+    public function sitemapForm(): Response
     {
-        echo View::show('Sitemap');
+        return $this->view->render('Sitemap');
     }
 }

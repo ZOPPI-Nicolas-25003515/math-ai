@@ -1,9 +1,13 @@
 <?php
 namespace App\Controller;
-use Core\View;
+use App\Core\{View,Request,Response};
 final class ContactController{
-
-    public function contactForm(): void{
-        echo View::show('Contact');
+    private View $view;
+    public function __construct(View $view) {
+        $this->view = $view;
+    }
+    public function contactForm(): Response
+    {
+        return $this->view->render('Contact');
     }
 }

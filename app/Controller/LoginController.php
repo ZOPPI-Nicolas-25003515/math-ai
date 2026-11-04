@@ -1,44 +1,25 @@
 <?php
 namespace App\Controller;
-use Core\View;
+use App\Core\{View,Request,Response};
 use App\Model\UserRepository;
 final class LoginController
 {
-    public function __construct(private readonly UserRepository $repository) {}
-    public function loginAction(): void
+    private View $view;
+    public function __construct(private readonly UserRepository $repository, View $view) {
+        $this->view = $view;
+    }
+    public function loginAction(Request $request): Response
     {
-        $errors = [];
-
-        if (!empty($_POST)) {
-            $email = filter_var(trim($_POST['email'] ?? ''),FILTER_VALIDATE_EMAIL);
-            $password = $_POST['password'] ?? '';
-            
-            if ($email === false) {
-                $errors[] = 'L\'adresse email est invalide.';
-            }
-
-            if (empty($errors)) {
-                $user = $this->repository->findByEmail($email);
-
-                if ($user !== null && $user->verifyPassword($password)) {
-                    $_SESSION['email'] = $user->email;
-                    header('Location: /');
-                    exit;
-                } else {
-                    $errors[] = 'Email ou mot de passe incorrect.';
-                }
-            }
+        $email = $request->post('email');
+        $password = $request->post('password');
+        $user = $this->repository->findByEmail($email);
+        if ($user !== null && $user->verifyPassword($password)) {
+            $request->setSession('user', ['id' => $user->id, 'email' => $user->email]);
+            return Response::redirect('/');
         }
-        echo View::show('Login', array('errors' => $errors, 'formData' => $_POST));
+        return $this->view->render('Login', ['errors' => ['Email ou mot de passe incorrect.'], 'email' => $email]);
     }
-
-    public function loginForm(): void {
-        echo View::show('Login', array('errors' => [], 'formData' => []));
-    }
-    public function logoutAction(): void
-    {
-        session_destroy();
-        header('Location: /');
-        exit;
+    public function loginForm(): Response {
+        return $this->view->render('Login', array('errors' => [], 'formData' => []));
     }
 }

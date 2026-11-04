@@ -1,10 +1,14 @@
 <?php
 namespace App\Controller;
-use Core\View;
+use App\Core\{View,Request,Response};
 final class MentionsController
 {
-    public function mentionsForm(): void
+    private View $view;
+    public function __construct(View $view) {
+        $this->view = $view;
+    }
+    public function mentionsForm(): Response
     {
-        echo View::show('Mentions');
+        return $this->view->render('Mentions');
     }
 }

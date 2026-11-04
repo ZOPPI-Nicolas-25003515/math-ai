@@ -1,43 +1,48 @@
 <?php
 
 namespace App\Controller;
-
+use App\Core\{View,Request,Response};
 use App\Service\OpenRouterService;
-use Core\View;
 
 class AiassistantController
 {
-    public function aiassistantForm(): void
+    private View $view;
+    public function __construct(View $view) {
+        $this->view = $view;
+    }
+    public function aiassistantForm(): Response
     {
-        \Core\View::show('Aiassistant', [
-            'answer' => $answer ?? '',
-            'error' => $error ?? '',
-            'question' => $question ?? ''
-        ]);
+        return $this->view->render('Aiassistant', array( 'answer' => '',
+                'errors' => [],
+                'question' => '',
+            'formData' => [])
+        );
     }
 
-    public function aiassistantAction(): void
+    public function aiassistantAction(Request $request): Response
     {
-        $question = trim($_POST['question'] ?? '');
-        $answer = null;
-        $error = null;
+        $question = trim($request->post('question') ?? '');
+        $answer = '';
+        $errors = [];
 
         if ($question === '' || mb_strlen($question) > 2000) {
-            $error = 'Saisis une question de 1 à 2000 caractères.';
+            $errors[] = 'Saisis une question de 1 à 2000 caractères.';
         } else {
             try {
                 $service = new OpenRouterService();
                 $answer = $service->ask($question);
             } catch (\Throwable $e) {
                 error_log($e->getMessage());
-                $error = 'Impossible de contacter MathIA pour le moment.';
+                $errors[] = 'Impossible de contacter MathIA pour le moment.';
             }
         }
 
-        \Core\View::show('Aiassistant', [
+        return $this->view->render('Aiassistant', [
             'answer' => $answer,
-            'error' => $error,
-            'question' => $question ?? ''
+            'errors' => $errors,
+            'question' => $question,
+            'formData' => $request->post
+
         ]);
     }
 }

@@ -1,9 +1,15 @@
 <?php
 namespace App\Controller;
-use Core\View;
+use App\Core\{View,Response};
+
 final class HomeController{
-    public function homeForm(): void
+    private View $view;
+
+    public function __construct(View $view){
+        $this->view = $view;
+    }
+    public function homeForm(): Response
     {
-        echo View::show('Home');
+        return $this->view->render('Home');
     }
 }
