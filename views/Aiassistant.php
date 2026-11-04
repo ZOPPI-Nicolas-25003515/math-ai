@@ -1,11 +1,33 @@
 <?php
 use App\View\{Alert,Textarea,Button,Strong,Form,Input,Label,Layout,Link,Hypertext,Paragraph,Title,Container};
+use Libs\Parsedown;
+function markdownWithMaths(string $text): string
+{
+    $formula = [];
+
+    // Extraire \[ ... \] et \( ... \)
+    $text = preg_replace_callback(
+        '~\\\\\[.*?\\\\\]|\\\\\(.*?\\\\\)~s',
+        function ($m) use (&$formula) {
+            $cle = 'MATHPLACEHOLDER' . count($formula) . 'END';
+            // On échappe le HTML (<, >, &) pour rester en mode sûr
+            $formula[$cle] = htmlspecialchars($m[0], ENT_NOQUOTES, 'UTF-8');
+            return $cle;
+        },
+        $text
+    );
+
+    $parsedown = new Parsedown();
+    $parsedown->setSafeMode(true);
+    $html = $parsedown->text($text);
+
+    // Remettre les formules
+    return strtr($html, $formula);
+}
 
 /**
  * @var array<string> $errors
  */
-
-
 echo new Layout (
         'Assistant IA',isset($loggedUser),[
                 new Container('section',[
@@ -18,8 +40,8 @@ echo new Layout (
                     ]),
                     !empty($answer) ? new Container('section',[
                     new Title(2,['Réponse de l\'IA']),
-                        new Paragraph([nl2br(htmlspecialchars($answer, ENT_QUOTES, 'UTF-8'))])
-                    ],'class=answer') : new Paragraph([new Alert ($errors)],'class=error')
+                        new Paragraph([markdownWithMaths($answer)])
+                    ],'class=answer-content') : new Paragraph([new Alert ($errors)],'class=error')
                 ],'class=aiassistant')
         ]
 );
