@@ -3,7 +3,7 @@ namespace App\Controller;
 use App\Core\{View,Request,Response};
 use App\Model\UserRepository;
 use App\Model\UserMail;
-final class ForgottenpasswordteacherController
+final class ForgottenpasswordController
 {
     private View $view;
     public function __construct(private readonly UserRepository $repository, View $view) {

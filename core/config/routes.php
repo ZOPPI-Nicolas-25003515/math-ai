@@ -3,8 +3,8 @@
 use App\Controller\{HomeController,
     LoginteacherController,
     RegisterteacherController,
-    ForgottenpasswordteacherController,
-    ResetpasswordteacherController,
+    ForgottenpasswordController,
+    ResetpasswordController,
     ContactController,
     MentionsController,
     SitemapController,
@@ -21,7 +21,8 @@ use App\Controller\{HomeController,
     SettingsController,
     RegisterchoiceController,
     RegisternotaffiliatedController,
-    LoginnotaffiliatedController};
+    LoginnotaffiliatedController,
+    AddclassroomController};
 
 return [
     ['GET', '/', [HomeController::class, 'homeForm']],
@@ -32,10 +33,10 @@ return [
     ['GET', '/registerteacher', [RegisterteacherController::class, 'registerteacherForm']],
     ['POST', '/registerteacher', [RegisterteacherController::class, 'registerteacherAction']],
     ['GET', '/logout', [LoginteacherController::class, 'logoutAction']],
-    ['GET', '/forgottenpassword', [ForgottenpasswordteacherController::class, 'forgottenpasswordForm']],
-    ['POST', '/forgottenpassword', [ForgottenpasswordteacherController::class, 'forgottenpasswordAction']],
-    ['GET', '/resetpassword', [ResetpasswordteacherController::class, 'resetpasswordForm']],
-    ['POST', '/resetpassword', [ResetpasswordteacherController::class, 'resetpasswordAction']],
+    ['GET', '/forgottenpassword', [ForgottenpasswordController::class, 'forgottenpasswordForm']],
+    ['POST', '/forgottenpassword', [ForgottenpasswordController::class, 'forgottenpasswordAction']],
+    ['GET', '/resetpassword', [ResetpasswordController::class, 'resetpasswordForm']],
+    ['POST', '/resetpassword', [ResetpasswordController::class, 'resetpasswordAction']],
     ['GET', '/sitemap', [SitemapController::class, 'sitemapForm']],
     ['GET', '/contact', [ContactController::class, 'contactForm']],
     ['GET', '/mentions', [MentionsController::class, 'mentionsForm']],
@@ -72,4 +73,6 @@ return [
     ['POST','/registernotaffiliated',[RegisternotaffiliatedController::class, 'registernotaffiliatedAction']],
     ['GET','/loginnotaffiliated',[LoginnotaffiliatedController::class, 'loginnotaffiliatedForm']],
     ['POST','/loginnotaffiliated',[LoginnotaffiliatedController::class, 'loginnotaffiliatedAction']],
+    ['GET', '/addclassroom', [AddclassroomController::class, 'addclassroomForm']],
+    ['POST', '/addclassroom', [AddclassroomController::class, 'addclassroomAction']],
 ];
