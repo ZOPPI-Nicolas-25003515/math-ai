@@ -1,31 +1,25 @@
-<section class="aiassistant">
-    <h1>MathIA</h1>
+<?php
+use App\View\{Alert,Textarea,Button,Strong,Form,Input,Label,Layout,Link,Hypertext,Paragraph,Title,Container};
 
-    <p>Pose ta question à notre Assistant IA </p>
+/**
+ * @var array<string> $errors
+ */
 
-    <form method="POST" action="/aiassistant">
-        <label for="question">Version : Chat GPT 4</label>
 
-        <textarea
-                id="question"
-                name="question"
-                rows="5"
-                maxlength="2000"
-                required
-                placeholder="Exemple : Résous 2x + 5 = 15"
-        ><?= htmlspecialchars($question ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
-
-        <button type="submit">Envoyer</button>
-    </form>
-
-    <?php if (!empty($answer)): ?>
-        <section class="answer">
-            <h2>Réponses de MathIA</h2>
-            <p><?= nl2br(htmlspecialchars($answer, ENT_QUOTES, 'UTF-8')) ?></p>
-        </section>
-    <?php endif; ?>
-
-    <?php if (!empty($error)): ?>
-        <p class="error"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></p>
-    <?php endif; ?>
-</section>
+echo new Layout (
+        'Assistant IA',isset($loggedUser),[
+                new Container('section',[
+                        new Title(1,['MathAI']),
+                    new Paragraph(['Pose ta question à la LLM']),
+                    new Form ('/aiassistant','post',[
+                            new Label('question','question',['Version : Chat GPT 4']),
+                        new Textarea('question','question',5,2000,'Exemple : Résous 2x + 5 = 15','required',[htmlspecialchars($question ?? '', ENT_QUOTES, 'UTF-8')]),
+                        new Button('submit','',['Envoyer'])
+                    ]),
+                    !empty($answer) ? new Container('section',[
+                    new Title(2,['Réponse de l\'IA']),
+                        new Paragraph([nl2br(htmlspecialchars($answer, ENT_QUOTES, 'UTF-8'))])
+                    ],'class=answer') : new Paragraph([new Alert ($errors)],'class=error')
+                ],'class=aiassistant')
+        ]
+);

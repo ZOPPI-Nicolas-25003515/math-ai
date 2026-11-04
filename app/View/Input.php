@@ -14,13 +14,13 @@ final class Input extends Component
     public function render(): string
     {
         $name = $this->e($this->name);
-        $id = $this->e($this->id);
+        $id = $this->id;
         $type = $this->e($this->type);
-        $optional = $this->e($this->optional);
+        $optional = $this->optional;
 
         return
             <<<HTML
-                <input type="{$type}" id="{$name}" name="{$name}" {$optional}" required>
+                <input type="{$type}" id="{$id}" name="{$name}" {$optional} required>
             HTML;
     }
 }

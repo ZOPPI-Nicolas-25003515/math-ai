@@ -12,7 +12,7 @@ final class Alert extends Component
 
     public function render(): string
     {
-        $optional = $this->e($this->optional);
+        $optional = $this->optional;
         $par = '';
         foreach ($this->alerts as $alert) {
             $par .= '<p '. $optional . '>' . $alert . '</p>';

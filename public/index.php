@@ -13,7 +13,9 @@ use App\Controller\{HomeController,
     SettingsController,
     ContactController,
     MentionsController,
-    SitemapController};
+    SitemapController,
+    AiassistantController,
+};
 use App\Model\UserRepository;
 
 
@@ -39,7 +41,7 @@ $craft = [
     ContactController::class => fn() => new ContactController($view),
     MentionsController::class => fn() => new MentionsController($view),
     SitemapController::class => fn() => new SitemapController($view),
-    AiassistantController::class => fn() => new AiassistantController($repository, $view)
+    AiassistantController::class => fn() => new AiassistantController($view)
 ];
 
 $router = new Router(require $root . '/app/Core/config/routes.php', $view, $craft);

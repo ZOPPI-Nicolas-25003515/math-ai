@@ -9,7 +9,7 @@ final class Title extends Component
      * @param string $optional
      */
     public function __construct(
-        private int $size,
+        private int $size, //h1,h2,h3...
         private readonly array $children,
         private readonly string $optional = '') {
         if (0 >= $size || $size > 6) $this->size = 6;
@@ -17,7 +17,7 @@ final class Title extends Component
 
     public function render(): string
     {
-        $optional = $this->e($this->optional);
+        $optional = $this->optional;
         $size = $this->size;
         $par = $this->renderAll($this->children);
 

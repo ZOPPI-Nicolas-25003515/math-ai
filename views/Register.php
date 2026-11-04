@@ -1,6 +1,10 @@
 <?php
 use App\View\{Alert,Button,Form,Input,Label,Layout,Link,Hypertext,Paragraph,Title,Container};
 
+/**
+ * @var array $errors
+ */
+
 echo new Layout ('Register',isset($loggedUser),[
         new Title (1,['Inscription']),
     new Paragraph([new Alert ($errors)]),
@@ -19,10 +23,10 @@ echo new Layout ('Register',isset($loggedUser),[
                             ),
                             new Container ('li',[
                                             new Label('confirmation','confirmation',['Confirmation du mot de passe']),
-                                            new Input('confirmation','confirmation','confirmation','required')
+                                            new Input('password','confirmation','confirmation','required')
                                     ]
                             ),
-                            new Button('submit','','S\'inscrire')
+                            new Button('submit','',['S\'inscrire'])
                     ]),
 
 

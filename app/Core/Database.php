@@ -1,5 +1,9 @@
 <?php
 
+/*
+ * Permet la connexion à la base de données avec les identifiants récupérés depuis la classe Env
+ */
+
 namespace App\Core;
 use PDO;
 use PDOException;

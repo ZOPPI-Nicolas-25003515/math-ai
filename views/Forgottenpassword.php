@@ -2,8 +2,8 @@
 use App\View\{Alert,Button,Form,Input,Layout,Label,Link,Hypertext,Paragraph,Title,Container};
 
 /**
- * @param array $errors
- * @param string $message
+ * @var array $errors
+ * @var string $message
  */
 
 echo new Layout ('Forgotten passsword',isset($loggedUser),[
@@ -16,11 +16,10 @@ echo new Layout ('Forgotten passsword',isset($loggedUser),[
                                     new Label ('email','label',['E-mail']),
                                 new Input('email','email','email','required')
                             ]),
-                            new Button('submit','','Réinitialiser votre mot de passe')
+                            new Button('submit','',['Réinitialiser votre mot de passe'])
                     ])
             ]),
           new Paragraph(['Retour à la ',
                   new Hypertext('/login',['connexion'])])
     ])
-
 ]);

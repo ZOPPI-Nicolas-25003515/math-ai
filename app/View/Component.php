@@ -1,6 +1,10 @@
 <?php
 namespace App\View;
-use App\Model\User;
+
+/*
+ * Classe abstraite principale des composants, qui vont hériter de cette dernière et utiliser ses méthodes.
+ */
+
 abstract class Component
 {
     abstract public function render(): string;
@@ -10,14 +14,20 @@ abstract class Component
         return $this->render();
     }
 
+    /*
+     * Affiche le texte envoyé en paramètre dans htmlspecialchars, pour empêcher l'écriture de code java script dans une zone de texte
+     */
     protected function e(string $text): string
     {
         return htmlspecialchars($text, ENT_QUOTES);
     }
 
+    /*
+     * Affiche chaque variable du tableau et lorsqu'on trouve une instance de Component, on l'affiche avec render
+     * render() : Affiche l'html de l'objet concerné
+     */
     /**
-    * @param string $renderAll
-     * @string
+    * @param array $childs
      */
     protected function renderAll(array $childs): string
     {
@@ -27,9 +37,5 @@ abstract class Component
         }
 
         return $html;
-    }
-
-    public function bismillah(): string {
-        return 'lumière';
     }
 }

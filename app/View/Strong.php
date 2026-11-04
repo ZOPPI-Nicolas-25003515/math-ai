@@ -3,8 +3,12 @@ namespace App\View;
 
 final class Strong extends Component
 {
+    /**
+     * @param array $content
+     * @param string $optional
+     */
     public function __construct(
-        private readonly string $text,
+        private readonly array $content,
         private readonly string $optional = ''
     ) {
     }
@@ -12,12 +16,12 @@ final class Strong extends Component
     public function render(): string
     {
 
-        $text = $this->e($this->text);
-        $optional = $this->e($this->optional);
+        $par = $this->renderAll($this->content);
+        $optional = $this->optional;
 
         return
             <<<HTML
-                <strong {$optional}>{$text}</strong>
+                <strong {$optional}>{$par}</strong>
             HTML
             ;
     }

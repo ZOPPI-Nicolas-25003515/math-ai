@@ -13,10 +13,10 @@ final class Label extends Component
 
     public function render(): string
     {
-        $for = $this->e($this->for);
-        $id = $this->e($this->id);
+        $for = $this->for;
+        $id = $this->id;
         $label = $this->renderAll($this->label);
-        $optional = $this->e($this->optional);
+        $optional = $this->optional;
 
         return
             <<<HTML

@@ -2,7 +2,7 @@
 use App\View\{Alert,Button,Form,Input,Layout,Label,Link,Hypertext,Paragraph,Title,Container};
 
 /**
- * @param array $errors
+ * @var array $errors
  */
 
 echo new Layout ('Login',isset($loggedUser),
@@ -19,9 +19,9 @@ echo new Layout ('Login',isset($loggedUser),
                             ]),
                             new Container('li',[
                                 new Label('password','password',['Password']),
-                                    new Input('password','password','email','required')
+                                    new Input('password','password','password','required')
                             ]),
-                            new Button('submit','','Se connecter')
+                            new Button('submit','',['Se connecter'])
                             ])
                     ])
             ])
@@ -29,31 +29,3 @@ echo new Layout ('Login',isset($loggedUser),
                             new Hypertext('/register',['ici']), '.'])
                 ,new Paragraph([new Hypertext('/forgottenpassword',['Mot de passe oublié ?'])])
             ]);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

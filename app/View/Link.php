@@ -15,7 +15,7 @@ final class Link extends Component
     {
         $href = $this->e($this->href);
         $rel = $this->e($this->rel);
-        $optional = $this->e($this->optional);
+        $optional = $this->optional;
         return
             <<<HTML
                 <link rel="{$rel}" href= "{$href}" {$optional}>

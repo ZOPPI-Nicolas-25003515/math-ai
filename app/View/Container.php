@@ -15,7 +15,7 @@ final class Container extends Component
     public function render(): string
     {
         $type = $this->e($this->type);
-        $optional = $this->e($this->optional);
+        $optional = $this->optional;
         $par = $this->renderAll($this->content);
 
         return

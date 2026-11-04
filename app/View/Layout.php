@@ -17,8 +17,8 @@ final class Layout extends Component
     {
         $title = $this->e($this->title);
         $nav = $this->renderAll(!$this->isLogged
-                ? [new Hypertext('/', ['MathAI']), new Hypertext('/login', ['Connexion']), new Hypertext('/register', ['Inscription'])]
-                : [new Hypertext('/', ['MathAI']), new Hypertext('/logout', ['Déconnexion'])]);
+                ? [new Hypertext('/', ['MathAI']),new Hypertext('/aiassistant', ['Assistant IA']), new Hypertext('/login', ['Connexion']), new Hypertext('/register', ['Inscription'])]
+                : [new Hypertext('/', ['MathAI']),new Hypertext('/aiassistant', ['Assistant IA']), new Hypertext('/settings', ['Paramètres'])]);
         $footer = $this->renderAll([new Container('footer',
                 [new Container('ul',[
                         new Container('li',[new Hypertext('/',['Accueil'])]),
@@ -28,6 +28,11 @@ final class Layout extends Component
                 'footer')]);
         $links = $this->renderAll([new Link ('icon', '/res/image/logoMathAi.ico','type="image/x-icon"'),new Link ('stylesheet', '/res/css/style.css')]);
         $par = $this->renderAll($this->content);
+/*
+ * A ajouter :
+ * <script src="/res/js/mathjax-config.js"></script>
+ * <script defer src="/res/js/mathjax.js"></script>
+ */
 
         return
                 <<<HTML
@@ -36,6 +41,9 @@ final class Layout extends Component
                 <head>
                     <meta charset="UTF-8">
                     {$links}
+                    
+                    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+                    <script defer src="/res/js/main.js"></script>
                     <title>{$this->e($title)}</title>
 
                 </head>

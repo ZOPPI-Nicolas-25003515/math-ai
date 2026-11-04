@@ -1,44 +1,66 @@
 <?php
-$A_view = $A_view ?? [];
-$error = $A_view['errors'] ?? [];
-$showModal = !empty($error);
-?>
+use App\View\{Alert,Button,Strong,Form,Input,Label,Layout,Link,Hypertext,Paragraph,Title,Container};
 
-<h1>Profil</h1>
+/**
+ * @var array $errors
+ */
 
-<?php if (!empty($error)) { ?>
-    <p style="color: red;"><?= htmlspecialchars($error[0]) ?></p>
-<?php } ?>
+$showModal = !empty($errors);
 
-<section class="infoCard">
-    <h2>Informations du compte</h2>
-    <p><strong>Email :</strong> <?= htmlspecialchars($A_view['email'] ?? 'votre@email.com') ?></p>
-    <p><strong>Statut :</strong> Compte actif</p>
-</section>
+$condition = $showModal ? 'false' : 'true';
+$popupCond = $showModal ? ('"popup_block is-open" ' . 'aria-hidden=' . $condition) : ('popup_block ' . 'aria-hidden=' . $condition);
+$popupParams = 'id=modalForm class=' . $popupCond;
 
-<section class="infoCard">
-    <h2>Paramètres du compte</h2>
-    <button><a id="buttons" href="/logout">Déconnexion</a></button>
-    <button id="openDeleteModalBtn" type="button">Supprimer le compte</button>
-</section>
-
-<button><a id="buttons" href="/">Retour à l'accueil</a></button>
-
-<div id="modalForm" class="popup_block<?= $showModal ? ' is-open' : '' ?>" aria-hidden="<?= $showModal ? 'false' : 'true' ?>">
-    <div class="modal-backdrop" data-close-modal="true"></div>
-    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="deleteAccountTitle">
-        <button type="button" class="modal-close" data-close-modal="true" aria-label="Fermer la modale">×</button>
-        <h3 id="deleteAccountTitle">Confirmation de suppression</h3>
-        <p>Pour confirmer la suppression du compte, saisissez votre mot de passe.</p>
-
-        <form id="deleteAccountForm" action="/settings" method="post">
-            <label for="deletePassword">Mot de passe</label>
-            <input id="deletePassword" type="password" name="password" autocomplete="current-password" placeholder="Votre mot de passe" required>
-
-            <div class="modal-actions">
-                <button type="button" class="secondary" data-close-modal="true">Annuler</button>
-                <input type="submit" value="Supprimer mon compte">
-            </div>
-        </form>
-    </div>
-</div>
+echo new Layout('Paramètres',isset($loggedUser),[
+        new Title(1,['Profil']),
+    new Container('section',[
+            new Container('ul',[
+                    new Container('li',[
+                            new Title(2,['Informations du compte'])
+                    ]),
+                    new Container('li',[
+                            new Paragraph([new Strong(['E-mail :']), $loggedUser['email'] ?? 'Vous n\'êtez pas connecté.'])
+                    ]),
+                    new Container('li',[
+                            new Paragraph([new Strong(['Statut :']), isset($loggedUser) ? 'Compte actif' : 'Non connecté'])
+                    ])
+            ])
+    ],'class=infoCard'),
+        isset($loggedUser) ? new Container('section',[
+                new Container('ul',[
+                        new Container('li',[
+                                new Title(2,['Paramètres du compte'])
+                        ]),
+                        new Container('li',[
+                                new Button('submit','',[new Hypertext('/logout',['Déconnexion'],'id=buttons')])
+                        ]),
+                        new Container('li',[
+                                new Button('button','id=openDeleteModalBtn',['Supprimer le compte'])
+                        ])
+                ])
+        ],'class=infoCard') : '',
+    new Button ('submit','',[new Hypertext('/',['Retour à l\'accueil'],'id=buttons')]),
+    new Container('div',[
+            new Container('div',[],'class=modal-backdrop data-close-modal=true'),
+        new Container('div',[
+                new Button('button','class=modal-close data-close-modal=true aria-label="Fermer la modale"',['×']),
+            new Title (3,['Confirmation de suppression'],'id=deleteAccountTitle'),
+                new Paragraph([new Alert($errors)]),
+                new Paragraph(['Pour confirmer la suppression du compte, saisissez votre mot de passe.']),
+            new Form('/settings','post',[
+                    new Container('ul',[
+                            new Container('li',[
+                                    new Label('deletePassword','dPassword',['Mot de passe'])
+                            ]),
+                            new Container('li',[
+                                    new Input ('password','deletePassword','password','autocomplete=current-password placeholder="Votre mot de passe"')
+                            ])
+                    ]),
+                new Container('div',[
+                        new Button('button','class=secondary data-close-modal=true',['Annuler']),
+                    new Button('submit','',['Supprimer mon compte'])
+                ],'class=modal-actions')
+            ],'id=deleteAccountForm')
+        ],'class=modal-panel role=dialog aria-modal=true aria-labelledby=deleteAccountTitle'),
+    ],$popupParams )
+]);

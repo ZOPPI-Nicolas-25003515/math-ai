@@ -1,5 +1,9 @@
 <?php
 
+/*
+ * Lit dans le fichier dédié .env les informations nécessaires pour le bon fonctionnement du site (bases de données,mail...)
+ */
+
 namespace App\Core;
 
 use function PHPUnit\Framework\isEmpty;

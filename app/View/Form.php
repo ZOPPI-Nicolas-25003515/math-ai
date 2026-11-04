@@ -18,7 +18,7 @@ final class Form extends Component
     {
         $action = $this->e($this->action);
         $method = $this->e($this->method);
-        $optional = $this->e($this->optional);
+        $optional = $this->optional;
 
         $par = $this->renderAll($this->content);
         return

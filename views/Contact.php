@@ -8,7 +8,4 @@ new Container('section',[
         semaines du lundi au vendredi à l\'IUT 
         d\'Aix-en-Provence.'])
 ],'class=contact')
-])
-
-
-?>
+]);
