@@ -12,6 +12,9 @@ if($_SESSION['role'] == 'teacher'){?>
     </a>
     <a class="cardTitle" href="/addexercise">
         <h2>Ajouter exercice</h2>
+    </a>
+    <a class="cardTitle" href="/addclassroom">
+        <h2>Ajouter une classe</h2>
     </a><?php
 }
 ?>

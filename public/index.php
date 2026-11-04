@@ -15,8 +15,8 @@ use App\Controller\{AnalyseiaController,
     HomeController,
     LoginteacherController,
     RegisterteacherController,
-    ForgottenpasswordteacherController,
-    ResetpasswordteacherController,
+    ForgottenpasswordController,
+    ResetpasswordController,
     AccountsettingsController,
     SettingsController,
     ContactController,
@@ -28,7 +28,8 @@ use App\Controller\{AnalyseiaController,
     AddanswerexerciseController,
     AddclassController,
     RegisterchoiceController,
-    RegisternotaffiliatedController};
+    RegisternotaffiliatedController,
+    AddclassroomController};
 use App\Model\UserRepository;
 
 session_start();
@@ -37,8 +38,8 @@ $controllers = [
     HomeController::class     => fn() => new HomeController(),
     LoginteacherController::class      => fn() => new LoginteacherController($repository),
     RegisterteacherController::class => fn() => new RegisterteacherController($repository),
-    ForgottenpasswordteacherController::class => fn() => new ForgottenpasswordteacherController($repository),
-    ResetpasswordteacherController::class => fn() => new ResetpasswordteacherController($repository),
+    ForgottenpasswordController::class => fn() => new ForgottenpasswordController($repository),
+    ResetpasswordController::class => fn() => new ResetpasswordController($repository),
     AccountsettingsController::class => fn() => new AccountsettingsController($repository),
     SettingsController::class => fn() => new SettingsController($repository),
     ContactController::class => fn() => new ContactController(),
@@ -55,6 +56,7 @@ $controllers = [
     AddanswerexerciseController::class => fn() => new AddanswerexerciseController(),
     RegisterchoiceController::class => fn() => new RegisterchoiceController(),
     RegisternotaffiliatedController::class => fn() => new RegisternotaffiliatedController($repository),
+    AddclassroomController::class => fn() => new AddclassroomController($repository),
 ];
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';   // "/login?x=1" -> "/login"

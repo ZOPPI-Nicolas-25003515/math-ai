@@ -120,6 +120,31 @@ final class UserRepository {
         return new NotAffiliated($id, $notaffiliatedid , $titleid);
     }
 
+    public function createClassroom(int $teacherid, string $name): Classroom
+    {
+        $stmt = $this->pdo->prepare('INSERT INTO Classroom (teacher_id ,name_classroom) VALUES (:teacher_id, :name_classroom )');
+        $stmt->execute(['teacher_id' => $teacherid, 'name_classroom' => $name]);
+        $id = $this->pdo->lastInsertId();
+        $id = (int) $id;
+        return new Classroom($id, $teacherid , $name);
+    }
+
+    public function createParticipantClassroom(int $classroomid, int $studentid ): ParticipantClassroom
+    {
+        $stmt = $this->pdo->prepare('INSERT INTO Classroom (classroom_id ,student_id) VALUES (:classroom_id, :student_id )');
+        $stmt->execute(['classroom_id' => $classroomid, 'student_id' => $studentid]);
+        return new ParticipantClassroom($classroomid, $studentid);
+    }
+
+    public function createStudent(int $student_id,int $high_school_id,int $title_id = 1,int $rank_id,int $education_id,int $speciality_id)
+    {
+        $stmt = $this->pdo->prepare('INSERT INTO Classroom ( 	student_id ,high_school_id ,title_id ,rank_id ,education_id ,speciality_id) VALUES (:student_id, :high_school_id, :title_id, :rank_id, :education_id, :speciality_id )');
+        $stmt->execute(['student_id' => $student_id, 'high_school_id' => $high_school_id, 'title_id' => $title_id, 'rank_id' => $rank_id, 'education_id' => $education_id, 'speciality_id' => $speciality_id]);
+        $id = $this->pdo->lastInsertId();
+        $id = (int) $id;
+        return new Student($id, $student_id , $high_school_id ,$title_id ,$rank_id, $education_id ,$speciality_id);
+    }
+
     public function classTitleTeacher(int $teacherid, int $subject)
     {
         $stmt = $this->pdo->prepare('SELECT id,title FROM Class WHERE teacher_id = :teacher_id AND subject_id = :subject_id');
@@ -133,7 +158,6 @@ final class UserRepository {
         $stmt->execute(['id' => $id]);
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
-
     public function findExerciseByPath(string $path): ?Exercise{
         $stmt = $this->pdo->prepare('SELECT id ,teacher_id ,subject_id ,exercise_path ,type_name ,difficulty_name FROM Exercise WHERE  exercise_path = :exercise_text ');
         $stmt->execute(['exercise_path' => $path]);
@@ -180,6 +204,24 @@ final class UserRepository {
     public function takeHighSchool()
     {
         $stmt = $this->pdo->prepare('SELECT id, high_school_name FROM High_school ');
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+    public function takeRank()
+    {
+        $stmt = $this->pdo->prepare('SELECT  id ,rank_name FROM Rank ');
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+    public function takeEducation()
+    {
+        $stmt = $this->pdo->prepare('SELECT  id ,education_name FROM Education ');
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+    public function takeSpeciality()
+    {
+        $stmt = $this->pdo->prepare('SELECT  id ,speciality_name FROM Speciality ');
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }

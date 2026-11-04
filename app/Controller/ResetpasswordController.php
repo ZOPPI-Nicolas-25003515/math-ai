@@ -4,7 +4,7 @@ use Core\View;
 use App\Model\UserRepository;
 use App\Model\UserValidate;
 
-final class ResetpasswordteacherController
+final class ResetpasswordController
 {
     public function __construct(private readonly UserRepository $repository) {}
 
@@ -21,8 +21,8 @@ final class ResetpasswordteacherController
 
             $errLength = $userReset->checkPasswordLength();
             $errConf = $userReset->passwordConfirmation();
-            $errorPassUse = $this->repository -> verifyTeacherPasswordUsability($reset_token,$password);
-            $errorToken = $this->repository -> verifyTeacherToken($reset_token);
+            $errorPassUse = $this->repository -> verifyPasswordUsability($reset_token,$password);
+            $errorToken = $this->repository -> verifyToken($reset_token);
 
             if (!empty($errLength)) $errors[] = $errLength;
             if (!empty($errConf)) $errors[] = $errConf;
@@ -30,10 +30,10 @@ final class ResetpasswordteacherController
             if (!empty($errorToken)) $errors[] = $errorToken;
 
             if (empty($errors)) {
-                $user = $this->repository->updateTeacher($reset_token,$password);
+                $user = $this->repository->updateUser($reset_token,$password);
                 if (!empty($user)) {
                     $_SESSION['id'] = $user->id;
-                    $_SESSION['email'] = $user->email;
+                    $_SESSION['email'] = $user->mail;
                     header('Location: /');
                     $message = 'Votre mot de passe a été modifié.';
                     exit;
