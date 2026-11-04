@@ -19,7 +19,7 @@ final class Hypertext extends Component
     {
         $href = $this->e($this->href);
         $par = $this->renderAll($this->content);
-        $optional = $this->e($this->optional);
+        $optional = $this->optional;
 
         return
             <<<HTML

@@ -1,5 +1,9 @@
 <?php
 
+/*
+ * Contient toutes les variables de tableaux spéciales du sites (get,post,server,session...), les contrôleurs les récupèrent ici
+ */
+
 namespace App\Core;
 final class Request {
     public string $method;
@@ -16,7 +20,7 @@ final class Request {
         $this->session = $session;
     }
     public static function fromGlobals(): self {
-        return new Request($_SERVER['REQUEST_METHOD'],$_SERVER['REQUEST_URI'],$_GET,$_POST,$_SESSION);
+        return new Request($_SERVER['REQUEST_METHOD'],rtrim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/') ?: '/',$_GET,$_POST,$_SESSION);
     }
 
     public function post(string $key, $default = null): mixed {

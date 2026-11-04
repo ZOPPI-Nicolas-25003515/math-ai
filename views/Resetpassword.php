@@ -1,45 +1,28 @@
 <?php
-$A_view = $A_view ?? [];
-$errors = $A_view['errors'];
-$token = $A_view['token'];
-?>
+use App\View\{Alert,Button,Form,Input,Label,Layout,Link,Hypertext,Paragraph,Title,Container};
 
-<h1>Réinitialiser le mot de passe</h1>
+/**
+ * @var array $errors
+ * @var string $token
+ */
 
-<?php
-if(!empty($errors)){?>
-    <p style="color: red;"><?=htmlspecialchars($errors[0])?></p><?php
-}
-?>
-
-<span>
-   <form action="/resetpassword" method="post">
-     <ul>
-         <li>
-             <li>
-                 <label id = "label" for = "token" >Reset_token</label>
-             </li>
-             <li>
-                <input class="textInput" type="token" name="token" value="<?=htmlspecialchars($token)?>" required>
-            </li>
-         </li>
-         <li>
-             <li>
-                 <label id = "label" for = "password" >Mot de passe</label>
-             </li>
-             <li>
-                <input class="textInput" type="password" name="password" value="" required>
-            </li>
-         </li>
-         <li>
-            <li>
-                <label id = "label" for = "confirmation">Confirmation du mot de passe</label>
-            </li>
-            <li>
-                <input class="textInput" type="password" name="confirmation" value="" required>
-            </li>
-         </li>
-         <button type="submit">Valider</button>
-       </ul>
-   </form>
-</span>
+echo new Layout ('Réinitialisation do mot de passe',isset($loggedUser),[
+        new Title (1,['Réinitialiser le mot de passe']),
+    new Paragraph([new Alert($errors)]),
+        new Container ('span',[
+            new Form ('/resetpassword','post',[
+                    new Container('ul',[
+                            new Container('li',[
+                                    new Label('password','password',['Mot de passe']),
+                                new Input('password','password','password','class=textInput required')
+                            ]),
+                            new Container('li',[
+                                    new Label('confirmation','confirmation',['Confirmation du mot de passe']),
+                                    new Input('password','confirmation','confirmation','class=textInput required')
+                            ]),
+                        new Input('hidden', 'token','token', 'value=' . $token),
+                        new Button ('submit','',['Valider'])
+                    ])
+            ])
+        ])
+]);

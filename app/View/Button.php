@@ -6,15 +6,15 @@ final class Button extends Component
     public function __construct(
         private readonly string $type,
         private readonly string $optional = '',
-        private readonly string $par = '',
+        private readonly array $par = [],
     ) {
     }
 
     public function render(): string
     {
-        $optional = $this->e($this->optional);
+        $optional = $this->optional;
         $type = $this->e($this->type);
-        $par = $this->e($this->par);
+        $par = $this->renderAll($this->par);
 
         return
             <<<HTML

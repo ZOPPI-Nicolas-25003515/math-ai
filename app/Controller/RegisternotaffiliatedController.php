@@ -11,15 +11,15 @@ final class RegisternotaffiliatedController
     public function __construct(private readonly UserRepository $repository,View $view) {
         $this->view = $view;
     }
+
     public function registernotaffiliatedAction(): Response
     {
         $errors = [];
-        $success = false;
 
-        if (!empty($_POST)) {
-            $email =filter_var(trim($_POST['email'] ?? ''),FILTER_VALIDATE_EMAIL);
-            $password = $_POST['password'] ?? '';
-            $confirmation = $_POST['confirmation'] ?? '';
+        if (!empty($request->post)) {
+            $email =filter_var(trim($request->post('email') ?? ''),FILTER_VALIDATE_EMAIL);
+            $password = $request->post('password') ?? '';
+            $confirmation = $request->post('confirmation') ?? '';
             $teachername = $_POST['name'] ?? '';
             $surname = $_POST['surname'] ?? '';
             //$s_name = trim($_POST['name'] ?? ''); Nous ajouterons en effet un nom et prénom plus tard.
@@ -39,18 +39,15 @@ final class RegisternotaffiliatedController
                 if ($this->repository->emailExists($email)) {
                     $errors[] = 'Un compte existe déjà avec cet email.';
                 }else{
-                    $user = $this->repository->createUser($teachername, $surname, $email, $password);
-                    $teacher = $this->repository->createNotAffiliated($user->id);
-                    $success = true;
-                    $_SESSION['id'] = $user->id;
-                    $_SESSION['email'] = $user->mail;
-                    $_SESSION['role'] = 'notaffiliated';
-                    header('Location: /');
-                    exit;
+                    $user = $this->repository->createUser($email, $password);
+                    $request->setSession('id', $user->id);
+                    $request->setSession('email', $user->email);
+                    $request->setSession('user', ['id' => $user->id, 'email' => $user->email, 'role' => 'not_affiliated']);
+                    return Response::redirect('/');
                 }
             }
         }
-        return $this->view->render('Register', array( 'errors' => $errors, 'formData' => $_POST));
+        return $this->view->render('Register', array( 'errors' => $errors, 'formData' => $request->post));
     }
     public function registerForm(): Response {
         return $this->view->render('Register', array( 'errors' => [], 'formData' => []));

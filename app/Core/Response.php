@@ -1,5 +1,10 @@
 <?php
 namespace App\Core;
+
+/*
+ * Reçoit le corps du HTML de la vue et le header, affiche cette vue et renvoie vers la page du header
+ */
+
 final class Response {
 private int $status;
 private string $body;

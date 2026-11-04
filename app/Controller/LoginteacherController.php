@@ -10,8 +10,6 @@ final class LoginController
     }
     public function loginAction(Request $request): Response
     {
-        $errors = [];
-
         $email = $request->post('email');
         $password = $request->post('password');
         $user = $this->repository->findByEmail($email);
@@ -19,15 +17,9 @@ final class LoginController
             $request->setSession('user', ['id' => $user->id, 'email' => $user->email]);
             return Response::redirect('/');
         }
-        return $this->view->render('Login', ['error' => 'Email ou mot de passe incorrect.', 'email' => $email]);
+        return $this->view->render('Login', ['errors' => ['Email ou mot de passe incorrect.'], 'email' => $email]);
     }
     public function loginForm(): Response {
         return $this->view->render('Login', array('errors' => [], 'formData' => []));
-    }
-    public function logoutAction(Request $request): Response
-    {
-        session_destroy();
-        unset($request);
-        return Response::redirect('/');
     }
 }

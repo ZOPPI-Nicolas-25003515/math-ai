@@ -11,47 +11,37 @@ final class ResetpasswordController
         $this->view = $view;
     }
 
-    public function resetpasswordAction(): Response
+    public function resetpasswordAction(Request $request): Response
     {
         $errors = [];
-        $message = '';
+        $password = $request->post('password') ?? '';
+        $confirmation = $request->post('confirmation') ?? '';
+        $reset_token = $request->post('token') ?? '';
+        $userReset = new UserValidate('', $password, $confirmation);
 
-        if (!empty($_POST)) {
-            $password = $_POST['password'] ?? '';
-            $confirmation = $_POST['confirmation'] ?? '';
-            $reset_token =$_POST['token'] ?? '';
-            $userReset = new UserValidate('', $password, $confirmation);
+        $errLength = $userReset->checkPasswordLength();
+        $errConf = $userReset->passwordConfirmation();
+        $errorPassUse = $this->repository -> verifyPasswordUsability($reset_token,$password);
+        $errorToken = $this->repository->verifyToken($reset_token);
 
-            $errLength = $userReset->checkPasswordLength();
-            $errConf = $userReset->passwordConfirmation();
-            $errorPassUse = $this->repository -> verifyPasswordUsability($reset_token,$password);
-            $errorToken = $this->repository -> verifyToken($reset_token);
+        if (!empty($errLength)) $errors[] = $errLength;
+        if (!empty($errConf)) $errors[] = $errConf;
+        if (!empty($errorPassUse)) $errors[] = $errorPassUse;
+        if (!empty($errorToken)) $errors[] = $errorToken;
 
-            if (!empty($errLength)) $errors[] = $errLength;
-            if (!empty($errConf)) $errors[] = $errConf;
-            if (!empty($errorPassUse)) $errors[] = $errorPassUse;
-            if (!empty($errorToken)) $errors[] = $errorToken;
-
-            if (empty($errors)) {
-                $user = $this->repository->updateUser($reset_token,$password);
-                if (!empty($user)) {
-                    $_SESSION['id'] = $user->id;
-                    $_SESSION['email'] = $user->mail;
-                    header('Location: /');
-                    $message = 'Votre mot de passe a été modifié.';
-                    exit;
-                }
-                else {
-                    $errors[] = 'Une erreur est survenue.';
-                }
-            }
+        if (empty($errors)) {
+            $user = $this->repository->updateUser($reset_token, $password);
+            $request->session['id'] = $user->id;
+            $request->session['email'] = $user->email;
+            $request->setSession('user', ['id' => $user->id, 'email' => $user->email]);
+            Response::redirect('/');
         }
-        return $this->view->render('Resetpassword', array('errors' => $errors, 'formData' => $_POST, 'token' => $reset_token));
+        return $this->view->render('Resetpassword', array('errors' => $errors,'token' => $reset_token, 'formData' => $request->post));
     }
 
-    public function resetpasswordForm(): Response
+    public function resetpasswordForm(Request $request): Response
     {
-        return $this->view->render('Resetpassword', array('errors' => [], 'formData' => [], 'token' => $_GET['token'] ?? ''));
+        $reset_token = rtrim($request->get('token') ?? '', '"');
+        return $this->view->render('Resetpassword', array('errors' => [],'token' => $reset_token, 'formData' => []));
     }
-
 }

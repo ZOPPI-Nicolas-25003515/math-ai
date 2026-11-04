@@ -14,7 +14,7 @@ final class Paragraph extends Component
 
     public function render(): string
     {
-        $optional = $this->e($this->optional);
+        $optional = $this->optional;
         $par = $this->renderAll($this->children);
 
         return
