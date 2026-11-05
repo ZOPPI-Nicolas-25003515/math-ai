@@ -1,5 +1,5 @@
 <?php
-namespace App\View;
+namespace App\Tags;
 use App\Model\User;
 final class Layout extends Component
 {

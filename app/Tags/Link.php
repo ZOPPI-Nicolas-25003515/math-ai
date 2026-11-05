@@ -1,5 +1,5 @@
 <?php
-namespace App\View;
+namespace App\Tags;
 
 final class Link extends Component
 {

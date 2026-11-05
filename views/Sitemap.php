@@ -1,6 +1,6 @@
 <?php
 
-use App\View\{Alert,Button,Form,Input,Layout,Link,Hypertext,Paragraph,Title,Container};
+use App\Tags\{Alert,Button,Form,Input,Layout,Link,Hypertext,Paragraph,Title,Container};
 
 echo new Layout('Site map',isset($loggedUser),[new Container('section',[
         new Title (1,['Plan du site']),

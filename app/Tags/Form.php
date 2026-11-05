@@ -1,5 +1,5 @@
 <?php
-namespace App\View;
+namespace App\Tags;
 use App\View\Input;
 
 final class Form extends Component

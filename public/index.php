@@ -7,6 +7,7 @@ use App\Core\{View,
     Request};
 use App\Controller\{HomeController,
     LoginController,
+    LogoutController,
     RegisterController,
     ForgottenpasswordController,
     ResetpasswordController,
@@ -34,6 +35,7 @@ $view = new View($root . '/views', ['loggedUser' => $_SESSION['user'] ?? null]);
 $craft = [
     HomeController::class     => fn() => new HomeController($view),
     LoginController::class      => fn() => new LoginController($repository, $view),
+    LogoutController::class      => fn() => new LogoutController(),
     RegisterController::class => fn() => new RegisterController($repository, $view),
     ForgottenpasswordController::class => fn() => new ForgottenpasswordController($repository,$view),
     ResetPasswordController::class => fn() => new ResetpasswordController($repository,$view),

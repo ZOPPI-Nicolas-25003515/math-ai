@@ -1,13 +1,15 @@
 <?php
-namespace App\View;
+namespace App\Tags;
 
-final class Strong extends Component
+/**
+ * @param string $href
+ * @param array $content
+ * @param string $optional
+ */
+final class Hypertext extends Component
 {
-    /**
-     * @param array $content
-     * @param string $optional
-     */
     public function __construct(
+        private readonly string $href,
         private readonly array $content,
         private readonly string $optional = ''
     ) {
@@ -15,13 +17,13 @@ final class Strong extends Component
 
     public function render(): string
     {
-
+        $href = $this->e($this->href);
         $par = $this->renderAll($this->content);
         $optional = $this->optional;
 
         return
             <<<HTML
-                <strong {$optional}>{$par}</strong>
+                <a href="{$href}" {$optional}>{$par}</a>
             HTML
             ;
     }

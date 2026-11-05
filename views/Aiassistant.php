@@ -1,6 +1,6 @@
 <?php
-use App\View\{Alert,Textarea,Button,Strong,Form,Input,Label,Layout,Link,Hypertext,Paragraph,Title,Container};
-use Libs\Parsedown;
+use App\Tags\{Alert,Textarea,Button,Strong,Form,Input,Label,Layout,Link,Hypertext,Paragraph,Title,Container};
+use App\Libs\Parsedown;
 function markdownWithMaths(string $text): string
 {
     $formula = [];
