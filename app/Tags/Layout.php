@@ -48,11 +48,11 @@ final class Layout extends Component
                     {$nav}
                 </nav>
                 </header>
-
-                <main>
-                    {$par}
+                <main class="background">
+                    <div class="content">
+                        {$par}
+                    </div>
                 </main>
-
                 {$footer}
                 </body>
                 </html>
