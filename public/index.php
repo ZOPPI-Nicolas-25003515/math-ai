@@ -29,7 +29,7 @@ session_start();
 
 $repository = new UserRepository(Database::connexion($root));
 
-$view = new View($root . '/views', ['loggedUser' => $_SESSION['user'] ?? null]);
+$view = new View($root . '/app/View', ['loggedUser' => $_SESSION['user'] ?? null]);
 
 $craft = [
     HomeController::class     => fn() => new HomeController($view),
