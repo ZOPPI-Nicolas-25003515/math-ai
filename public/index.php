@@ -17,6 +17,8 @@ use App\Controller\{HomeController,
     AiassistantController,
 };
 use App\Model\UserRepository;
+use App\Libs\Parsedown;
+use App\Service\OpenRouterService;
 
 
 $root = __DIR__ . '/..';
@@ -29,7 +31,7 @@ session_start();
 
 $repository = new UserRepository(Database::connexion($root));
 
-$view = new View($root . '/app/View', ['loggedUser' => $_SESSION['user'] ?? null]);
+$view = new View($root . '/view', ['loggedUser' => $_SESSION['user'] ?? null]);
 
 $craft = [
     HomeController::class     => fn() => new HomeController($view),
