@@ -19,7 +19,7 @@ final class RegisternotaffiliatedController
         $success = false;
 
         if (!empty($request->post)) {
-            $email =filter_var(trim($request->post('email') ?? ''),FILTER_VALIDATE_EMAIL);
+            $email = filter_var(trim($request->post('email') ?? ''), FILTER_VALIDATE_EMAIL);
             $password = $request->post('password') ?? '';
             $confirmation = $request->post('confirmation') ?? '';
             $teachername = $_POST['name'] ?? '';
@@ -27,7 +27,7 @@ final class RegisternotaffiliatedController
             $highschoolid = $_POST['high_school'] ?? '';
             //$s_name = trim($_POST['name'] ?? ''); Nous ajouterons en effet un nom et prénom plus tard.
 
-            $userValidate = new UserValidate($email,$password,$confirmation);
+            $userValidate = new UserValidate($email, $password, $confirmation);
 
             $emailError = $userValidate->checkEmailValidity();
             $passwordError = $userValidate->checkPasswordLength();
@@ -41,7 +41,7 @@ final class RegisternotaffiliatedController
             if (empty($errors)) {
                 if ($this->repository->emailExists($email)) {
                     $errors[] = 'Un compte existe déjà avec cet email.';
-                }else{
+                } else {
                     $user = $this->repository->createUser($teachername, $surname, $email, $password);
                     $teacher = $this->repository->createNotAffiliated($user->id, $highschoolid);
                     $request->setSession('id', $user->id);
@@ -51,11 +51,12 @@ final class RegisternotaffiliatedController
                 }
             }
         }
-        return $this->view->render('Register', array( 'errors' => $errors, 'formData' => $request->post));
+        return $this->view->render('Register', array('errors' => $errors, 'formData' => $request->post));
     }
 
 
-   public function registerForm(): Response {
-        return $this->view->render('Register', array( 'errors' => [], 'formData' => []));
+    public function registerForm(): Response
+    {
+        return $this->view->render('Register', array('errors' => [], 'formData' => []));
     }
 }
