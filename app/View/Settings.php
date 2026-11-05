@@ -38,7 +38,7 @@ echo new Layout('Paramètres',isset($loggedUser),[
                                 new Button('button','id=openDeleteModalBtn',['Supprimer le compte'])
                         ]),
                         new Container('li',[
-                                new Button('submit','',[new Hypertext('/forgottenpassword',['Réinitiliser le mot de passe'],'id=buttons')])
+                                new Button('submit','',[new Hypertext('/forgottenpassword',['Réinitialiser le mot de passe'],'id=buttons')])
                         ])
                 ])
         ],'class=infoCard') : '',
