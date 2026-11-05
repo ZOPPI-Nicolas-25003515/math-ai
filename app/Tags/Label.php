@@ -1,26 +1,26 @@
 <?php
-namespace App\View;
+namespace App\Tags;
 
-final class Input extends Component
+final class Label extends Component
 {
     public function __construct(
-        private readonly string $type,
+        private readonly string $for,
         private readonly string $id,
-        private readonly string $name,
+        private readonly array $label,
         private readonly string $optional = ''
     ) {
     }
 
     public function render(): string
     {
-        $name = $this->e($this->name);
+        $for = $this->for;
         $id = $this->id;
-        $type = $this->e($this->type);
+        $label = $this->renderAll($this->label);
         $optional = $this->optional;
 
         return
             <<<HTML
-                <input type="{$type}" id="{$id}" name="{$name}" {$optional} required>
+                <label id="{$id}" for="{$for}" {$optional}>{$label}</label>
             HTML;
     }
 }

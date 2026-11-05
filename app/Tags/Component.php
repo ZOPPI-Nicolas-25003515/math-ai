@@ -1,5 +1,5 @@
 <?php
-namespace App\View;
+namespace App\Tags;
 
 /*
  * Classe abstraite principale des composants, qui vont hériter de cette dernière et utiliser ses méthodes.
