@@ -1,3 +1,0 @@
-<?php
-?>
-<h1> Une erreur est survenue. <h1>
