@@ -7,7 +7,6 @@ use App\Core\{View,
     Request};
 
 use App\Controller\{AnalyseiaController,
-    AssistantiaController,
     ClassiaController,
     ExerciseiaController,
     AiassistantController,

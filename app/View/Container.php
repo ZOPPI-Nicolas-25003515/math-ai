@@ -9,7 +9,9 @@ final class Container extends Component
      * @param string $optional
      */
     public function __construct(
-        private readonly string $type,private readonly array $content,private readonly string $optional = '') {
+        private readonly string $type,
+        private readonly array $content,
+        private readonly string $optional = '') {
     }
 
     public function render(): string

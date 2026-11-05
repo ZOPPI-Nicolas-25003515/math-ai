@@ -1,3 +1,4 @@
+
 <?php
 ?>
 <h1>Exercice sur la reponse de l'IA</h1>
