@@ -1,5 +1,5 @@
 <?php
-use App\View\{Alert,Button,Strong,Form,Input,Label,Layout,Link,Hypertext,Paragraph,Title,Container};
+use App\Tags\{Alert,Button,Strong,Form,Input,Label,Layout,Link,Hypertext,Paragraph,Title,Container};
 
 /**
  * @var array $errors
@@ -36,6 +36,9 @@ echo new Layout('Paramètres',isset($loggedUser),[
                         ]),
                         new Container('li',[
                                 new Button('button','id=openDeleteModalBtn',['Supprimer le compte'])
+                        ]),
+                        new Container('li',[
+                                new Button('submit','',[new Hypertext('/forgottenpassword',['Réinitiliser le mot de passe'],'id=buttons')])
                         ])
                 ])
         ],'class=infoCard') : '',

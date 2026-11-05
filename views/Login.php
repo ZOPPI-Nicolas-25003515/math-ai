@@ -1,5 +1,5 @@
 <?php
-use App\View\{Alert,Button,Form,Input,Layout,Label,Link,Hypertext,Paragraph,Title,Container};
+use App\Tags\{Alert,Button,Form,Input,Layout,Label,Link,Hypertext,Paragraph,Title,Container};
 
 /**
  * @var array $errors
