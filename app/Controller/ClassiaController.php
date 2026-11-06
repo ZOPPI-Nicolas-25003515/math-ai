@@ -1,12 +1,17 @@
 <?php
 namespace App\Controller;
-use App\Core\{View,Request,Response};
+use App\Core\{View,Response};
 
 
 final class ClassiaController
 {
-    public function classiaForm(): void
+    private View $view;
+
+    public function __construct(View $view) {
+        $this->view = $view;
+    }
+    public function classiaForm(): Response
     {
-        echo View::show('Classia');
+        return $this->view->render('Classia', array('errors' => [], 'formData' => []));
     }
 }

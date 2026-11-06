@@ -1,66 +1,54 @@
 <?php
 namespace App\Controller;
 
-use Core\View;
+use App\Core\{View,Request,Response};
 use App\Model\UserRepository;
 
 final class AccountsettingsController {
-    public function __construct(private readonly ?UserRepository $repository){}
 
-    public function settingsForm(): void
+    private View $view;
+    public function __construct(private readonly UserRepository $repository, View $view) {
+        $this->view = $view;
+    }
+    public function settingsForm(Request $request): Response
     {
-        $email = $_SESSION['email'] ?? null;
+        $email = $request->session('email');
 
         if ($email === null) {
-            header('Location: /login');
-            exit;
+            return Response::redirect('/login');
         }
 
         $user = $this->repository->findByEmail($email);
 
         if ($user === null) {
             unset($_SESSION['email'], $_SESSION['id']);
-            header('Location: /login');
-            exit;
+            return Response::redirect('/login');
         }
-
-        echo View::show('AccountSettings', [
-            'email' => $user->getEmail(),
-            'errors' => [],
-        ]);
+        return $this->view->render('AccountSettings', ['errors' => [], 'email' => $user->getEmail()]);
     }
 
-    public function deleteAction(): void
+    public function deleteAction(Request $request): Response
     {
-        $email = $_SESSION['email'] ?? null;
-        $password = $_POST['password'] ?? '';
+        $email = $request->session('email');
+        $password = $request->session('password');
+
 
         if ($email === null) {
-            header('Location: /login');
-            exit;
+            return Response::redirect('/login');
         }
 
         if (trim((string) $password) === '') {
-            echo View::show('AccountSettings', [
-                'email' => $email,
-                'errors' => ['Le mot de passe est requis pour supprimer le compte.'],
-            ]);
-            return;
+            return $this->view->render('AccountSettings', ['errors' => ['Le mot de passe est requis pour supprimer le compte.'], 'email' =>$email]);
         }
 
         try {
             $this->repository->deleteUser($email, (string) $password);
         } catch (\InvalidArgumentException $e) {
-            echo View::show('AccountSettings', [
-                'email' => $email,
-                'errors' => [$e->getMessage()],
-            ]);
-            return;
+            return $this->view->render('AccountSettings', ['errors' => [$e->getMessage()], 'email' =>$email]);
         }
 
         session_unset();
         session_destroy();
-        header('Location: /');
-        exit;
+        return Response::redirect('/');
     }
 }

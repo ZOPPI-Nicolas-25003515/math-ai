@@ -4,29 +4,31 @@ namespace App\Controller;
 
 use App\Model\UserFile;
 use App\Model\UserRepository;
-use App\Model\UserValidate;
-use Core\View;
+use App\Core\{View,Request,Response};
 
 final class AddexerciseController
 {
-    public function __construct(private readonly UserRepository $repository) {}
+    private View $view;
 
-    public function addexerciseAction(): void
+    public function __construct(private readonly UserRepository $repository, View $view) {
+        $this->view = $view;
+    }
+    public function addexerciseAction(Request $request): Response
     {
         $errors = [];
         $success = false;
 
         if (!empty($_POST)) {
 
-            $subject = isset($_POST['subject']) ? (int) $_POST['subject'] : 0;
+            $subject =(int) $request->post('subject');
 
-            if ($subject <= 0) {
+            if (empty($subject)) {
                 $errors[] = 'Veuillez sélectionner un sujet valide.';
             }
 
-            $teacherid = (int) $_SESSION['id'];
-            $type = $_POST['type'] ?? '';
-            $difficulty = $_POST['difficulty'] ?? '';
+            $type = $request->post('type');
+            $difficulty = $request->post('difficulty');
+            $teacherid = (int) $request->session('id');
 
             $fileData = $_FILES['pdf_file'] ?? [];
             $path = $fileData['name'] ?? '';
@@ -35,8 +37,8 @@ final class AddexerciseController
 
             $fileError = $userFile->copyExerciseS($_FILES['pdf_file']);
 
-            if ($teacherid <= 0) {
-                $errors[] = 'Vous devez être connecté en tant que professeur pour ajouter un cours.';
+            if (empty($teacherid)) {
+                $errors[] = 'Vous devez être connecté en tant que professeur pour ajouter un exercise.';
             }
 
             if (!empty($fileError)) $errors[] = $fileError;
@@ -46,17 +48,15 @@ final class AddexerciseController
                     $errors[] = 'Un de vos exercice à deja ce nom';
                 }else{
                     $exercise = $this->repository->createExercise($teacherid,$subject,$path,$type,$difficulty);
-                    $success = true;
-                    header('/answerexercise');
-                    exit;
+                    return Response::redirect('/answerexercise');
                 }
             }
         }
-        echo View::show('Addclass', array( 'errors' => $errors,'success' => $success, 'formData' => $_POST));
+        return $this->view->render('Addclass', array('errors' => [$errors], 'formData' => [$_POST]));
     }
 
-    public function addexerciseForm(): void
+    public function addexerciseForm(): Response
     {
-        echo View::show('Addexercise');
+        return $this->view->render('Addexercise', array('errors' => [], 'formData' => []));
     }
 }

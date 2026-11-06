@@ -4,55 +4,21 @@ namespace App\Controller;
 
 use App\Model\UserFile;
 use App\Model\UserRepository;
-use Core\View;
+use App\Core\{View,Request,Response};
 
-class AddclassroomController
+final class AddclassroomController
 {
-    public function __construct(private readonly UserRepository $repository) {}
+    private View $view;
 
-    public function addclassroomAction(): void
-    {
-        $errors = [];
-        $success = false;
-
-        if (!empty($_POST)) {
-
-            $subject = isset($_POST['subject']) ? (int) $_POST['subject'] : 0;
-            if ($subject <= 0) {
-                $errors[] = 'Veuillez sélectionner un sujet valide.';
-            }
-
-            $title = $_POST['titre_cours'] ?? '';
-            $teacherid = (int) $_SESSION['id'];
-
-            $fileData = $_FILES['pdf_file'] ?? [];
-            $path = $fileData['name'] ?? '';
-
-            $userFile = new UserFile();
-
-            $fileError = $userFile->copyClass($_FILES['pdf_file']);
-
-            if ($teacherid <= 0) {
-                $errors[] = 'Vous devez être connecté en tant que professeur pour ajouter un cours.';
-            }
-
-            if (!empty($fileError)) $errors[] = $fileError;
-
-            if (empty($errors)) {
-                if ($this->repository->pathExists($path,$teacherid)) {
-                    $errors[] = 'Un de vos cours à deja ce nom';
-                }else{
-                    $class = $this->repository->createClass($path,$teacherid,$title,$subject);
-                    $success = true;
-                    header('Location: /');
-                    exit;
-                }
-            }
-        }
-        echo View::show('Addclassroom', array( 'errors' => $errors,'success' => $success, 'formData' => $_POST));
+    public function __construct(private readonly UserRepository $repository, View $view) {
+        $this->view = $view;
     }
-    public function addclassroomForm(): void
+    public function addclassroomAction(Request $request): Response
     {
-        echo View::show('Addclassroom');
+        return Response::redirect('/');
+    }
+    public function addclassroomForm(): Response
+    {
+        return $this->view->render('Addclass', array('errors' => [], 'formData' => []));
     }
 }

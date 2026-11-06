@@ -4,57 +4,51 @@ namespace App\Controller;
 
 use App\Model\UserFile;
 use App\Model\UserRepository;
-use Core\View;
+use App\Core\{View,Request,Response};
 
-class AddclassController
+final class AddclassController
 {
+    private View $view;
 
-    public function __construct(private readonly UserRepository $repository) {}
+    public function __construct(private readonly UserRepository $repository, View $view) {
+        $this->view = $view;
+    }
 
-    public function addclassAction(): void
+    public function addclassAction(Request $request): Response
     {
-        $errors = [];
-        $success = false;
+        $subject =(int) $request->post('subject');
+        if (empty($subject)) {
+            $errors[] = 'Veuillez sélectionner un sujet valide.';
+        }
 
-        if (!empty($_POST)) {
+        $title = $request->post('titre_cours');
+        $teacherid = (int) $request->session('id');
 
-            $subject = isset($_POST['subject']) ? (int) $_POST['subject'] : 0;
-            if ($subject <= 0) {
-                $errors[] = 'Veuillez sélectionner un sujet valide.';
-            }
+        $fileData = $_FILES['pdf_file'] ?? [];
+        $path = $fileData['name'] ?? '';
 
-            $title = $_POST['titre_cours'] ?? '';
-            $teacherid = (int) $_SESSION['id'];
+        $userFile = new UserFile();
 
-            $fileData = $_FILES['pdf_file'] ?? [];
-            $path = $fileData['name'] ?? '';
+        $fileError = $userFile->copyClass($_FILES['pdf_file']);
 
-            $userFile = new UserFile();
+        if (empty($teacherid)) {
+            $errors[] = 'Vous devez être connecté en tant que professeur pour ajouter un cours.';
+        }
 
-            $fileError = $userFile->copyClass($_FILES['pdf_file']);
+        if (!empty($fileError)) $errors[] = $fileError;
 
-            if ($teacherid <= 0) {
-                $errors[] = 'Vous devez être connecté en tant que professeur pour ajouter un cours.';
-            }
-
-            if (!empty($fileError)) $errors[] = $fileError;
-
-            if (empty($errors)) {
-                if ($this->repository->pathExists($path,$teacherid)) {
-                    $errors[] = 'Un de vos cours à deja ce nom';
-                }else{
-
-                    $class = $this->repository->createClass($path,$teacherid,$title,$subject);
-                    $success = true;
-                    header('Location: /');
-                    exit;
-                }
+        if (empty($errors)) {
+            if ($this->repository->pathExists($path,$teacherid)) {
+                $errors[] = 'Un de vos cours à deja ce nom';
+            }else{
+                $class = $this->repository->createClass($path,$teacherid,$title,$subject);
+                return Response::redirect('/');
             }
         }
-        echo View::show('Addclass', array( 'errors' => $errors,'success' => $success, 'formData' => $_POST));
+        return $this->view->render('Addclass', ['errors' => [$errors], 'formData' => $_POST]);
     }
-    public function addclassForm(): void
+    public function addclassForm(): Response
     {
-        echo View::show('Addclass');
+        return $this->view->render('Addclass', array('errors' => [], 'formData' => []));
     }
 }

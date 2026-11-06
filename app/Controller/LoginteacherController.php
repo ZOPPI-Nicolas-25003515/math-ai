@@ -2,13 +2,13 @@
 namespace App\Controller;
 use App\Core\{View,Request,Response};
 use App\Model\UserRepository;
-final class LoginController
+final class LoginteacherController
 {
     private View $view;
     public function __construct(private readonly UserRepository $repository, View $view) {
         $this->view = $view;
     }
-    public function loginAction(Request $request): Response
+    public function loginteacherAction(Request $request): Response
     {
         $email = $request->post('email');
         $password = $request->post('password');
@@ -19,7 +19,7 @@ final class LoginController
         }
         return $this->view->render('Login', ['errors' => ['Email ou mot de passe incorrect.'], 'email' => $email]);
     }
-    public function loginForm(): Response {
+    public function loginteacherForm(): Response {
         return $this->view->render('Login', array('errors' => [], 'formData' => []));
     }
 }
