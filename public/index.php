@@ -16,6 +16,7 @@ use App\Controller\{HomeController,
     MentionsController,
     SitemapController,
     AiassistantController,
+    Profileresetpassword
 };
 use App\Model\UserRepository;
 
@@ -43,7 +44,8 @@ $craft = [
     ContactController::class => fn() => new ContactController($view),
     MentionsController::class => fn() => new MentionsController($view),
     SitemapController::class => fn() => new SitemapController($view),
-    AiassistantController::class => fn() => new AiassistantController($view)
+    AiassistantController::class => fn() => new AiassistantController($view),
+    Profileresetpassword::class => fn() => new Profileresetpassword($repository)
 ];
 
 $router = new Router(require $root . '/app/Core/config/routes.php', $view, $craft);
