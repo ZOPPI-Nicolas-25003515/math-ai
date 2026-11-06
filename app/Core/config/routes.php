@@ -10,6 +10,7 @@ use App\Controller\{HomeController,
     SitemapController,
     AiassistantController,
     SettingsController,
+    Profileresetpassword,
     LogoutController};
 
 return [
@@ -30,5 +31,6 @@ return [
     ['GET', '/aiassistant', [AiassistantController::class, 'aiassistantForm']],
     ['POST', '/aiassistant', [AiassistantController::class, 'aiassistantAction']],
     ['GET', '/settings', [SettingsController::class, 'settingsForm']],
-    ['POST', '/settings', [SettingsController::class, 'deleteAction']]
+    ['POST', '/settings', [SettingsController::class, 'deleteAction']],
+    ['GET', '/profileresetpassword', [Profileresetpassword::class, 'profileresetpasswordAction']],
 ];

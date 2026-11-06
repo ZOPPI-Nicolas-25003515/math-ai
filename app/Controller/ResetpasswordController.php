@@ -34,7 +34,7 @@ final class ResetpasswordController
             $request->session['id'] = $user->id;
             $request->session['email'] = $user->email;
             $request->setSession('user', ['id' => $user->id, 'email' => $user->email]);
-            Response::redirect('/');
+            return Response::redirect('/');
         }
         return $this->view->render('Resetpassword', array('errors' => $errors,'token' => $reset_token, 'formData' => $request->post));
     }
