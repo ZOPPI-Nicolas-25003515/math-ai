@@ -41,7 +41,7 @@ echo new Layout (
                     !empty($answer) ? new Container('section',[
                     new Title(2,['Réponse de l\'IA']),
                         new Paragraph([markdownWithMaths($answer)])
-                    ],'class=answer-content') : new Paragraph([new Alert ($errors)],'class=error')
-                ],'class=aiassistant')
+                    ],'') : new Paragraph([new Alert ($errors)],'')
+                ],'')
         ]
 );
