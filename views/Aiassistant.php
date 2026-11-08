@@ -1,5 +1,5 @@
 <?php
-use App\Tags\{Alert,Textarea,Button,Strong,Form,Input,Label,Layout,Link,Hypertext,Paragraph,Title,Container};
+use App\Tags\{Alert,Textarea,Button,Strong,Form,Input,Label,Layout,Link,Hypertext,Paragraph,Title,Container,RawHtml};
 use App\Libs\Parsedown;
 function markdownWithMaths(string $text): string
 {
@@ -39,9 +39,9 @@ echo new Layout (
                         new Button('submit','',['Envoyer'])
                     ]),
                     !empty($answer) ? new Container('section',[
-                    new Title(2,['Réponse de l\'IA']),
-                        new Paragraph([markdownWithMaths($answer)])
-                    ],'class=answer-content') : new Paragraph([new Alert ($errors)],'class=error')
+                        new Title(2,['Réponse de l\'IA']),
+                        new Container('div',[new RawHtml(markdownWithMaths($answer))],'class=answer-content')
+                    ],'class=answer') : new Paragraph([new Alert ($errors)],'class=error')
                 ],'class=aiassistant')
         ]
 );
