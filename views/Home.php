@@ -7,16 +7,16 @@ use App\Tags\{Alert,Button,Form,Input,Layout,Link,Hypertext,Paragraph,Title,Cont
 
 echo (new Layout('MathAi',isset($loggedUser),[
 isset($loggedUser) ? new Title(
-        2,['Bonjour, ' . $loggedUser['email']]) : '',
+        3,['Bonjour, ' . $loggedUser['email']]) : '',
     new Container('div',[ new Title(
         1,['Accueil'])],''),
-    new Paragraph(['Une application web interactive destinée aux lycéens, permettant d’explorer l’utilisation des intelligences artificielles génératives, et notamment des LLM, pour apprendre les mathématiques.'],''),
+    new Paragraph(['Une application web interactive destinée aux lycéens, permettant d’explorer l’utilisation des intelligences artificielles génératives, et notamment des LLM, pour apprendre les mathématiques.'],'class=homeDescription'),
     new Container('div',[
             new Hypertext('/analyseia',[
                     new Container('div',[
                             new Title(2,['Analyse la réponse d\'une LLM']),
-                        new Paragraph(['Paragraphe'])
-                    ], '')
-            ],'')
-    ],'')
+                        new Paragraph(['Description'])
+                    ], 'class=infoCard')
+            ],'class=cardTitle')
+    ],'class=infoCard-grid')
 ]))->render();

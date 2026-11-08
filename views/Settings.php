@@ -12,19 +12,20 @@ $popupCond = $showModal ? ('"popup_block is-open" ' . 'aria-hidden=' . $conditio
 $popupParams = 'id=modalForm class=' . $popupCond;
 
 echo new Layout('Paramètres',isset($loggedUser),[
+    new Container('div', [
     new Title(1,['Profil']),
     new Container('section',[
         new Container('ul',[
             new Container('li',[
                 new Title(2,['Informations du compte'])
-            ]),
+            ],'class=profileInfos'),
             new Container('li',[
                 new Paragraph([new Strong(['E-mail :']), $loggedUser['email'] ?? 'Vous n\'êtez pas connecté.'])
-            ]),
+            ],'class=profileInfos'),
             new Container('li',[
                 new Paragraph([new Strong(['Statut :']), isset($loggedUser) ? 'Compte actif' : 'Non connecté'])
-            ])
-        ])
+            ],'class=profileInfos')
+        ],'class=centeredPlaced')
     ],'class=infoCard'),
     isset($loggedUser) ? new Container('section',[
         new Container('ul',[
@@ -32,17 +33,17 @@ echo new Layout('Paramètres',isset($loggedUser),[
                 new Title(2,['Paramètres du compte'])
             ]),
             new Container('li',[
-                new Button('submit','',[new Hypertext('/logout',['Déconnexion'],'id=buttons')])
+                new Hypertext('/logout',['Déconnexion'],'class=fakeButton')
             ]),
             new Container('li',[
                 new Button('button','id=openDeleteModalBtn',['Supprimer le compte'])
             ]),
             new Container('li',[
-                new Button('submit','',[new Hypertext('/profileresetpassword',['Réinitialiser le mot de passe'],'id=buttons')])
+                new Hypertext('/profileresetpassword',['Réinitialiser le mot de passe'],'class=fakeButton')
             ])
         ])
     ],'class=infoCard') : '',
-    new Button ('submit','',[new Hypertext('/',['Retour à l\'accueil'],'id=buttons')]),
+    new Hypertext('/',['Retour à l\'accueil'],'class=fakeButton')],'class=profile'),
     new Container('div',[
         new Container('div',[],'class=modal-backdrop data-close-modal=true'),
         new Container('div',[

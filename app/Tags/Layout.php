@@ -81,9 +81,7 @@ final class Layout extends Component
                 </nav>
                 </header>
                 <main >
-                    <div >
-                        {$par}
-                    </div>
+                     {$par}
                 </main>
                 {$footer}
                 </body>

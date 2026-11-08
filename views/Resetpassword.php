@@ -21,7 +21,8 @@ echo new Layout ('Réinitialisation do mot de passe',isset($loggedUser),[
                                     new Input('password','confirmation','confirmation','')
                             ]),
                         new Input('hidden', 'token','token', 'value=' . $token),
-                        new Button ('submit','',['Valider'])
+                        new Container('div',[new Button ('submit','class=postButton',['Valider'])])
+
                     ])
             ])
         ])

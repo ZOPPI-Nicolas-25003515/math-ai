@@ -24,9 +24,9 @@ echo new Layout ('Login',isset($loggedUser),
                                         new Hypertext('/forgottenpassword',['Mot de passe oublié ?'],'class=forgotpassword')],'class=rightPlaced')
                             ],'')
                             ],''),
-                        new Container('div',[
-                            new Button('submit','',['Se connecter'])
-                        ],'class=centeredPlaced')
+                        new Container('li',[
+                            new Button('submit','class=postButton',['Se connecter'])
+                        ])
 
                     ])
                 ,new Paragraph(['Vous n\'avez pas de compte ? Inscrivez-vous ',
