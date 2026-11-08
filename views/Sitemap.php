@@ -38,5 +38,5 @@ echo new Layout('Site map',isset($loggedUser),[new Container('section',[
                             new Hypertext('/aiassistant',['Assistant IA'])])
             ]),
     ])
-],'class=sitemap')]);
+],'')]);
 

@@ -16,7 +16,7 @@ echo new Layout ('Forgotten passsword',isset($loggedUser),[
                                     new Label ('email','label',['E-mail']),
                                 new Input('email','email','email','required')
                             ]),
-                            new Button('submit','',['Réinitialiser votre mot de passe'])
+                            new Container('li',[new Button('submit','class=postButton',['Réinitialiser votre mot de passe'])])
                     ])
             ]),
           new Paragraph(['Retour à la ',

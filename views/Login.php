@@ -14,18 +14,23 @@ echo new Layout ('Login',isset($loggedUser),
                     new Form('/login','post',[
                     new Container('ul',[
                             new Container('li',[
-                                new Label('email','email',['E-mail']),
+                                new Label('email','email',['Adresse mail']),
                                     new Input('email','email','email','required')
-                            ]),
+                            ],''),
                             new Container('li',[
-                                new Label('password','password',['Password']),
-                                    new Input('password','password','password','required')
-                            ]),
-                            new Button('submit','',['Se connecter'])
-                            ])
+                                new Label('password','password',['Mot de passe']),
+                                    new Input('password','password','password','required'),
+                                new Container('div',[
+                                        new Hypertext('/forgottenpassword',['Mot de passe oublié ?'],'class=forgotpassword')],'class=rightPlaced')
+                            ],'')
+                            ],''),
+                        new Container('li',[
+                            new Button('submit','class=postButton',['Se connecter'])
+                        ])
+
                     ])
-            ])
                 ,new Paragraph(['Vous n\'avez pas de compte ? Inscrivez-vous ',
-                            new Hypertext('/register',['ici']), '.'])
-                ,new Paragraph([new Hypertext('/forgottenpassword',['Mot de passe oublié ?'])])
+                    new Hypertext('/register',['ici']), '.'],'')
+            ],'')
+
             ]);

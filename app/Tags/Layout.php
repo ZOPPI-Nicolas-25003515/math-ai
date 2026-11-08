@@ -16,9 +16,41 @@ final class Layout extends Component
     public function render(): string
     {
         $title = $this->e($this->title);
-        $nav = $this->renderAll(!$this->isLogged
-                ? [new Hypertext('/', ['MathAI']),new Hypertext('/aiassistant', ['Assistant IA']), new Hypertext('/login', ['Connexion']), new Hypertext('/register', ['Inscription'])]
-                : [new Hypertext('/', ['MathAI']),new Hypertext('/aiassistant', ['Assistant IA']), new Hypertext('/settings', ['Paramètres'])]);
+        $nav = $this->renderAll(!$this->isLogged ?
+                [new Container('div',[
+                    new Container('ul',[
+                        new Container('li',[
+                            new Hypertext('/', ['MathAI'])])], ''),
+                    new Container('ul',[
+                        new Container('li',[
+                            new Hypertext('/aiassistant', ['Assistant IA'])]),
+                        new Container('li',[
+                            new Hypertext('/login', ['Connexion'])]),
+                        new Container('li',[
+                            new Hypertext('/register', ['Inscription'])])
+                    ],'')],'')]
+                /*
+                new Hypertext('/', ['MathAI']),
+                new Hypertext('/aiassistant', ['Assistant IA']),
+                new Hypertext('/login', ['Connexion']),
+                new Hypertext('/register', ['Inscription'])]
+                */
+                :
+                [new Container('div',[
+                    new Container('ul',[
+                        new Container('li',[
+                            new Hypertext('/', ['MathAI'])])]),
+                    new Container('ul',[
+                        new Container('li',[
+                            new Hypertext('/aiassistant', ['Assistant IA'])]),
+                        new Container('li',[
+                            new Hypertext('/settings', ['Paramètres'])])
+                ])],'')]);
+            /*
+                [new Hypertext('/', ['MathAI']),
+                new Hypertext('/aiassistant', ['Assistant IA']),
+                new Hypertext('/settings', ['Paramètres'])]);
+*/
         $footer = $this->renderAll([new Container('footer',
                 [new Container('ul',[
                         new Container('li',[new Hypertext('/',['Accueil'])]),
@@ -48,11 +80,9 @@ final class Layout extends Component
                     {$nav}
                 </nav>
                 </header>
-
-                <main>
-                    {$par}
+                <main >
+                     {$par}
                 </main>
-
                 {$footer}
                 </body>
                 </html>
