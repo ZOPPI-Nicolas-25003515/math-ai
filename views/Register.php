@@ -26,7 +26,7 @@ echo new Layout ('Register',isset($loggedUser),[
                                             new Input('password','confirmation','confirmation','required')
                                     ]
                             ),
-                            new Button('submit','',['S\'inscrire'])
+                            new Container('li',[new Button('submit','class=postButton',['S\'inscrire'])])
                     ]),
 
 

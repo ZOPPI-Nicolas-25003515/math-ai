@@ -7,5 +7,5 @@ new Container('section',[
     new Paragraph(['Vous pouvez nous retrouver toutes les 
         semaines du lundi au vendredi à l\'IUT 
         d\'Aix-en-Provence.'])
-],'class=contact')
+],'')
 ]);

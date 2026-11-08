@@ -14,14 +14,16 @@ echo new Layout ('Réinitialisation do mot de passe',isset($loggedUser),[
                     new Container('ul',[
                             new Container('li',[
                                     new Label('password','password',['Mot de passe']),
-                                new Input('password','password','password','class=textInput required')
+                                new Input('password','password','password','')
                             ]),
                             new Container('li',[
                                     new Label('confirmation','confirmation',['Confirmation du mot de passe']),
-                                    new Input('password','confirmation','confirmation','class=textInput required')
+                                    new Input('password','confirmation','confirmation','')
                             ]),
                         new Input('hidden', 'token','token', 'value=' . $token),
-                        new Button ('submit','',['Valider'])
+                        new Container('li',[
+                            new Button ('submit','class=postButton',['Valider'])
+                        ])
                     ])
             ])
         ])

@@ -38,8 +38,8 @@ echo new Layout ('Mentions',isset($loggedUser),[new Container('section',[
                             new Paragraph(['Le propriétaire de ce site Web se réserve le droit de modifier cette notice sans préavis. L\'utilisateur est donc tenu à consulter régulierement cette notice afin de prendre note des changements.'])
                     ]),
             ])
-    ], 'class=mentions-liens')
+    ], '')
 
-],'class=mentions-legales')]);
+],'')]);
 
 
