@@ -67,10 +67,10 @@ final class Layout extends Component
                 <head>
                     <meta charset="UTF-8">
                     {$links}
-                    <script src="/res/js/mathjax-config.js"></script>
-                    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-                    <script defer src="/res/js/main.js"></script>
-                    <script defer src="/res/js/mathjax.js"></script>
+                    <link rel="stylesheet" href="/res/katex/katex.min.css">
+                    <script defer src="/res/katex/katex.min.js"></script>
+                    <script defer src="/res/katex/contrib/auto-render.min.js"></script>
+                    <script defer src="/res/js/math.js"></script>
                     <title>{$this->e($title)}</title>
 
                 </head>
