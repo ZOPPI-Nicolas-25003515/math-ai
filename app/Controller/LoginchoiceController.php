@@ -1,11 +1,16 @@
 <?php
 namespace App\Controller;
-use Core\View;
+use App\Core\{View,Response};
 final class LoginchoiceController
 {
+    private View $view;
 
-    public function loginchoiceForm(): void {
-        echo View::show('Loginchoice', array('errors' => [], 'formData' => []));
+    public function __construct(View $view){
+        $this->view = $view;
+    }
+
+    public function loginchoiceForm(): Response {
+        return $this->view->render('Loginchoice');
     }
 
 }

@@ -5,7 +5,7 @@ namespace App\View;
 final class Option extends Component
 {
     public function __construct(
-        private readonly string $value,
+        private readonly string $value = '',
         private readonly array $content,
     ) {
     }

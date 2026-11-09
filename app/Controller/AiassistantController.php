@@ -4,7 +4,7 @@ namespace App\Controller;
 use App\Core\{View,Request,Response};
 use App\Service\OpenRouterService;
 
-class AiassistantController
+final class AiassistantController
 {
     private View $view;
     public function __construct(View $view) {

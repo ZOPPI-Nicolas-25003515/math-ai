@@ -13,6 +13,7 @@ final class Aianalysis
     }
     public function aianalysisForm(): Response
     {
-        return $this->view->render('Aianalysis');
+        $_SESSION['subject']=1;
+        return $this->view->render('Analyseia', array('errors' => [], 'formData' => []));
     }
 }

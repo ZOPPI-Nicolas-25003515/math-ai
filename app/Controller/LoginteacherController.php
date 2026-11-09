@@ -14,12 +14,12 @@ final class LoginteacherController
         $password = $request->post('password');
         $user = $this->repository->findByEmail($email);
         if ($user !== null && $user->verifyPassword($password)) {
-            $request->setSession('user', ['id' => $user->id, 'email' => $user->email, 'role' => 'teacher']);
+            $request->setSession('user', ['id' => $user->id, 'email' => $user->mail, 'role' => 'teacher']);
             return Response::redirect('/');
         }
-        return $this->view->render('Login', ['errors' => ['Email ou mot de passe incorrect.'], 'email' => $email]);
+        return $this->view->render('Loginteacher', ['errors' => ['Email ou mot de passe incorrect.'], 'email' => $email]);
     }
     public function loginteacherForm(): Response {
-        return $this->view->render('Login', array('errors' => [], 'formData' => []));
+        return $this->view->render('Loginteacher', array('errors' => [], 'formData' => []));
     }
 }

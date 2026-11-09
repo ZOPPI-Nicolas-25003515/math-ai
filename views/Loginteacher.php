@@ -11,7 +11,7 @@ echo new Layout ('Login',isset($loggedUser),
                 new Paragraph(
                         [new Alert ($errors)]),
             new Container ('span',[
-                    new Form('/login','post',[
+                    new Form('/loginteacher','post',[
                     new Container('ul',[
                             new Container('li',[
                                 new Label('email','email',['E-mail']),

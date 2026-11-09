@@ -2,7 +2,6 @@
 namespace App\Controller;
 use App\Core\{View,Response};
 
-
 final class ClassiaController
 {
     private View $view;

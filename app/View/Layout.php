@@ -10,7 +10,10 @@ final class Layout extends Component
      * */
 
     public function __construct(
-            private readonly string $title, private readonly bool $isLogged, private readonly array $content) {
+            private readonly string $title,
+            private readonly bool $isLogged,
+            private readonly array $content
+    ) {
     }
 
     public function render(): string

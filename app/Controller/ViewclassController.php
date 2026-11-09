@@ -1,13 +1,17 @@
 <?php
 
 namespace App\Controller;
-use Core\View;
+use Hoa\File\Read;
+use App\Core\{View,Response};
 use App\Model\UserRepository;
 class ViewclassController
 {
-    public function __construct(private readonly UserRepository $repository) {}
+    private View $view;
+    public function __construct(private readonly UserRepository $repository,View $view) {
+        $this->view = $view;
+    }
 
-    public function downloadAction(): void
+    public function downloadAction(): Response
     {
         $id = (int) ($_GET['id'] ?? 0);
 
@@ -42,7 +46,7 @@ class ViewclassController
         exit;
     }
 
-    public function viewAction(): void
+    public function viewAction(): Response
     {
         $classId = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
@@ -56,9 +60,7 @@ class ViewclassController
             die("Ce cours n'existe pas.");
         }
 
-        echo View::show('Viewclass', [
-            'class' => $classData
-        ]);
+        return $this->view->render('Viewclass',['class' => $classData]);
     }
 
 }

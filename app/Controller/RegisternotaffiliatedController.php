@@ -24,7 +24,6 @@ final class RegisternotaffiliatedController
             $confirmation = $request->post('confirmation') ?? '';
             $teachername = $_POST['name'] ?? '';
             $surname = $_POST['surname'] ?? '';
-            //$s_name = trim($_POST['name'] ?? ''); Nous ajouterons en effet un nom et prénom plus tard.
 
             $userValidate = new UserValidate($email, $password, $confirmation);
 
@@ -42,10 +41,10 @@ final class RegisternotaffiliatedController
                     $errors[] = 'Un compte existe déjà avec cet email.';
                 } else {
                     $user = $this->repository->createUser($teachername, $surname, $email, $password);
-                    $teacher = $this->repository->createNotAffiliated($user->id, $highschoolid);
+                    $teacher = $this->repository->createNotAffiliated($user->id);
                     $request->setSession('id', $user->id);
-                    $request->setSession('email', $user->email);
-                    $request->setSession('user', ['id' => $user->id, 'email' => $user->email, 'role' => 'not_affiliated']);
+                    $request->setSession('email', $user->mail);
+                    $request->setSession('user', ['id' => $user->id, 'email' => $user->mail, 'role' => 'not_affiliated']);
                     return Response::redirect('/');
                 }
             }
