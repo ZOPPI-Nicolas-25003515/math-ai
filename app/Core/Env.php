@@ -38,7 +38,7 @@ final class Env
      * (renvoie null si aucune variable n'a été trouvée)
      */
 
-    public static function get(string $key, string $default = null): string
+    public static function get(string $key, ?string $default = null)
     {
         $value = $_ENV[$key] ?? getenv($key);
         return $value === false ? $default : $value;
